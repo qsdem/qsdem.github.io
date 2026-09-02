@@ -51,13 +51,10 @@ The site width is defined once, in `assets/css/main.css`:
 }
 ```
 
-`main` is capped at `--page-max` and centred, with `82px` of top padding so text sits clear of the nav
-tabs. The **header is full width and left-aligned**, so the brand and tabs sit in the `--page-pad`
-gutter at any window size; it deliberately does not take `--page-max`. Both use the same gutter.
-
-Because the header is left-aligned and `main` is centred, on a window wider than 1200px the brand
-and the first line of body text do not share a left edge. Give `main` `margin: 0` to anchor it left
-as well if that is wanted.
+Both the header and `main` are **anchored left** on the `--page-pad` gutter, so the brand, the nav
+tabs and the first word of body text share one left edge at every window width. The header spans the
+full viewport; `main` is capped at `--page-max` and carries `82px` of top padding so text sits clear
+of the tabs. Neither is centred: centring `main` would push the text inward and break that edge.
 
 **Every new page must wrap its content in `<main>`** so it inherits this. Do not set a
 `max-width` on `main` in a page's own `<style>` block; change the tokens above instead.

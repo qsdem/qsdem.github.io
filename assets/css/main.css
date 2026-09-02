@@ -50,7 +50,9 @@ header.site {
 main {
   width: 100%;
   max-width: var(--page-max);
-  margin: 0 auto;
+  /* anchored left, not centred, so the first word of the body text starts on the same
+     gutter as the brand and the nav tabs in the header above it */
+  margin: 0;
   /* top padding gives the content room to breathe under the nav tabs; the homepage has no
      <main>, so its full-bleed sweep still butts straight against the header */
   padding: 82px var(--page-pad) 72px;
