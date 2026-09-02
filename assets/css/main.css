@@ -53,7 +53,7 @@ main {
   margin: 0 auto;
   /* top padding gives the content room to breathe under the nav tabs; the homepage has no
      <main>, so its full-bleed sweep still butts straight against the header */
-  padding: 120px var(--page-pad) 72px;
+  padding: 82px var(--page-pad) 72px;
 }
 
 .brand {

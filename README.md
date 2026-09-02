@@ -51,7 +51,7 @@ The site width is defined once, in `assets/css/main.css`:
 }
 ```
 
-`main` is capped at `--page-max` and centred, with `120px` of top padding so text sits well clear of the nav
+`main` is capped at `--page-max` and centred, with `82px` of top padding so text sits clear of the nav
 tabs. The **header is full width and left-aligned**, so the brand and tabs sit in the `--page-pad`
 gutter at any window size; it deliberately does not take `--page-max`. Both use the same gutter.
 
