@@ -21,30 +21,30 @@
   .eq {
     display: block; text-align: center; margin: 22px 0;
     font-family: "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
-    font-size: 19px; line-height: 1.4;
+    font-size: 20px; line-height: 1.4;
   }
   .eq i { font-style: italic; }
   .eq .op { font-style: normal; padding: 0 .12em; }
-  .eq .sum { font-size: 25px; font-style: normal; vertical-align: -0.09em; }
+  .eq .sum { font-size: 26px; font-style: normal; vertical-align: -0.09em; }
   .gk { font-style: normal; }   /* upright Greek: italic alpha renders as a Latin 'a' in these serifs */
 
   /* one grid for both columns, so every row lines up across the two panels */
   .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; align-items: start; }
-  .pair h3 { font-size: 16px; font-weight: 500; margin: 0; }
+  .pair h3 { font-size: 17px; font-weight: 500; margin: 0; }
   canvas {
     display: block; width: 100%; height: auto; aspect-ratio: 445 / 322;
     border: 1px solid var(--rule); border-radius: 8px; background: #fff;
     touch-action: none; cursor: grab;
   }
-  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); margin: 12px 0 8px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14.5px; color: var(--muted); margin: 12px 0 8px; }
   .legend i { display: inline-block; width: 20px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 6px; border-radius: 2px; }
   .legend .f i { border-color: var(--force); } .legend .s i { border-color: var(--step); }
   .legend .e i { border-color: var(--ellipse); }
-  .read { font-size: 14px; font-variant-numeric: tabular-nums; color: var(--muted); line-height: 1.75; }
+  .read { font-size: 15px; font-variant-numeric: tabular-nums; color: var(--muted); line-height: 1.75; }
   .read b { color: var(--ink); font-weight: 500; }
   .mat { display: inline-grid; grid-template-columns: auto auto; gap: 0 14px; padding: 2px 10px;
          border-left: 1.5px solid var(--ink); border-right: 1.5px solid var(--ink); border-radius: 6px; margin: 3px 0; color: var(--ink); }
-  .credit { margin: 34px 0 0; font-size: 14.5px; color: var(--muted); }
+  .credit { margin: 34px 0 0; font-size: 15.5px; color: var(--muted); }
   .credit a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; }
   .credit a:hover { color: var(--force); }
 

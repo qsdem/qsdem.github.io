@@ -26,7 +26,7 @@ body {
   min-height: 100vh;
   color: var(--ink);
   font-family: var(--font);
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -47,7 +47,7 @@ main {
 }
 
 .brand {
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 500;
   letter-spacing: -0.005em;
   color: var(--ink);
@@ -62,7 +62,7 @@ nav.site {
 }
 
 nav.site a {
-  font-size: 15.5px;
+  font-size: 16.5px;
   font-weight: 500;
   color: var(--ink);
   text-decoration: none;
