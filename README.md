@@ -40,34 +40,18 @@ thin band with dead black beneath it, so the frame **repeats down the page** ins
 with `background-repeat: repeat-y` on two crossfading layers rather than cloned `<img>` per tile,
 which keeps it at one decoded bitmap per frame no matter how many tiles are on screen.
 
-## Layout width — keep this consistent
+## Styling
 
-The site width is defined once, in `assets/css/main.css`:
+The site mirrors `braydennoh.github.io/style.css` exactly: the same self-hosted Myriad Pro, the
+same 15px / 1.5 body on a 960px left-aligned column with 30x40 padding, the same `#003399` links,
+the same 13px dot-separated top nav, and the same two-column layout.
 
-```css
-:root {
-  --page-max: 1500px;                    /* content column */
-  --page-pad: clamp(24px, 4.5vw, 64px);  /* left/right gutter */
-}
-```
+**Every page has a left sidebar.** `.columns` is a flex row of a fixed 280px `.sidebar` and a
+flexible `.main`, with a 40px gap. The page heading (`h1`) and the Meade Group credit live in the
+sidebar; the content lives in `.main`. Below 700px the columns stack and the sidebar goes full
+width, as in the reference.
 
-The **header spans the full viewport and is left-anchored** on the `--page-pad` gutter, so the brand
-and tabs sit at the left edge at any window width. `main` is capped at `--page-max`, **centred**, and
-carries `82px` of top padding so text sits clear of the tabs. The two are deliberately not aligned
-with each other.
-
-A thin `--rule` line sits under the header on every page except the homepage. It is a pseudo-element
-rather than a border, so it spans exactly the text column instead of bleeding to the window edges;
-`index.html` switches it off because its full-bleed sweep meets the header directly.
-
-**Every new page must wrap its content in `<main>`** so it inherits this. Do not set a
-`max-width` on `main` in a page's own `<style>` block; change the tokens above instead.
-
-## Fonts
-
-`Myriad Pro` is first in the stack, so it renders for viewers who have it installed locally.
-Everyone else gets `Source Sans 3` from Google Fonts, the closest open humanist sans. Serving
-Myriad Pro itself would need a webfont licence from Adobe.
+Fonts are the three woff2 files in `assets/fonts/`, copied from the reference site.
 
 ## About page
 

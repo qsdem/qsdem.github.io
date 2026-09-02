@@ -1,103 +1,127 @@
-/* qsdem */
+/* qsDEM -- styling mirrors braydennoh.github.io/style.css: the same self-hosted Myriad Pro, the
+   same 15px/1.5 body, the same 960px left-aligned column, the same nav, and the same two-column
+   layout with a fixed-width sidebar present on every page. */
 
-:root {
-  /* Site default is a white page. The HOMEPAGE ONLY overrides these three to go black, in its
-     own <style> block, so the full-bleed render frames meet the page with no visible seam. */
-  --bg: #ffffff;
-  --ink: #1f1f1f;
-  --muted: #444746;
-  --rule: #e6e6e6;
-  --font: "Myriad Pro", Myriad, "Source Sans 3", "Source Sans Pro",
-          "Segoe UI", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
-
-  /* ---------------------------------------------------------------------
-     SITE LAYOUT WIDTH -- single source of truth. Every page must put its
-     content inside <main> so it picks these up. <main> is capped at
-     --page-max and centred; the header is full width and left-aligned, both
-     using --page-pad as their gutter. Change these two values and the whole
-     site follows.
-     --------------------------------------------------------------------- */
-  --page-max: 1500px;
-  --page-pad: clamp(24px, 4.5vw, 64px);
+@font-face {
+  font-family: "Myriad Pro";
+  src: url("../fonts/MyriadPro-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
-* { box-sizing: border-box; }
+@font-face {
+  font-family: "Myriad Pro";
+  src: url("../fonts/MyriadPro-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
-html, body { background: var(--bg); }
+@font-face {
+  font-family: "Myriad Pro";
+  src: url("../fonts/MyriadPro-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  color: var(--ink);
-  font-family: var(--font);
-  font-size: 18px;
+  font-family: "Myriad Pro", Arial, Helvetica, sans-serif;
+  font-size: 15px;
   line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+  color: #222;
+  background: #fff;
+  padding: 30px 40px;
+  max-width: 960px;
 }
 
-/* The header spans the whole viewport and sits in the left gutter, so the brand and the tabs
-   stay at the left edge however wide the window is. It deliberately does NOT take --page-max:
-   only <main> is capped and centred. `width: 100%` also keeps it stretched when the body is a
-   flex column, as it is on the homepage. */
-header.site {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 64px;
-  width: 100%;
-  padding: 26px var(--page-pad);
-}
-
-/* Thin rule between the nav tabs and the page content. Drawn as a pseudo-element rather than a
-   border so it spans exactly the text column (gutter to gutter, capped at --page-max) instead of
-   bleeding to the window edges. The homepage switches it off: its full-bleed sweep meets the
-   header directly. */
-header.site::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: var(--page-pad);
-  right: var(--page-pad);
-  border-bottom: 1px solid var(--rule);
-}
-
-main {
-  width: 100%;
-  max-width: var(--page-max);
-  margin: 0 auto;
-  /* top padding gives the content room to breathe under the nav tabs; the homepage has no
-     <main>, so its full-bleed sweep still butts straight against the header */
-  padding: 82px var(--page-pad) 72px;
-}
-
-.brand {
-  font-size: 21px;
-  font-weight: 500;
-  letter-spacing: -0.005em;
-  color: var(--ink);
+a {
+  color: #003399;
   text-decoration: none;
-  white-space: nowrap;
 }
 
-nav.site {
+a:hover { text-decoration: underline; }
+a:visited { color: #003399; }
+
+/* Top nav */
+nav {
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+nav a { margin-right: 4px; }
+
+nav .sep {
+  margin-right: 4px;
+  color: #999;
+}
+
+nav a[aria-current="page"] { color: #222; }
+
+/* Page heading, which lives in the sidebar */
+h1 {
+  font-size: 26px;
+  font-weight: normal;
+  margin-bottom: 16px;
+}
+
+/* Two columns: fixed sidebar on the left, content on the right */
+.columns {
   display: flex;
-  align-items: center;
-  gap: 34px;
+  gap: 40px;
 }
 
-nav.site a {
-  font-size: 16.5px;
-  font-weight: 500;
-  color: var(--ink);
-  text-decoration: none;
-  white-space: nowrap;
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
-nav.site a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.sidebar p { margin-bottom: 16px; }
 
-nav.site a[aria-current="page"] { color: var(--muted); }
+.sidebar h3 {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
 
-@media (max-width: 600px) {
-  header.site { gap: 22px; flex-wrap: wrap; }
-  nav.site { gap: 22px; }
+.sidebar .contact {
+  font-size: 13px;
+  color: #555;
+  margin-top: 16px;
+}
+
+.sidebar .separator {
+  border: none;
+  border-top: 1px dotted #ccc;
+  margin: 16px 0;
+}
+
+.main { flex: 1; min-width: 0; }
+
+.main p { margin-bottom: 16px; }
+
+.main h3 {
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  body { padding: 20px 20px; }
+
+  .columns {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .sidebar { width: 100%; }
 }

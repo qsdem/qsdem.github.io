@@ -3,127 +3,111 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Apply — qsDEM</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&display=swap">
+<title>Apply &mdash; qsDEM</title>
 <link rel="stylesheet" href="assets/css/main.css">
 <style>
-  /* page-specific only: the layout width comes from main.css */
-  :root { --accent: #d13b2f; --panel: #fcfcfb; --border: #cfcfcf; }   /* --rule from main.css */
-
-  .notice {
-    max-width: 78ch; margin: 0 0 30px; padding: 13px 17px;
-    border-left: 3px solid var(--ink); background: #f6f6f4;
-    border-radius: 0 8px 8px 0; font-size: 15.5px; color: var(--muted);
-  }
-  .notice b { color: var(--ink); font-weight: 600; }
-
-  form { max-width: 62ch; }
-  .field { margin: 0 0 20px; }
-  .field label { display: block; font-size: 15.5px; font-weight: 500; margin: 0 0 6px; }
-  .field .hint { font-weight: 400; color: var(--muted); }
+  /* form controls, sized to the reference's type scale */
+  .field { margin: 0 0 16px; }
+  .field label { display: block; font-size: 14px; font-weight: bold; margin: 0 0 4px; }
+  .field .hint { font-weight: normal; color: #555; }
   input[type=text], input[type=email], textarea {
-    display: block; width: 100%; font: 400 16px/1.5 var(--font); color: var(--ink);
-    background: var(--panel); border: 1px solid var(--border); border-radius: 7px; padding: 9px 11px;
+    display: block; width: 100%; font: 400 15px/1.5 inherit; font-family: inherit; color: #222;
+    background: #fff; border: 1px solid #bbb; padding: 6px 8px;
   }
-  input[type=text]:focus, input[type=email]:focus, textarea:focus {
-    outline: none; border-color: var(--ink);
-  }
-  textarea { resize: vertical; min-height: 118px; }
-
+  input[type=text]:focus, input[type=email]:focus, textarea:focus { outline: none; border-color: #666; }
+  textarea { resize: vertical; min-height: 110px; }
   .terms {
-    border: 1px solid var(--rule); border-radius: 8px; padding: 16px 18px;
-    margin: 30px 0 16px; font-size: 15.5px; color: var(--muted); line-height: 1.6;
-    max-height: 230px; overflow-y: auto; background: var(--panel);
+    border: 1px solid #ddd; padding: 12px 14px; margin: 24px 0 12px;
+    font-size: 14px; color: #444; line-height: 1.6; max-height: 220px; overflow-y: auto;
   }
-  .terms p { margin: 0 0 11px; }
+  .terms p { margin: 0 0 10px; }
   .terms p:last-child { margin-bottom: 0; }
-  .terms ul { margin: 0 0 11px; padding-left: 20px; }
-  .terms li { margin: 0 0 6px; }
-  .terms strong { color: var(--ink); font-weight: 600; }
-
-  .agree { display: flex; gap: 10px; align-items: flex-start; font-size: 15.5px; margin: 0 0 26px; }
-  .agree input { margin: 3px 0 0; accent-color: var(--ink); width: 16px; height: 16px; flex: none; }
-
+  .terms ul { margin: 0 0 10px; padding-left: 18px; list-style: disc; }
+  .terms li { margin: 0 0 4px; }
+  .agree { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; margin: 0 0 20px; }
+  .agree input { margin: 3px 0 0; width: 14px; height: 14px; flex: none; }
   button[type=submit] {
-    font: 500 16px var(--font); color: #fff; background: var(--ink);
-    border: 1px solid var(--ink); border-radius: 999px; padding: 10px 22px; cursor: pointer;
+    font: 400 15px inherit; font-family: inherit; color: #fff; background: #222;
+    border: 1px solid #222; padding: 7px 16px; cursor: pointer;
   }
-  button[type=submit]:hover { filter: brightness(1.25); }
-
-  .result { margin: 18px 0 0; font-size: 15.5px; color: var(--accent); min-height: 1.5em; }
+  button[type=submit]:hover { background: #444; }
+  .result { margin: 14px 0 0; font-size: 14px; color: #a33; min-height: 1.4em; }
 </style>
 </head>
 <body>
 
-<header class="site">
-  <a class="brand" href="index.html">qsDEM</a>
-  <nav class="site">
-      <a href="apply.html" aria-current="page">Apply</a>
-      <a href="wiki.html">Wiki</a>
-      <a href="about.html">About</a>
-  </nav>
-</header>
-
-<main>
-  <p class="notice"><b>This form is a demo.</b> It is not connected to anything yet and nothing you
-    type is sent or stored.</p>
-
-  <form id="applyForm" novalidate>
-    <div class="field">
-      <label for="name">Name</label>
-      <input id="name" name="name" type="text" autocomplete="name">
+<nav>
+  <a href="index.html">Home</a> <span class="sep">&middot;</span>
+  <a href="apply.html" aria-current="page">Apply</a> <span class="sep">&middot;</span>
+  <a href="wiki.html">Wiki</a> <span class="sep">&middot;</span>
+  <a href="about.html">About</a>
+</nav>
+<div class="columns">
+  <div class="sidebar">
+    <h1>Apply</h1>
+    <div class="contact">
+      Developed and maintained by
+      <a href="https://eps.harvard.edu/research-group/meade-group/">Meade Group</a> at Harvard.
     </div>
+  </div>
 
-    <div class="field">
-      <label for="email">Email</label>
-      <input id="email" name="email" type="email" autocomplete="email">
-    </div>
+  <div class="main">
+    <p><b>This form is a demo.</b> It is not connected to anything yet and nothing you
+      type is sent or stored.</p>
+    <form id="applyForm" novalidate>
+        <div class="field">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" autocomplete="name">
+        </div>
 
-    <div class="field">
-      <label for="institution">Institution</label>
-      <input id="institution" name="institution" type="text" autocomplete="organization">
-    </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email">
+        </div>
 
-    <div class="field">
-      <label for="intent">Intent of use</label>
-      <textarea id="intent" name="intent"></textarea>
-    </div>
+        <div class="field">
+          <label for="institution">Institution</label>
+          <input id="institution" name="institution" type="text" autocomplete="organization">
+        </div>
 
-    <div class="field">
-      <label for="github">GitHub username <span class="hint">&mdash; access is granted through a private repository</span></label>
-      <input id="github" name="github" type="text" autocomplete="username">
-    </div>
+        <div class="field">
+          <label for="intent">Intent of use</label>
+          <textarea id="intent" name="intent"></textarea>
+        </div>
 
-    <div class="terms">
-      <p><strong>Terms and conditions of qsDEM use</strong></p>
-      <p>At present, qsDEM is not fully open source. It is distributed on a case-by-case basis to
-        academic users, strictly for non-commercial use.</p>
-      <p>Continued access is conditional on the following:</p>
-      <ul>
-        <li>qsDEM is for non-commercial academic research only.</li>
-        <li>Access is granted to the named applicant. Redistribution of the code, in whole or in
-          part, is not permitted.</li>
-        <li>Publications that use qsDEM should cite it and acknowledge its developers.</li>
-      </ul>
-      <p>Failure to comply with any of these terms will result in access being withdrawn.</p>
-    </div>
+        <div class="field">
+          <label for="github">GitHub username <span class="hint">&mdash; access is granted through a private repository</span></label>
+          <input id="github" name="github" type="text" autocomplete="username">
+        </div>
 
-    <label class="agree">
-      <input id="agree" name="agree" type="checkbox">
-      <span>I agree to the terms and conditions of qsDEM use.</span>
-    </label>
+        <div class="terms">
+          <p><strong>Terms and conditions of qsDEM use</strong></p>
+          <p>At present, qsDEM is not fully open source. It is distributed on a case-by-case basis to
+            academic users, strictly for non-commercial use.</p>
+          <p>Continued access is conditional on the following:</p>
+          <ul>
+            <li>qsDEM is for non-commercial academic research only.</li>
+            <li>Access is granted to the named applicant. Redistribution of the code, in whole or in
+              part, is not permitted.</li>
+            <li>Publications that use qsDEM should cite it and acknowledge its developers.</li>
+          </ul>
+          <p>Failure to comply with any of these terms will result in access being withdrawn.</p>
+        </div>
 
-    <button type="submit">Submit request</button>
-    <p class="result" id="result" role="status" aria-live="polite"></p>
-  </form>
-</main>
+        <label class="agree">
+          <input id="agree" name="agree" type="checkbox">
+          <span>I agree to the terms and conditions of qsDEM use.</span>
+        </label>
 
+        <button type="submit">Submit request</button>
+        <p class="result" id="result" role="status" aria-live="polite"></p>
+      </form>
+  </div>
+</div>
 <script>
 'use strict';
-// Demo only: nothing leaves the page. Wiring this to a real backend means either an external form
-// service or a GitHub issue template, since GitHub Pages serves static files and cannot receive posts.
+// Demo only: nothing leaves the page. Wiring this to a real backend means an external form service
+// or a GitHub issue template, since GitHub Pages serves static files and cannot receive posts.
 document.getElementById('applyForm').addEventListener('submit', function (ev) {
   ev.preventDefault();
   document.getElementById('result').textContent =

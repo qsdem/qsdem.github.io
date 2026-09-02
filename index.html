@@ -4,64 +4,58 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>qsDEM</title>
-<meta name="color-scheme" content="dark">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="assets/css/main.css">
 <style>
-  /* HOMEPAGE ONLY: black page, so the black sky in the render frames meets the page seamlessly.
-     Every other page keeps the white default from main.css. */
-  :root { --bg: #000000; --ink: #f1efeb; --muted: #9aa0a8; }
-
-  /* no separator here: the sweep runs straight into the header */
-  header.site::after { display: none; }
-
-  /* Fill the viewport below the header. The frame is 16:9, so on a wide screen one copy is
-     taller than the space left over and you see a single full frame. On a portrait phone or
-     tablet one copy would occupy a thin band, so the frame REPEATS down the page instead of
-     leaving black: background-repeat handles that with one decode per frame, where cloning
-     ten <img> per tile would multiply the decoded bitmaps. */
-  body { display: flex; flex-direction: column; min-height: 100vh; min-height: 100svh; }
-
+  /* the looping sweep sits in the content column, so it takes the column's width */
   .sweep {
     position: relative;
-    flex: 1 0 auto;
-    min-height: 56.25vw;            /* 16:9 of the viewport width = one whole frame */
-    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 16 / 9;
     background: #000;
+    overflow: hidden;
   }
   .sweep .layer {
     position: absolute;
     inset: 0;
-    background-repeat: repeat-y;    /* the tiling that removes the black space when tall */
-    background-size: 100% auto;
-    background-position: top center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
     opacity: 0;
     transition: opacity 260ms linear;
     will-change: opacity;
   }
+  .caption { font-size: 13px; color: #555; margin-top: 8px; }
 </style>
 </head>
 <body>
 
-<header class="site">
-  <a class="brand" href="index.html">qsDEM</a>
-  <nav class="site">
-      <a href="apply.html">Apply</a>
-      <a href="wiki.html">Wiki</a>
-      <a href="about.html">About</a>
-  </nav>
-</header>
+<nav>
+  <a href="index.html" aria-current="page">Home</a> <span class="sep">&middot;</span>
+  <a href="apply.html">Apply</a> <span class="sep">&middot;</span>
+  <a href="wiki.html">Wiki</a> <span class="sep">&middot;</span>
+  <a href="about.html">About</a>
+</nav>
+<div class="columns">
+  <div class="sidebar">
+    <h1>qsDEM</h1>
+    <p>A quasi-static discrete element model for slow geological deformation.</p>
+    <div class="contact">
+      Developed and maintained by
+      <a href="https://eps.harvard.edu/research-group/meade-group/">Meade Group</a> at Harvard.
+    </div>
+  </div>
 
-<div class="sweep" id="sweep">
-  <div class="layer" id="la"></div>
-  <div class="layer" id="lb"></div>
+  <div class="main">
+    <div class="sweep" id="sweep">
+      <div class="layer" id="la"></div>
+      <div class="layer" id="lb"></div>
+    </div>
+  </div>
 </div>
 
 <script>
 'use strict';
-// Ten frames evenly spaced across run c8, swept in place as one continuous loop.
+// Ten frames evenly spaced across the sediment run, swept in place as one continuous loop.
 // Two layers alternate: the incoming frame fades in ON TOP of the outgoing one, which stays
 // opaque underneath. Fading both at once would let the black show through and dip the whole
 // image dark at every step.
@@ -93,8 +87,8 @@
   var HOLD = 620;    // ms each frame is held
   var FADE = 260;    // ms of fade, must match the CSS transition
 
-  // one decode per frame, so pick the variant by device pixels rather than cloning elements
-  var wanted = window.innerWidth * (window.devicePixelRatio || 1);
+  var el = document.getElementById('sweep');
+  var wanted = el.getBoundingClientRect().width * (window.devicePixelRatio || 1);
   var FRAMES = wanted > 1920 ? BIG : SMALL;
 
   var layers = [document.getElementById('la'), document.getElementById('lb')];

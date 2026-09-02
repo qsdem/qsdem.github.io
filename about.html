@@ -3,142 +3,128 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>About — qsDEM</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&display=swap">
+<title>About &mdash; qsDEM</title>
 <link rel="stylesheet" href="assets/css/main.css">
 <style>
-  :root {
-    /* light page: --rule and the text colours come from main.css */
-    --panel: #ffffff;          /* canvas ground */
-    --wall-fill: #eef0f2;      /* the region the grain is excluded from */
-    --wall: #3a3d42;           /* wall line */
-    --grain: #2f6fdd;
-    --force: #d13b2f;
-    --step: #123f8f;
-    --ellipse: #5c6470;
-    --trail: rgba(47,111,221,0.35);
-    --ghost: rgba(47,111,221,0.65);
-  }
-
-  .intro { margin: 0 0 34px; }
-  .intro p { margin: 0 0 15px; }
-  .intro a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; }
-  .intro a:hover { color: var(--force); }
+  /* explorable only; type and colour come from main.css */
   .eq {
-    display: block; text-align: center; margin: 22px 0;
+    display: block; text-align: center; margin: 18px 0;
     font-family: "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
-    font-size: 18px; line-height: 1.4;
+    font-size: 15px; line-height: 1.4;
   }
   .eq i { font-style: italic; }
   .eq .op { font-style: normal; padding: 0 .12em; }
   .eq .sum { font-size: 1.3em; font-style: normal; vertical-align: -0.09em; }
   .gk { font-style: normal; }   /* upright Greek: italic alpha renders as a Latin 'a' in these serifs */
 
-  /* one grid for both columns, so every row lines up across the two panels */
-  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; align-items: start; }
-  .pair h3 { font-size: 18px; font-weight: 500; margin: 0; }
+  :root {
+    --panel: #ffffff; --wall-fill: #eef0f2; --wall: #3a3d42;
+    --grain: #2f6fdd; --force: #d13b2f; --step: #123f8f; --ellipse: #5c6470;
+    --trail: rgba(47,111,221,0.35); --ghost: rgba(47,111,221,0.65);
+    --ink: #222; --muted: #555;
+  }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; align-items: start; margin-top: 20px; }
+  .pair h3 { font-size: 14px; font-weight: bold; margin: 0; }
   canvas {
     display: block; width: 100%; height: auto; aspect-ratio: 445 / 322;
-    border: 1px solid var(--rule); border-radius: 8px; background: var(--panel);
-    touch-action: none; cursor: grab;
+    border: 1px solid #ddd; background: var(--panel); touch-action: none; cursor: grab;
   }
-  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14.5px; color: var(--muted); margin: 12px 0 8px; }
-  .legend i { display: inline-block; width: 20px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 6px; border-radius: 2px; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: #555; margin: 8px 0 6px; }
+  .legend i { display: inline-block; width: 16px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 5px; }
   .legend .f i { border-color: var(--force); } .legend .s i { border-color: var(--step); }
   .legend .e i { border-color: var(--ellipse); }
-  .read { font-size: 15px; font-variant-numeric: tabular-nums; color: var(--muted); line-height: 1.75; }
-  .read b { color: var(--ink); font-weight: 500; }
-  .mat { display: inline-grid; grid-template-columns: auto auto; gap: 0 14px; padding: 2px 10px;
-         border-left: 1.5px solid var(--ink); border-right: 1.5px solid var(--ink); border-radius: 6px; margin: 3px 0; color: var(--ink); }
-  .credit { margin: 34px 0 0; font-size: 15.5px; color: var(--muted); }
-  .credit a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; }
-  .credit a:hover { color: var(--force); }
+  .read { font-size: 12.5px; font-variant-numeric: tabular-nums; color: #555; line-height: 1.7; }
+  .read b { color: #222; font-weight: bold; }
+  .mat { display: inline-grid; grid-template-columns: auto auto; gap: 0 10px; padding: 1px 8px;
+         border-left: 1px solid #222; border-right: 1px solid #222; margin: 2px 0; color: #222; }
 
-  @media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
+  @media (max-width: 700px) { .pair { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
-<header class="site">
-  <a class="brand" href="index.html">qsDEM</a>
-  <nav class="site">
-      <a href="apply.html">Apply</a>
-      <a href="wiki.html">Wiki</a>
-      <a href="about.html" aria-current="page">About</a>
-  </nav>
-</header>
-
-<main>
-  <section class="intro">
-    <p>qsDEM is a
-      <!-- Kishino, Y. (1988) "Disc Model Analysis of Granular Media", in Satake & Jenkins (eds),
-           Micromechanics of Granular Materials, Studies in Applied Mechanics 20, Elsevier, 143-152.
-           DOI link used because the direct sciencedirect.com path is bot-blocked for some visitors. -->
-      <a href="https://doi.org/10.1016/B978-0-444-70523-5.50024-2">Kishino (1988)</a>
-      inspired non-inertial discrete element model for simulating slow geological and environmental
-      processes. This approach is designed for systems with inertial numbers less than 10<sup>&minus;2</sup>
-      and satisfies force balance without fictitious forces or accelerations.</p>
-
-    <p>In commonly used
-      <a href="https://www.emerald.com/jgeot/article-abstract/29/1/47/399512/A-discrete-numerical-model-for-granular-assemblies?redirectedFrom=fulltext">dynamic DEM</a>,
-      the grain's position is updated by Newton's second law of motion. In other words, the grain only
-      knows which way the force is pushing it, which is perfect for modeling fast, high-inertial events
-      like avalanches, but not so much for slow, low-inertial systems like tectonic deformation.</p>
-
-    <p>Kishino's quasi-static DEM (qsDEM) solves low-inertial systems by removing mass and time entirely.
-      qsDEM replaces the time-integration of Newton's law with a geometric matrix inversion. When a grain
-      experiences an unbalanced net force, qsDEM calculates the forward step (&Delta;<i>X</i>)
-      required to deform the surrounding constraints to cancel out the unbalanced force. It solves this by
-      using the contact stiffness matrix (<i>S</i>), and the optimal step forward is calculated by
-      multiplying the net force by the inverse of this matrix,</p>
-
-    <span class="eq">&Delta;<i>X</i> <span class="op">=</span> <span class="gk">&alpha;</span>&thinsp;<i>S</i><sup>&minus;1</sup>&thinsp;<i>F</i><sub>net</sub></span>
-
-    <p><span class="gk">&alpha;</span> is a relaxation factor, which is a numerical stability term to prevent overshooting
-      the target.</p>
-
-    <p>What exactly is the contact stiffness matrix (<i>S</i>)? This is the summation of stiffness
-      contributions from every constraint it is currently touching.</p>
-
-    <span class="eq"><i>S</i> <span class="op">=</span> <span class="sum">&Sigma;</span><sub><i>c</i></sub>&thinsp;<i>T<sub>c</sub></i>&thinsp;<i>S<sub>c</sub></i>&thinsp;<i>T<sub>c</sub></i><sup>T</sup></span>
-
-    <p>Intuitively, before the grain moves, the stiffness matrix (<i>S</i>) acts as a map of its local
-      confines, and by multiplying the force by the inverse of the stiffness, the forward step's movement
-      vector &Delta;<i>X</i> is rotated away from the stiffest boundaries, automatically steering the grain
-      down the optimal path of least resistance.</p>
-
-    <p>To see what this looks like, below is a simple demonstration comparing standard dynamic DEM with
-      qsDEM. The blue ball can be dragged anywhere in the boundary, which gravity will act on. Notice how
-      standard DEM causes the net force to drive the grain directly, which requires damping to settle. In
-      qsDEM, the grain does not bounce, as non-inertial systems carry no momentum.</p>
-  </section>
-
-  <div class="pair">
-    <h3>DEM</h3>
-    <h3>qsDEM</h3>
-
-    <canvas id="cdem" width="445" height="322"></canvas>
-    <canvas id="cqs" width="445" height="322"></canvas>
-
-    <div>
-      <div class="legend"><span class="f"><i></i>direction of the net force</span></div>
-      <div class="read" id="readdem"></div>
-    </div>
-    <div>
-      <div class="legend">
-        <span class="f"><i></i>direction of the net force</span>
-        <span class="e"><i></i>stiffness S</span>
-        <span class="s"><i></i>step &Delta;X</span>
-      </div>
-      <div class="read" id="readqs"></div>
+<nav>
+  <a href="index.html">Home</a> <span class="sep">&middot;</span>
+  <a href="apply.html">Apply</a> <span class="sep">&middot;</span>
+  <a href="wiki.html">Wiki</a> <span class="sep">&middot;</span>
+  <a href="about.html" aria-current="page">About</a>
+</nav>
+<div class="columns">
+  <div class="sidebar">
+    <h1>About</h1>
+    <div class="contact">
+      Developed and maintained by
+      <a href="https://eps.harvard.edu/research-group/meade-group/">Meade Group</a> at Harvard.
     </div>
   </div>
 
-  <p class="credit">The code is developed and maintained by
-    <a href="https://eps.harvard.edu/research-group/meade-group/">Meade Group</a> at Harvard.</p>
-</main>
+  <div class="main">
+      <p>qsDEM is a
+        <!-- Kishino, Y. (1988) "Disc Model Analysis of Granular Media", in Satake & Jenkins (eds),
+             Micromechanics of Granular Materials, Studies in Applied Mechanics 20, Elsevier, 143-152.
+             DOI link used because the direct sciencedirect.com path is bot-blocked for some visitors. -->
+        <a href="https://doi.org/10.1016/B978-0-444-70523-5.50024-2">Kishino (1988)</a>
+        inspired non-inertial discrete element model for simulating slow geological and environmental
+        processes. This approach is designed for systems with inertial numbers less than 10<sup>&minus;2</sup>
+        and satisfies force balance without fictitious forces or accelerations.</p>
+
+      <p>In commonly used
+        <a href="https://www.emerald.com/jgeot/article-abstract/29/1/47/399512/A-discrete-numerical-model-for-granular-assemblies?redirectedFrom=fulltext">dynamic DEM</a>,
+        the grain's position is updated by Newton's second law of motion. In other words, the grain only
+        knows which way the force is pushing it, which is perfect for modeling fast, high-inertial events
+        like avalanches, but not so much for slow, low-inertial systems like tectonic deformation.</p>
+
+      <p>Kishino's quasi-static DEM (qsDEM) solves low-inertial systems by removing mass and time entirely.
+        qsDEM replaces the time-integration of Newton's law with a geometric matrix inversion. When a grain
+        experiences an unbalanced net force, qsDEM calculates the forward step (&Delta;<i>X</i>)
+        required to deform the surrounding constraints to cancel out the unbalanced force. It solves this by
+        using the contact stiffness matrix (<i>S</i>), and the optimal step forward is calculated by
+        multiplying the net force by the inverse of this matrix,</p>
+
+      <span class="eq">&Delta;<i>X</i> <span class="op">=</span> <span class="gk">&alpha;</span>&thinsp;<i>S</i><sup>&minus;1</sup>&thinsp;<i>F</i><sub>net</sub></span>
+
+      <p><span class="gk">&alpha;</span> is a relaxation factor, which is a numerical stability term to prevent overshooting
+        the target.</p>
+
+      <p>What exactly is the contact stiffness matrix (<i>S</i>)? This is the summation of stiffness
+        contributions from every constraint it is currently touching.</p>
+
+      <span class="eq"><i>S</i> <span class="op">=</span> <span class="sum">&Sigma;</span><sub><i>c</i></sub>&thinsp;<i>T<sub>c</sub></i>&thinsp;<i>S<sub>c</sub></i>&thinsp;<i>T<sub>c</sub></i><sup>T</sup></span>
+
+      <p>Intuitively, before the grain moves, the stiffness matrix (<i>S</i>) acts as a map of its local
+        confines, and by multiplying the force by the inverse of the stiffness, the forward step's movement
+        vector &Delta;<i>X</i> is rotated away from the stiffest boundaries, automatically steering the grain
+        down the optimal path of least resistance.</p>
+
+      <p>To see what this looks like, below is a simple demonstration comparing standard dynamic DEM with
+        qsDEM. The blue ball can be dragged anywhere in the boundary, which gravity will act on. Notice how
+        standard DEM causes the net force to drive the grain directly, which requires damping to settle. In
+        qsDEM, the grain does not bounce, as non-inertial systems carry no momentum.</p>
+  
+
+  <div class="pair">
+      <h3>DEM</h3>
+      <h3>qsDEM</h3>
+
+      <canvas id="cdem" width="445" height="322"></canvas>
+      <canvas id="cqs" width="445" height="322"></canvas>
+
+      <div>
+        <div class="legend"><span class="f"><i></i>direction of the net force</span></div>
+        <div class="read" id="readdem"></div>
+      </div>
+      <div>
+        <div class="legend">
+          <span class="f"><i></i>direction of the net force</span>
+          <span class="e"><i></i>stiffness S</span>
+          <span class="s"><i></i>step &Delta;X</span>
+        </div>
+        <div class="read" id="readqs"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 'use strict';
