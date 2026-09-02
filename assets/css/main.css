@@ -25,7 +25,15 @@ header.site {
   display: flex;
   align-items: center;
   gap: 64px;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 26px clamp(24px, 4.5vw, 64px);
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(24px, 4.5vw, 64px) 56px;
 }
 
 .brand {

@@ -3,16 +3,58 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>About — qsdem</title>
+<title>About — qsDEM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="assets/css/main.css">
+<style>
+  :root {
+    --rule: #e6e6e6;
+    --grain: #2f6fdd; --wall: #3a3d42; --force: #d13b2f; --step: #123f8f; --ellipse: #5c6470;
+  }
+
+  .intro { margin: 0 0 34px; }
+  .intro p { margin: 0 0 15px; }
+  .intro a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; }
+  .intro a:hover { color: var(--force); }
+  .eq {
+    display: block; text-align: center; margin: 22px 0;
+    font-family: "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
+    font-size: 19px; line-height: 1.4;
+  }
+  .eq i { font-style: italic; }
+  .eq .op { font-style: normal; padding: 0 .12em; }
+  .eq .sum { font-size: 25px; font-style: normal; vertical-align: -0.09em; }
+  .gk { font-style: normal; }   /* upright Greek: italic alpha renders as a Latin 'a' in these serifs */
+
+  /* one grid for both columns, so every row lines up across the two panels */
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; align-items: start; }
+  .pair h3 { font-size: 16px; font-weight: 500; margin: 0; }
+  canvas {
+    display: block; width: 100%; height: auto; aspect-ratio: 445 / 322;
+    border: 1px solid var(--rule); border-radius: 8px; background: #fff;
+    touch-action: none; cursor: grab;
+  }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); margin: 12px 0 8px; }
+  .legend i { display: inline-block; width: 20px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 6px; border-radius: 2px; }
+  .legend .f i { border-color: var(--force); } .legend .s i { border-color: var(--step); }
+  .legend .e i { border-color: var(--ellipse); }
+  .read { font-size: 14px; font-variant-numeric: tabular-nums; color: var(--muted); line-height: 1.75; }
+  .read b { color: var(--ink); font-weight: 500; }
+  .mat { display: inline-grid; grid-template-columns: auto auto; gap: 0 14px; padding: 2px 10px;
+         border-left: 1.5px solid var(--ink); border-right: 1.5px solid var(--ink); border-radius: 6px; margin: 3px 0; color: var(--ink); }
+  .credit { margin: 34px 0 0; font-size: 14.5px; color: var(--muted); }
+  .credit a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; }
+  .credit a:hover { color: var(--force); }
+
+  @media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
+</style>
 </head>
 <body>
 
 <header class="site">
-  <a class="brand" href="index.html">qsdem</a>
+  <a class="brand" href="index.html">qsDEM</a>
   <nav class="site">
       <a href="apply.html">Apply</a>
       <a href="wiki.html">Wiki</a>
@@ -20,5 +62,390 @@
   </nav>
 </header>
 
+<main>
+  <section class="intro">
+    <p>qsDEM is a
+      <!-- Kishino, Y. (1988) "Disc Model Analysis of Granular Media", in Satake & Jenkins (eds),
+           Micromechanics of Granular Materials, Studies in Applied Mechanics 20, Elsevier, 143-152.
+           DOI link used because the direct sciencedirect.com path is bot-blocked for some visitors. -->
+      <a href="https://doi.org/10.1016/B978-0-444-70523-5.50024-2">Kishino (1988)</a>
+      inspired non-inertial discrete element model for simulating slow geological and environmental
+      processes. This approach is designed for systems with inertial numbers less than 10<sup>&minus;2</sup>
+      and satisfies force balance without fictitious forces or accelerations.</p>
+
+    <p>In commonly used
+      <a href="https://www.emerald.com/jgeot/article-abstract/29/1/47/399512/A-discrete-numerical-model-for-granular-assemblies?redirectedFrom=fulltext">dynamic DEM</a>,
+      the grain's position is updated by Newton's second law of motion. In other words, the grain only
+      knows which way the force is pushing it, which is perfect for modeling fast, high-inertial events
+      like avalanches, but not so much for slow, low-inertial systems like tectonic deformation.</p>
+
+    <p>Kishino's quasi-static DEM (qsDEM) solves low-inertial systems by removing mass and time entirely.
+      qsDEM replaces the time-integration of Newton's law with a geometric matrix inversion. When a grain
+      experiences an unbalanced net force, qsDEM calculates the forward step (&Delta;<i>X</i>)
+      required to deform the surrounding constraints to cancel out the unbalanced force. It solves this by
+      using the contact stiffness matrix (<i>S</i>), and the optimal step forward is calculated by
+      multiplying the net force by the inverse of this matrix,</p>
+
+    <span class="eq">&Delta;<i>X</i> <span class="op">=</span> <span class="gk">&alpha;</span>&thinsp;<i>S</i><sup>&minus;1</sup>&thinsp;<i>F</i><sub>net</sub></span>
+
+    <p><span class="gk">&alpha;</span> is a relaxation factor, which is a numerical stability term to prevent overshooting
+      the target.</p>
+
+    <p>What exactly is the contact stiffness matrix (<i>S</i>)? This is the summation of stiffness
+      contributions from every constraint it is currently touching.</p>
+
+    <span class="eq"><i>S</i> <span class="op">=</span> <span class="sum">&Sigma;</span><sub><i>c</i></sub>&thinsp;<i>T<sub>c</sub></i>&thinsp;<i>S<sub>c</sub></i>&thinsp;<i>T<sub>c</sub></i><sup>T</sup></span>
+
+    <p>Intuitively, before the grain moves, the stiffness matrix (<i>S</i>) acts as a map of its local
+      confines, and by multiplying the force by the inverse of the stiffness, the forward step's movement
+      vector &Delta;<i>X</i> is rotated away from the stiffest boundaries, automatically steering the grain
+      down the optimal path of least resistance.</p>
+
+    <p>To see what this looks like, below is a simple demonstration comparing standard dynamic DEM with
+      qsDEM. The blue ball can be dragged anywhere in the boundary, which gravity will act on. Notice how
+      standard DEM causes the net force to drive the grain directly, which requires damping to settle. In
+      qsDEM, the grain does not bounce, as non-inertial systems carry no momentum.</p>
+  </section>
+
+  <div class="pair">
+    <h3>DEM</h3>
+    <h3>qsDEM</h3>
+
+    <canvas id="cdem" width="445" height="322"></canvas>
+    <canvas id="cqs" width="445" height="322"></canvas>
+
+    <div>
+      <div class="legend"><span class="f"><i></i>direction of the net force</span></div>
+      <div class="read" id="readdem"></div>
+    </div>
+    <div>
+      <div class="legend">
+        <span class="f"><i></i>direction of the net force</span>
+        <span class="e"><i></i>stiffness S</span>
+        <span class="s"><i></i>step &Delta;X</span>
+      </div>
+      <div class="read" id="readqs"></div>
+    </div>
+  </div>
+
+  <p class="credit">The code is developed and maintained by
+    <a href="https://eps.harvard.edu/research-group/meade-group/">Meade Group</a> at Harvard.</p>
+</main>
+
+<script>
+'use strict';
+// ------------------------------------------------------------------ model
+const W = 445, H = 322;   // height cut to 75%; width unchanged
+const R = 22;              // grain radius (px)
+const K = 2000;            // contact stiffness (force per px of overlap)
+const M = 1;               // mass
+const G = 2400;            // gravity (px/s^2) -> equilibrium overlap M*G/K = 1.2 px
+const REG = K / 20;        // qsDEM diagonal regularisation (production: reg_t = kn/20)
+const CAP = 0.4 * R;       // qsDEM step cap (production: 0.2 R)
+const DMAX = 15;           // deepest overlap a drag may create
+const DT = 1 / 120;        // DEM time step: 19% of the 2/sqrt(K/M) = 0.045 s stability limit
+const TOL = 0.01;          // force gate |F| / mg
+const DAMP = 4.0;          // DEM artificial damping, fixed
+const ALPHA = 0.75;        // qsDEM modification factor, fixed
+const RATE_DEM = 100;      // DEM time steps per second of wall clock
+const RATE_QS = 50;        // qsDEM iterations per second of wall clock
+const APEX = {x: 157, y: 277};   // left margin 45 px = bottom margin 45 px
+const ANG_L = 68 * Math.PI / 180;   // steep left wall
+const ANG_R = 22 * Math.PI / 180;   // shallow right wall
+
+const tL = {x: -Math.cos(ANG_L), y: -Math.sin(ANG_L)};
+const tR = {x:  Math.cos(ANG_R), y: -Math.sin(ANG_R)};
+const OBS = [
+  {p: APEX, t: tL, n: {x: -tL.y, y: tL.x}},                                  // left wall, n into the wedge
+  {p: APEX, t: tR, n: {x:  tR.y, y: -tR.x}},                                 // right wall
+  {p: {x: W, y: 0}, t: {x: 0, y: 1}, n: {x: -1, y: 0}, hidden: true}          // keeps the grain on screen
+];
+
+function contacts(c) {
+  const out = [];
+  for (const ob of OBS) {
+    const d = R - ((c.x - ob.p.x) * ob.n.x + (c.y - ob.p.y) * ob.n.y);
+    if (d > 0) out.push({n: ob.n, d});
+  }
+  return out;
+}
+function netForce(cs) {
+  let fx = 0, fy = M * G;                              // canvas y points down, so gravity is +y
+  for (const c of cs) { fx += K * c.d * c.n.x; fy += K * c.d * c.n.y; }
+  return {x: fx, y: fy};
+}
+function stiffness(cs) {                               // Kishino eq. 11 plus the production regularisation
+  let sxx = REG, sxy = 0, syy = REG;
+  for (const c of cs) { sxx += K * c.n.x * c.n.x; sxy += K * c.n.x * c.n.y; syy += K * c.n.y * c.n.y; }
+  return {sxx, sxy, syy};
+}
+function qsSolve(pos) {                                // Kishino eq. 12
+  const cs = contacts(pos), F = netForce(cs), S = stiffness(cs);
+  const det = S.sxx * S.syy - S.sxy * S.sxy;           // > 0 always, thanks to REG
+  let dx = ALPHA * ( S.syy * F.x - S.sxy * F.y) / det;
+  let dy = ALPHA * (-S.sxy * F.x + S.sxx * F.y) / det;
+  const l = Math.hypot(dx, dy);
+  if (l > CAP) { dx *= CAP / l; dy *= CAP / l; }
+  return {cs, F, S, det, dx, dy, fr: Math.hypot(F.x, F.y) / (M * G)};
+}
+function demSolve(st) {
+  const cs = contacts(st), F = netForce(cs);
+  return {cs, F, fr: Math.hypot(F.x, F.y) / (M * G)};
+}
+function clampOverlap(c) {                             // no deeper than DMAX into any wall
+  for (let it = 0; it < 3; it++) {
+    for (const k of contacts(c)) if (k.d > DMAX) { c.x += (k.d - DMAX) * k.n.x; c.y += (k.d - DMAX) * k.n.y; }
+  }
+  return c;
+}
+const DROP = {x: APEX.x + 60, y: 100};
+function angleFX(q) {
+  const lf = Math.hypot(q.F.x, q.F.y), lx = Math.hypot(q.dx, q.dy);
+  if (lf < 1e-9 || lx < 1e-12) return 0;
+  return Math.acos(Math.max(-1, Math.min(1, (q.F.x * q.dx + q.F.y * q.dy) / (lf * lx)))) * 180 / Math.PI;
+}
+function eig2(S) {
+  const tr = S.sxx + S.syy, d = Math.sqrt(Math.max(0, (S.sxx - S.syy) ** 2 + 4 * S.sxy * S.sxy));
+  return {l1: (tr + d) / 2, l2: (tr - d) / 2, th: 0.5 * Math.atan2(2 * S.sxy, S.sxx - S.syy)};
+}
+
+// ------------------------------------------------------------------ drawing
+// Both arrows are fixed-length direction indicators drawn from the grain's edge: |F| spans two orders of
+// magnitude across these states and a true-to-scale step is shorter than the grain's own radius, so the
+// numbers stay in the readout and the dashed circle shows where the step lands.
+const FLEN = 46, XLEN = 40;
+// The stiffness ellipse is normalised to a fixed major axis, so its shape (stiff across the contact
+// normal, soft along the wall) stays legible outside the grain whatever the absolute stiffness is.
+const ELL_MAJOR = 46, ELL_MIN_RATIO = 0.08;
+
+function css(n) { return getComputedStyle(document.body).getPropertyValue(n).trim(); }
+function fmt(v, d = 2) { return (Math.abs(v) < 1e-12 ? 0 : v).toFixed(d); }
+function lerp(a, b, t) { return {x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t}; }
+
+function setupCanvas(cv) {
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
+// the shaft stops at the base of the head, so nothing pokes through the tip
+function arrow(ctx, x0, y0, x1, y1, color, w) {
+  const dx = x1 - x0, dy = y1 - y0, l = Math.hypot(dx, dy);
+  if (l < 1.2) return;
+  const ux = dx / l, uy = dy / l;
+  const head = Math.min(4.5 + 2.1 * w, l * 0.85);
+  const bx = x1 - ux * head, by = y1 - uy * head, hw = head * 0.5;
+  ctx.save();
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = w; ctx.lineCap = 'butt';
+  if (l > head + 0.5) { ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(bx, by); ctx.stroke(); }
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(bx - uy * hw, by + ux * hw);
+  ctx.lineTo(bx + uy * hw, by - ux * hw);
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+// drawn from the centre outward; the grain is painted afterwards and hides the shaft inside it,
+// so the arrow reads as leaving the circle's edge with no gap
+function dirArrow(ctx, c, vx, vy, color, len, w) {
+  const l = Math.hypot(vx, vy);
+  if (l < 1e-12) return;
+  const ux = vx / l, uy = vy / l;
+  arrow(ctx, c.x, c.y, c.x + ux * (R + len), c.y + uy * (R + len), color, w);
+}
+
+function drawWorld(ctx) {
+  ctx.clearRect(0, 0, W, H);
+  ctx.save();
+  const far = 1400;
+  ctx.fillStyle = '#eef0f2';
+  for (const ob of OBS) {
+    if (ob.hidden) continue;
+    const a = {x: ob.p.x - ob.t.x * far, y: ob.p.y - ob.t.y * far};
+    const b = {x: ob.p.x + ob.t.x * far, y: ob.p.y + ob.t.y * far};
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+    ctx.lineTo(b.x - ob.n.x * far, b.y - ob.n.y * far); ctx.lineTo(a.x - ob.n.x * far, a.y - ob.n.y * far);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.strokeStyle = css('--wall'); ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round'; ctx.lineCap = 'butt';
+  ctx.beginPath();
+  ctx.moveTo(APEX.x + tL.x * far, APEX.y + tL.y * far);
+  ctx.lineTo(APEX.x, APEX.y);
+  ctx.lineTo(APEX.x + tR.x * far, APEX.y + tR.y * far);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawPath(ctx, pts, color) {
+  if (pts.length < 2) return;
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = 1.3;
+  ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+  for (const p of pts) ctx.lineTo(p.x, p.y);
+  ctx.stroke(); ctx.restore();
+}
+
+function drawGrain(ctx, c, cs) {
+  ctx.save();
+  ctx.beginPath(); ctx.arc(c.x, c.y, R, 0, 6.2832);
+  ctx.fillStyle = css('--grain'); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  for (const k of cs) {
+    ctx.beginPath();
+    ctx.arc(c.x - k.n.x * (R - k.d / 2), c.y - k.n.y * (R - k.d / 2), Math.min(4, 1.5 + k.d / 3), 0, 6.2832);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawEllipse(ctx, c, S) {
+  const e = eig2(S);
+  const ratio = e.l1 > 0 ? Math.max(e.l2 / e.l1, ELL_MIN_RATIO) : 1;
+  ctx.save();
+  ctx.strokeStyle = css('--ellipse'); ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.ellipse(c.x, c.y, ELL_MAJOR, ELL_MAJOR * ratio, e.th, 0, 6.2832);
+  ctx.stroke(); ctx.restore();
+}
+
+function ghost(ctx, c, color) {
+  ctx.save();
+  ctx.setLineDash([3, 3]); ctx.strokeStyle = color; ctx.lineWidth = 1.3;
+  ctx.beginPath(); ctx.arc(c.x, c.y, R, 0, 6.2832); ctx.stroke(); ctx.restore();
+}
+
+// ------------------------------------------------------------------ state
+const cdem = document.getElementById('cdem'), ctxD = setupCanvas(cdem);
+const cqs  = document.getElementById('cqs'),  ctxQ = setupCanvas(cqs);
+const readD = document.getElementById('readdem'), readQ = document.getElementById('readqs');
+
+let dem, demPrev, demSteps, demSettled, demRes, demTrail;
+let qs, qsPrev, qsIters, qsConv, qsRes, qsPath;
+let accD = 0, accQ = 0, last = performance.now(), dragging = false;
+
+function reset(p) {
+  dem = {x: p.x, y: p.y, vx: 0, vy: 0}; demPrev = {x: p.x, y: p.y};
+  demSteps = 0; demSettled = null; demRes = demSolve(dem); demTrail = [{x: p.x, y: p.y}];
+  qs = {x: p.x, y: p.y}; qsPrev = {x: p.x, y: p.y};
+  qsIters = 0; qsConv = null; qsRes = qsSolve(qs); qsPath = [{x: p.x, y: p.y}];
+  accD = 0; accQ = 0;
+}
+reset(DROP);
+
+function stepDem() {                                   // one explicit DEM time step
+  if (demSettled === null) {
+    demPrev = {x: dem.x, y: dem.y};
+    demRes = demSolve(dem);
+    dem.vx += (demRes.F.x / M - DAMP * dem.vx) * DT;
+    dem.vy += (demRes.F.y / M - DAMP * dem.vy) * DT;
+    dem.x += dem.vx * DT; dem.y += dem.vy * DT;
+    demSteps++;
+    if (demSteps % 2 === 0) { demTrail.push({x: dem.x, y: dem.y}); if (demTrail.length > 600) demTrail.shift(); }
+    const ke = 0.5 * M * (dem.vx * dem.vx + dem.vy * dem.vy);
+    const after = demSolve(dem);
+    if (after.fr < TOL && ke < 0.5 && after.cs.length >= 2) demSettled = demSteps;
+  } else { demPrev = {x: dem.x, y: dem.y}; }
+}
+
+function stepQs() {                                    // one qsDEM force-balance iteration
+  if (qsConv === null) {
+    qsRes = qsSolve(qs);
+    if (qsRes.fr < TOL && qsRes.cs.length >= 2) { qsConv = qsIters; qsPrev = {x: qs.x, y: qs.y}; }
+    else {
+      qsPrev = {x: qs.x, y: qs.y};
+      qs.x += qsRes.dx; qs.y += qsRes.dy;
+      qsIters++;
+      qsPath.push({x: qs.x, y: qs.y}); if (qsPath.length > 500) qsPath.shift();
+    }
+  } else { qsPrev = {x: qs.x, y: qs.y}; }
+}
+
+// ------------------------------------------------------------------ shared drag: both grains follow
+function canvasPoint(cv, ev) {
+  const r = cv.getBoundingClientRect();
+  return {x: (ev.clientX - r.left) * W / r.width, y: (ev.clientY - r.top) * H / r.height};
+}
+function attachDrag(cv, getLocal) {
+  let off = null;
+  cv.addEventListener('pointerdown', ev => {
+    const p = canvasPoint(cv, ev), g = getLocal();
+    if (Math.hypot(p.x - g.x, p.y - g.y) > R + 12) return;
+    dragging = true; off = {x: g.x - p.x, y: g.y - p.y};
+    cv.setPointerCapture(ev.pointerId); cv.style.cursor = 'grabbing';
+    ev.preventDefault();
+  });
+  cv.addEventListener('pointermove', ev => {
+    if (!dragging || !off) return;
+    const p = canvasPoint(cv, ev);
+    reset(clampOverlap({x: p.x + off.x, y: p.y + off.y}));       // both panels take the same state
+  });
+  const end = () => { if (dragging) { dragging = false; off = null; cv.style.cursor = 'grab'; last = performance.now(); } };
+  cv.addEventListener('pointerup', end);
+  cv.addEventListener('pointercancel', end);
+}
+attachDrag(cdem, () => dem);
+attachDrag(cqs, () => qs);
+
+// ------------------------------------------------------------------ loop
+function frame(now) {
+  let dt = (now - last) / 1000; last = now;
+  if (!isFinite(dt) || dt < 0) dt = 0;
+  dt = Math.min(dt, 0.25);
+  if (dragging) { accD = 0; accQ = 0; }
+  else {
+    let guard = 0;
+    accD += dt * RATE_DEM;
+    while (accD >= 1 && guard++ < 400) { accD -= 1; stepDem(); }
+    guard = 0;
+    accQ += dt * RATE_QS;
+    while (accQ >= 1 && guard++ < 400) { accQ -= 1; stepQs(); }
+  }
+  const pd = lerp(demPrev, dem, dragging ? 1 : Math.min(accD, 1));
+  const pq = lerp(qsPrev, qs, dragging ? 1 : Math.min(accQ, 1));
+
+  // ---- DEM panel
+  drawWorld(ctxD);
+  drawPath(ctxD, demTrail, 'rgba(47,111,221,0.32)');
+  dirArrow(ctxD, pd, demRes.F.x, demRes.F.y, css('--force'), FLEN, 2.5);
+  drawGrain(ctxD, pd, demRes.cs);
+
+  // ---- qsDEM panel
+  drawWorld(ctxQ);
+  drawPath(ctxQ, qsPath, 'rgba(47,111,221,0.4)');
+  if (qsConv === null) ghost(ctxQ, {x: qsPrev.x + qsRes.dx, y: qsPrev.y + qsRes.dy}, 'rgba(47,111,221,0.65)');
+  if (qsConv === null) dirArrow(ctxQ, pq, qsRes.dx, qsRes.dy, css('--step'), XLEN, 3);
+  dirArrow(ctxQ, pq, qsRes.F.x, qsRes.F.y, css('--force'), FLEN, 2.5);
+  drawGrain(ctxQ, pq, qsRes.cs);
+  drawEllipse(ctxQ, pq, qsRes.S);              // drawn over the grain, so it is never hidden behind it
+  for (const k of qsRes.cs) {
+    ctxQ.save(); ctxQ.strokeStyle = '#666'; ctxQ.lineWidth = 1;
+    ctxQ.beginPath();
+    ctxQ.moveTo(pq.x - k.n.x * R, pq.y - k.n.y * R);
+    ctxQ.lineTo(pq.x - k.n.x * (R + 13), pq.y - k.n.y * (R + 13));
+    ctxQ.stroke(); ctxQ.restore();
+  }
+
+  // ---- readouts
+  const keD = 0.5 * M * (dem.vx * dem.vx + dem.vy * dem.vy);
+  readD.innerHTML =
+    `time steps <b>${demSteps}</b> &nbsp; sim time <b>${fmt(demSteps * DT)}</b> s<br>` +
+    `|F| / mg <b>${fmt(demRes.fr)}</b> &nbsp; contacts <b>${demRes.cs.length}</b><br>` +
+    `kinetic energy <b>${fmt(keD / 1000, 1)}</b> &times;10<sup>3</sup>`;
+  readQ.innerHTML =
+    `iterations <b>${qsIters}</b><br>` +
+    `|F| / mg <b>${fmt(qsRes.fr)}</b> &nbsp; contacts <b>${qsRes.cs.length}</b><br>` +
+    `S / k<sub>n</sub> = <span class="mat"><span>${fmt(qsRes.S.sxx / K)}</span><span>${fmt(qsRes.S.sxy / K)}</span>` +
+    `<span>${fmt(qsRes.S.sxy / K)}</span><span>${fmt(qsRes.S.syy / K)}</span></span>` +
+    ` &nbsp; &Delta;X = (<b>${fmt(qsRes.dx)}</b>, <b>${fmt(qsRes.dy)}</b>) px<br>` +
+    `angle between F and &Delta;X <b>${fmt(angleFX(qsRes), 0)}&deg;</b>`;
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
 </body>
 </html>
