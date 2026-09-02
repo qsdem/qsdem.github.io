@@ -17,7 +17,7 @@
      using --page-pad as their gutter. Change these two values and the whole
      site follows.
      --------------------------------------------------------------------- */
-  --page-max: 1200px;
+  --page-max: 1500px;
   --page-pad: clamp(24px, 4.5vw, 64px);
 }
 

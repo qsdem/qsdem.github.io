@@ -46,7 +46,7 @@ The site width is defined once, in `assets/css/main.css`:
 
 ```css
 :root {
-  --page-max: 1200px;                    /* content column */
+  --page-max: 1500px;                    /* content column */
   --page-pad: clamp(24px, 4.5vw, 64px);  /* left/right gutter */
 }
 ```
