@@ -58,6 +58,8 @@ Fonts are the three woff2 files in `assets/fonts/`, copied from the reference si
 ## About page
 
 `about.html` carries page-specific styles inline for the explorable (canvas, equations, panel
-grid) and a self-contained script with no libraries. The standalone version of the same demo
+grid) and a self-contained script with no libraries. Each method is one `.col` holding its title,
+canvas, legend and readout, so below 900px they stack as DEM title, DEM plot, DEM numbers, then the
+same for qsDEM, rather than interleaving. The standalone version of the same demo
 lives outside this repo at `Research/qsdem2/demos/qsdem_explorable.html`; the two are separate
 files, so a change to one does not propagate to the other.

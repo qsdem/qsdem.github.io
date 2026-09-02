@@ -24,8 +24,10 @@
     --ink: #222; --muted: #555;
   }
 
-  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; align-items: start; margin-top: 20px; }
-  .pair h3 { font-size: 14px; font-weight: bold; margin: 0; }
+  /* each method is one self-contained column, so on a narrow screen they stack as
+     DEM title, DEM plot, DEM numbers, then the same for qsDEM */
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; margin-top: 20px; }
+  .pair h3 { font-size: 14px; font-weight: bold; margin: 0 0 5px; }
   canvas {
     display: block; width: 100%; height: auto; aspect-ratio: 445 / 322;
     border: 1px solid #ddd; background: var(--panel); touch-action: none; cursor: grab;
@@ -39,13 +41,13 @@
   .mat { display: inline-grid; grid-template-columns: auto auto; gap: 0 10px; padding: 1px 8px;
          border-left: 1px solid #222; border-right: 1px solid #222; margin: 2px 0; color: #222; }
 
-  @media (max-width: 700px) { .pair { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { .pair { grid-template-columns: 1fr; gap: 26px; } }
 </style>
 </head>
 <body>
 
 <nav>
-  <a href="index.html">Home</a> <span class="sep">&middot;</span>
+  <a href="index.html">qsDEM</a> <span class="sep">&middot;</span>
   <a href="apply.html">Apply</a> <span class="sep">&middot;</span>
   <a href="wiki.html">Wiki</a> <span class="sep">&middot;</span>
   <a href="about.html" aria-current="page">About</a>
@@ -102,24 +104,22 @@
   
 
   <div class="pair">
+    <div class="col">
       <h3>DEM</h3>
-      <h3>qsDEM</h3>
-
       <canvas id="cdem" width="445" height="322"></canvas>
-      <canvas id="cqs" width="445" height="322"></canvas>
+      <div class="legend"><span class="f"><i></i>direction of the net force</span></div>
+      <div class="read" id="readdem"></div>
+    </div>
 
-      <div>
-        <div class="legend"><span class="f"><i></i>direction of the net force</span></div>
-        <div class="read" id="readdem"></div>
+    <div class="col">
+      <h3>qsDEM</h3>
+      <canvas id="cqs" width="445" height="322"></canvas>
+      <div class="legend">
+        <span class="f"><i></i>direction of the net force</span>
+        <span class="e"><i></i>stiffness S</span>
+        <span class="s"><i></i>step &Delta;X</span>
       </div>
-      <div>
-        <div class="legend">
-          <span class="f"><i></i>direction of the net force</span>
-          <span class="e"><i></i>stiffness S</span>
-          <span class="s"><i></i>step &Delta;X</span>
-        </div>
-        <div class="read" id="readqs"></div>
-      </div>
+      <div class="read" id="readqs"></div>
     </div>
   </div>
 </div>
