@@ -1,8 +1,12 @@
 /* qsdem */
 
 :root {
+  /* Site default is a white page. The HOMEPAGE ONLY overrides these three to go black, in its
+     own <style> block, so the full-bleed render frames meet the page with no visible seam. */
+  --bg: #ffffff;
   --ink: #1f1f1f;
   --muted: #444746;
+  --rule: #e6e6e6;
   --font: "Myriad Pro", Myriad, "Source Sans 3", "Source Sans Pro",
           "Segoe UI", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
 
@@ -19,7 +23,7 @@
 
 * { box-sizing: border-box; }
 
-html, body { background: #ffffff; }
+html, body { background: var(--bg); }
 
 body {
   margin: 0;

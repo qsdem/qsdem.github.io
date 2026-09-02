@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="assets/css/main.css">
 <style>
   /* page-specific only: the layout width comes from main.css */
-  :root { --rule: #e6e6e6; --accent: #d13b2f; }
+  :root { --accent: #d13b2f; --panel: #fcfcfb; --border: #cfcfcf; }   /* --rule from main.css */
 
   .notice {
     max-width: 78ch; margin: 0 0 30px; padding: 13px 17px;
@@ -25,7 +25,7 @@
   .field .hint { font-weight: 400; color: var(--muted); }
   input[type=text], input[type=email], textarea {
     display: block; width: 100%; font: 400 16px/1.5 var(--font); color: var(--ink);
-    background: #fff; border: 1px solid #cfcfcf; border-radius: 7px; padding: 9px 11px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 7px; padding: 9px 11px;
   }
   input[type=text]:focus, input[type=email]:focus, textarea:focus {
     outline: none; border-color: var(--ink);
@@ -35,7 +35,7 @@
   .terms {
     border: 1px solid var(--rule); border-radius: 8px; padding: 16px 18px;
     margin: 30px 0 16px; font-size: 15.5px; color: var(--muted); line-height: 1.6;
-    max-height: 230px; overflow-y: auto; background: #fcfcfb;
+    max-height: 230px; overflow-y: auto; background: var(--panel);
   }
   .terms p { margin: 0 0 11px; }
   .terms p:last-child { margin-bottom: 0; }

@@ -10,8 +10,16 @@
 <link rel="stylesheet" href="assets/css/main.css">
 <style>
   :root {
-    --rule: #e6e6e6;
-    --grain: #2f6fdd; --wall: #3a3d42; --force: #d13b2f; --step: #123f8f; --ellipse: #5c6470;
+    /* light page: --rule and the text colours come from main.css */
+    --panel: #ffffff;          /* canvas ground */
+    --wall-fill: #eef0f2;      /* the region the grain is excluded from */
+    --wall: #3a3d42;           /* wall line */
+    --grain: #2f6fdd;
+    --force: #d13b2f;
+    --step: #123f8f;
+    --ellipse: #5c6470;
+    --trail: rgba(47,111,221,0.35);
+    --ghost: rgba(47,111,221,0.65);
   }
 
   .intro { margin: 0 0 34px; }
@@ -33,7 +41,7 @@
   .pair h3 { font-size: 18px; font-weight: 500; margin: 0; }
   canvas {
     display: block; width: 100%; height: auto; aspect-ratio: 445 / 322;
-    border: 1px solid var(--rule); border-radius: 8px; background: #fff;
+    border: 1px solid var(--rule); border-radius: 8px; background: var(--panel);
     touch-action: none; cursor: grab;
   }
   .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14.5px; color: var(--muted); margin: 12px 0 8px; }
@@ -260,8 +268,10 @@ function dirArrow(ctx, c, vx, vy, color, len, w) {
 function drawWorld(ctx) {
   ctx.clearRect(0, 0, W, H);
   ctx.save();
+  ctx.fillStyle = css('--panel');
+  ctx.fillRect(0, 0, W, H);
   const far = 1400;
-  ctx.fillStyle = '#eef0f2';
+  ctx.fillStyle = css('--wall-fill');
   for (const ob of OBS) {
     if (ob.hidden) continue;
     const a = {x: ob.p.x - ob.t.x * far, y: ob.p.y - ob.t.y * far};
@@ -409,20 +419,20 @@ function frame(now) {
 
   // ---- DEM panel
   drawWorld(ctxD);
-  drawPath(ctxD, demTrail, 'rgba(47,111,221,0.32)');
+  drawPath(ctxD, demTrail, css('--trail'));
   dirArrow(ctxD, pd, demRes.F.x, demRes.F.y, css('--force'), FLEN, 2.5);
   drawGrain(ctxD, pd, demRes.cs);
 
   // ---- qsDEM panel
   drawWorld(ctxQ);
-  drawPath(ctxQ, qsPath, 'rgba(47,111,221,0.4)');
-  if (qsConv === null) ghost(ctxQ, {x: qsPrev.x + qsRes.dx, y: qsPrev.y + qsRes.dy}, 'rgba(47,111,221,0.65)');
+  drawPath(ctxQ, qsPath, css('--trail'));
+  if (qsConv === null) ghost(ctxQ, {x: qsPrev.x + qsRes.dx, y: qsPrev.y + qsRes.dy}, css('--ghost'));
   if (qsConv === null) dirArrow(ctxQ, pq, qsRes.dx, qsRes.dy, css('--step'), XLEN, 3);
   dirArrow(ctxQ, pq, qsRes.F.x, qsRes.F.y, css('--force'), FLEN, 2.5);
   drawGrain(ctxQ, pq, qsRes.cs);
   drawEllipse(ctxQ, pq, qsRes.S);              // drawn over the grain, so it is never hidden behind it
   for (const k of qsRes.cs) {
-    ctxQ.save(); ctxQ.strokeStyle = '#666'; ctxQ.lineWidth = 1;
+    ctxQ.save(); ctxQ.strokeStyle = css('--wall'); ctxQ.lineWidth = 1;
     ctxQ.beginPath();
     ctxQ.moveTo(pq.x - k.n.x * R, pq.y - k.n.y * R);
     ctxQ.lineTo(pq.x - k.n.x * (R + 13), pq.y - k.n.y * (R + 13));
