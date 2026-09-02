@@ -4,27 +4,47 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>qsDEM</title>
+<meta name="color-scheme" content="dark">
 <link rel="stylesheet" href="assets/css/main.css">
 <style>
-  /* the looping sweep sits in the content column, so it takes the column's width */
+  /* HOMEPAGE ONLY: no sidebar, black page, animation over the whole page. Every other page keeps
+     the 960px column and the left sidebar from main.css. */
+  html, body { background: #000; }
+  body {
+    max-width: none;
+    padding: 0;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+  nav { padding: 22px 40px; margin: 0; }
+  nav a { color: #fff; }                       /* all white on black, easier to read than the blue */
+  nav a[aria-current="page"] { color: #fff; }
+  nav .sep { color: #777; }
+
+  /* Fills the page under the nav. One 16:9 copy is taller than that on a wide screen, so a
+     desktop sees a whole frame; on a portrait phone the frame REPEATS down the page instead of
+     leaving black, via background-repeat, which keeps one decoded bitmap per frame. */
   .sweep {
     position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    background: #000;
+    flex: 1 0 auto;
+    min-height: 56.25vw;
     overflow: hidden;
+    background: #000;
   }
   .sweep .layer {
     position: absolute;
     inset: 0;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
+    background-repeat: repeat-y;
+    background-size: 100% auto;
+    background-position: top center;
     opacity: 0;
     transition: opacity 260ms linear;
     will-change: opacity;
   }
-  .caption { font-size: 13px; color: #555; margin-top: 8px; }
+  @media (max-width: 700px) { nav { padding: 18px 20px; } }
 </style>
 </head>
 <body>
@@ -35,22 +55,10 @@
   <a href="wiki.html">Wiki</a> <span class="sep">&middot;</span>
   <a href="about.html">About</a>
 </nav>
-<div class="columns">
-  <div class="sidebar">
-    <h1>qsDEM</h1>
-    <p>A quasi-static discrete element model for slow geological deformation.</p>
-    <div class="contact">
-      Developed and maintained by
-      <a href="https://eps.harvard.edu/research-group/meade-group/">Meade Group</a> at Harvard.
-    </div>
-  </div>
 
-  <div class="main">
-    <div class="sweep" id="sweep">
-      <div class="layer" id="la"></div>
-      <div class="layer" id="lb"></div>
-    </div>
-  </div>
+<div class="sweep" id="sweep">
+  <div class="layer" id="la"></div>
+  <div class="layer" id="lb"></div>
 </div>
 
 <script>
@@ -87,8 +95,7 @@
   var HOLD = 620;    // ms each frame is held
   var FADE = 260;    // ms of fade, must match the CSS transition
 
-  var el = document.getElementById('sweep');
-  var wanted = el.getBoundingClientRect().width * (window.devicePixelRatio || 1);
+  var wanted = window.innerWidth * (window.devicePixelRatio || 1);
   var FRAMES = wanted > 1920 ? BIG : SMALL;
 
   var layers = [document.getElementById('la'), document.getElementById('lb')];

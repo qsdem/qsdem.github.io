@@ -34,7 +34,9 @@ Transitions fade the incoming frame in **on top of** the outgoing one, which sta
 underneath. Fading both at once would let the black container show through and dip the whole image
 dark at every step.
 
-The sweep now sits in the content column beside the sidebar, sized to that column at 16:9.
+The sweep fills the page under the nav. One 16:9 copy is taller than that space on a wide screen,
+so a desktop sees a whole frame; on a portrait phone the frame repeats down the page instead of
+leaving black, via `background-repeat: repeat-y`, which keeps one decoded bitmap per frame.
 
 ## Styling
 
@@ -42,10 +44,14 @@ The site mirrors `braydennoh.github.io/style.css` exactly: the same self-hosted 
 same 15px / 1.5 body on a 960px left-aligned column with 30x40 padding, the same `#003399` links,
 the same 13px dot-separated top nav, and the same two-column layout.
 
-**Every page has a left sidebar.** `.columns` is a flex row of a fixed 280px `.sidebar` and a
-flexible `.main`, with a 40px gap. The page heading (`h1`) and the Meade Group credit live in the
-sidebar; the content lives in `.main`. Below 700px the columns stack and the sidebar goes full
-width, as in the reference.
+**Apply, Wiki and About have a left sidebar.** `.columns` is a flex row of a fixed 280px
+`.sidebar` and a flexible `.main`, with a 40px gap. The page heading (`h1`) and that page's standing
+text live in the sidebar (the access terms on Apply, the model description on About); the content
+lives in `.main`. Below 700px the columns stack and the sidebar goes full width, as in the reference.
+
+`index.html` is the exception: no sidebar and no 960px column. It overrides the body to a black
+full-bleed page whose nav links are white for legibility, with the looping sweep filling everything
+below the nav.
 
 Fonts are the three woff2 files in `assets/fonts/`, copied from the reference site.
 
