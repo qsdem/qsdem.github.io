@@ -14,24 +14,30 @@
      Every other page keeps the white default from main.css. */
   :root { --bg: #000000; --ink: #f1efeb; --muted: #9aa0a8; }
 
-  /* full bleed: the deliberate exception to --page-max */
+  /* Fill the viewport below the header. The frame is 16:9, so on a wide screen one copy is
+     taller than the space left over and you see a single full frame. On a portrait phone or
+     tablet one copy would occupy a thin band, so the frame REPEATS down the page instead of
+     leaving black: background-repeat handles that with one decode per frame, where cloning
+     ten <img> per tile would multiply the decoded bitmaps. */
+  body { display: flex; flex-direction: column; min-height: 100vh; min-height: 100svh; }
+
   .sweep {
     position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    background: #000;
+    flex: 1 0 auto;
+    min-height: 56.25vw;            /* 16:9 of the viewport width = one whole frame */
     overflow: hidden;
+    background: #000;
   }
-  .sweep img {
+  .sweep .layer {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    background-repeat: repeat-y;    /* the tiling that removes the black space when tall */
+    background-size: 100% auto;
+    background-position: top center;
     opacity: 0;
     transition: opacity 260ms linear;
+    will-change: opacity;
   }
-  .sweep img.on { opacity: 1; }
 </style>
 </head>
 <body>
@@ -46,79 +52,83 @@
 </header>
 
 <div class="sweep" id="sweep">
-    <img class="on" src="assets/img/c8/00_step00007_3840.webp"
-         srcset="assets/img/c8/00_step00007_1920.webp 1920w, assets/img/c8/00_step00007_3840.webp 3840w" sizes="100vw"
-         fetchpriority="high" decoding="async"
-         alt="qsDEM subduction after 0.1 km of plate convergence">
-    <img data-src="assets/img/c8/01_step01120_3840.webp" data-srcset="assets/img/c8/01_step01120_1920.webp 1920w, assets/img/c8/01_step01120_3840.webp 3840w" sizes="100vw"
-         decoding="async" alt="qsDEM subduction after 22.4 km of plate convergence">
-    <img data-src="assets/img/c8/02_step02226_3840.webp" data-srcset="assets/img/c8/02_step02226_1920.webp 1920w, assets/img/c8/02_step02226_3840.webp 3840w" sizes="100vw"
-         decoding="async" alt="qsDEM subduction after 44.5 km of plate convergence">
-    <img data-src="assets/img/c8/03_step03339_3840.webp" data-srcset="assets/img/c8/03_step03339_1920.webp 1920w, assets/img/c8/03_step03339_3840.webp 3840w" sizes="100vw"
-         decoding="async" alt="qsDEM subduction after 66.8 km of plate convergence">
-    <img data-src="assets/img/c8/04_step04452_3840.webp" data-srcset="assets/img/c8/04_step04452_1920.webp 1920w, assets/img/c8/04_step04452_3840.webp 3840w" sizes="100vw"
-         decoding="async" alt="qsDEM subduction after 89 km of plate convergence">
-    <img data-src="assets/img/c8/05_step05558_3840.webp" data-srcset="assets/img/c8/05_step05558_1920.webp 1920w, assets/img/c8/05_step05558_3840.webp 3840w" sizes="100vw"
-         decoding="async" alt="qsDEM subduction after 111.2 km of plate convergence">
-    <img data-src="assets/img/c8/06_step06671_3840.webp" data-srcset="assets/img/c8/06_step06671_1920.webp 1920w, assets/img/c8/06_step06671_3840.webp 3840w" sizes="100vw"
-         decoding="async" alt="qsDEM subduction after 133.4 km of plate convergence">
-    <img data-src="assets/img/c8/07_step07784_3840.webp" data-srcset="assets/img/c8/07_step07784_1920.webp 1920w, assets/img/c8/07_step07784_3840.webp 3840w" sizes="100vw"
-         decoding="async" alt="qsDEM subduction after 155.7 km of plate convergence">
-    <img data-src="assets/img/c8/08_step08890_3840.webp" data-srcset="assets/img/c8/08_step08890_1920.webp 1920w, assets/img/c8/08_step08890_3840.webp 3840w" sizes="100vw"
-         decoding="async" alt="qsDEM subduction after 177.8 km of plate convergence">
-    <img data-src="assets/img/c8/09_step10000_3840.webp" data-srcset="assets/img/c8/09_step10000_1920.webp 1920w, assets/img/c8/09_step10000_3840.webp 3840w" sizes="100vw"
-         decoding="async" alt="qsDEM subduction after 200 km of plate convergence">
+  <div class="layer" id="la"></div>
+  <div class="layer" id="lb"></div>
 </div>
 
 <script>
 'use strict';
-// Ten frames evenly spaced across the run, crossfaded in place as one looping sweep.
-// Frame 0 ships in the HTML; the other nine are attached after first paint so the page is
-// never blocked on ~35 MB of imagery, and the loop only starts once they have all decoded.
+// Ten frames evenly spaced across run c8, swept in place as one continuous loop.
+// Two layers alternate: the incoming frame fades in ON TOP of the outgoing one, which stays
+// opaque underneath. Fading both at once would let the black show through and dip the whole
+// image dark at every step.
 (function () {
-  var el = document.getElementById('sweep');
-  var imgs = Array.prototype.slice.call(el.querySelectorAll('img'));
-  var HOLD = 620;          // ms each frame is held
-  var FADE = 260;          // ms of fade, must match the CSS transition below
+  var BIG = [
+    'assets/img/c8/00_step00007_3840.webp',
+    'assets/img/c8/01_step01120_3840.webp',
+    'assets/img/c8/02_step02226_3840.webp',
+    'assets/img/c8/03_step03339_3840.webp',
+    'assets/img/c8/04_step04452_3840.webp',
+    'assets/img/c8/05_step05558_3840.webp',
+    'assets/img/c8/06_step06671_3840.webp',
+    'assets/img/c8/07_step07784_3840.webp',
+    'assets/img/c8/08_step08890_3840.webp',
+    'assets/img/c8/09_step10000_3840.webp'
+  ];
+  var SMALL = [
+    'assets/img/c8/00_step00007_1920.webp',
+    'assets/img/c8/01_step01120_1920.webp',
+    'assets/img/c8/02_step02226_1920.webp',
+    'assets/img/c8/03_step03339_1920.webp',
+    'assets/img/c8/04_step04452_1920.webp',
+    'assets/img/c8/05_step05558_1920.webp',
+    'assets/img/c8/06_step06671_1920.webp',
+    'assets/img/c8/07_step07784_1920.webp',
+    'assets/img/c8/08_step08890_1920.webp',
+    'assets/img/c8/09_step10000_1920.webp'
+  ];
+  var HOLD = 620;    // ms each frame is held
+  var FADE = 260;    // ms of fade, must match the CSS transition
 
-  function attach() {
-    return Promise.all(imgs.map(function (im) {
-      if (im.dataset.src) {
-        im.srcset = im.dataset.srcset;
-        im.src = im.dataset.src;
-        delete im.dataset.src;
-        delete im.dataset.srcset;
-      }
-      if (im.complete) return Promise.resolve();
+  // one decode per frame, so pick the variant by device pixels rather than cloning elements
+  var wanted = window.innerWidth * (window.devicePixelRatio || 1);
+  var FRAMES = wanted > 1920 ? BIG : SMALL;
+
+  var layers = [document.getElementById('la'), document.getElementById('lb')];
+  var showing = 0;
+
+  function paint(layer, url) { layer.style.backgroundImage = 'url("' + url + '")'; }
+
+  paint(layers[0], FRAMES[0]);
+  layers[0].style.opacity = '1';
+
+  function preload() {
+    return Promise.all(FRAMES.map(function (u) {
       return new Promise(function (res) {
-        im.addEventListener('load', res, {once: true});
-        im.addEventListener('error', res, {once: true});
+        var im = new Image();
+        im.onload = im.onerror = res;
+        im.src = u;
       });
     }));
   }
 
-  function loop() {
-    var i = 0, z = 1;
-    setInterval(function () {
-      var prev = i;
-      var next = (i + 1) % imgs.length;
-      // Fade the incoming frame in ON TOP of the outgoing one, which stays fully opaque
-      // underneath. Fading both at once would let the black container show through mid-way
-      // and dip the whole image dark at every transition.
-      imgs[next].style.zIndex = String(++z);
-      imgs[next].classList.add('on');
-      setTimeout(function () { imgs[prev].classList.remove('on'); }, FADE + 40);
-      i = next;
-    }, HOLD);
-  }
-
-  attach().then(function () {
+  preload().then(function () {
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      imgs[0].classList.remove('on');           // hold the final state instead of animating
-      imgs[imgs.length - 1].classList.add('on');
+      paint(layers[0], FRAMES[FRAMES.length - 1]);   // hold the final state instead of animating
       return;
     }
-    loop();
+    var i = 0, z = 1;
+    setInterval(function () {
+      i = (i + 1) % FRAMES.length;
+      var incoming = layers[1 - showing];
+      var outgoing = layers[showing];
+      paint(incoming, FRAMES[i]);
+      void incoming.offsetWidth;                     // paint the new frame before fading it in
+      incoming.style.zIndex = String(++z);
+      incoming.style.opacity = '1';
+      setTimeout(function () { outgoing.style.opacity = '0'; }, FADE + 40);
+      showing = 1 - showing;
+    }, HOLD);
   });
 })();
 </script>

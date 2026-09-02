@@ -32,6 +32,12 @@ Transitions fade the incoming frame in **on top of** the outgoing one, which sta
 underneath. Fading both at once would let the black container show through and dip the whole image
 dark at every step.
 
+The sweep fills the viewport below the header. One 16:9 copy is taller than that space on a wide
+screen, so a desktop sees a single whole frame. On a portrait phone or tablet one copy would be a
+thin band with dead black beneath it, so the frame **repeats down the page** instead. That is done
+with `background-repeat: repeat-y` on two crossfading layers rather than cloned `<img>` per tile,
+which keeps it at one decoded bitmap per frame no matter how many tiles are on screen.
+
 ## Layout width — keep this consistent
 
 The site width is defined once, in `assets/css/main.css`:
