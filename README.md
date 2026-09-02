@@ -22,7 +22,8 @@ block so the black sky in the render frames meets the page with no seam, and its
 is the one deliberate exception to the layout width below: it spans the full viewport.
 
 The ten frames in `assets/img/c8/` are evenly spaced across run c8 (600x20 km plate, 30 deg wedge,
-190,004 particles, 200 km of convergence), all sharing one 16:9 crop of x 150-450 km, y 0-168.75 km,
+190,004 particles, 200 km of convergence), all sharing one 16:9 crop of x 150-450 km, y 10-178.75 km (the bottom lifted clear of the
+floor, whose boundary layer was visible at y = 0),
 rendered by `../9.2/geometrytest/frames_16x9.py`. Two widths per frame, 3840 and 1920, so `srcset`
 can spare phones the desktop file. About 39 MB for the desktop set, which is why frame 0 ships in
 the HTML and the other nine are attached by script after first paint.
