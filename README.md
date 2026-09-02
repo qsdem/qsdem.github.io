@@ -49,8 +49,9 @@ The site width is defined once, in `assets/css/main.css`:
 }
 ```
 
-`header.site` and `main` both use those two values, which is what keeps the brand, the nav tabs
-and the page content aligned on one left edge at every window size.
+`main` is capped at `--page-max` and centred. The **header is full width and left-aligned**, so
+the brand and tabs sit in the `--page-pad` gutter at any window size; it deliberately does not take
+`--page-max`. Both use the same gutter.
 
 **Every new page must wrap its content in `<main>`** so it inherits this. Do not set a
 `max-width` on `main` in a page's own `<style>` block; change the tokens above instead.

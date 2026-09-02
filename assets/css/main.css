@@ -12,10 +12,10 @@
 
   /* ---------------------------------------------------------------------
      SITE LAYOUT WIDTH -- single source of truth. Every page must put its
-     content inside <main> so it picks these up. The header and <main> share
-     the same max-width and horizontal padding, which is what keeps the
-     brand, the nav tabs and the page content on one common left edge.
-     Change these two values and the whole site follows.
+     content inside <main> so it picks these up. <main> is capped at
+     --page-max and centred; the header is full width and left-aligned, both
+     using --page-pad as their gutter. Change these two values and the whole
+     site follows.
      --------------------------------------------------------------------- */
   --page-max: 1200px;
   --page-pad: clamp(24px, 4.5vw, 64px);
@@ -35,14 +35,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* The header spans the whole viewport and sits in the left gutter, so the brand and the tabs
+   stay at the left edge however wide the window is. It deliberately does NOT take --page-max:
+   only <main> is capped and centred. `width: 100%` also keeps it stretched when the body is a
+   flex column, as it is on the homepage. */
 header.site {
   display: flex;
   align-items: center;
   gap: 64px;
-  width: 100%;                 /* keeps the header full-width when body is a flex column
-                                  (auto cross-axis margins would otherwise cancel stretch) */
-  max-width: var(--page-max);
-  margin: 0 auto;
+  width: 100%;
   padding: 26px var(--page-pad);
 }
 
