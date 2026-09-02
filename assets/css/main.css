@@ -5,6 +5,16 @@
   --muted: #444746;
   --font: "Myriad Pro", Myriad, "Source Sans 3", "Source Sans Pro",
           "Segoe UI", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+
+  /* ---------------------------------------------------------------------
+     SITE LAYOUT WIDTH -- single source of truth. Every page must put its
+     content inside <main> so it picks these up. The header and <main> share
+     the same max-width and horizontal padding, which is what keeps the
+     brand, the nav tabs and the page content on one common left edge.
+     Change these two values and the whole site follows.
+     --------------------------------------------------------------------- */
+  --page-max: 1200px;
+  --page-pad: clamp(24px, 4.5vw, 64px);
 }
 
 * { box-sizing: border-box; }
@@ -25,15 +35,15 @@ header.site {
   display: flex;
   align-items: center;
   gap: 64px;
-  max-width: 1200px;
+  max-width: var(--page-max);
   margin: 0 auto;
-  padding: 26px clamp(24px, 4.5vw, 64px);
+  padding: 26px var(--page-pad);
 }
 
 main {
-  max-width: 1200px;
+  max-width: var(--page-max);
   margin: 0 auto;
-  padding: 0 clamp(24px, 4.5vw, 64px) 56px;
+  padding: 0 var(--page-pad) 56px;
 }
 
 .brand {
