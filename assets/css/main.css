@@ -39,12 +39,15 @@ header.site {
   display: flex;
   align-items: center;
   gap: 64px;
+  width: 100%;                 /* keeps the header full-width when body is a flex column
+                                  (auto cross-axis margins would otherwise cancel stretch) */
   max-width: var(--page-max);
   margin: 0 auto;
   padding: 26px var(--page-pad);
 }
 
 main {
+  width: 100%;
   max-width: var(--page-max);
   margin: 0 auto;
   padding: 0 var(--page-pad) 56px;
