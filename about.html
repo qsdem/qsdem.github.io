@@ -32,8 +32,9 @@
     display: block; width: 100%; height: auto; aspect-ratio: 445 / 322;
     border: 1px solid #ddd; background: var(--panel); touch-action: none; cursor: grab;
   }
-  .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: #555; margin: 8px 0 6px; }
-  .legend i { display: inline-block; width: 16px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 5px; }
+  .legend { display: flex; gap: 10px; flex-wrap: nowrap; white-space: nowrap; font-size: 11.5px; color: #555; margin: 8px 0 6px; }
+  .legend span { white-space: nowrap; }
+  .legend i { display: inline-block; width: 14px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 4px; }
   .legend .f i { border-color: var(--force); } .legend .s i { border-color: var(--step); }
   .legend .e i { border-color: var(--ellipse); }
   .read { font-size: 12.5px; font-variant-numeric: tabular-nums; color: #555; line-height: 1.7; }
@@ -107,7 +108,7 @@
     <div class="col">
       <h3>DEM</h3>
       <canvas id="cdem" width="445" height="322"></canvas>
-      <div class="legend"><span class="f"><i></i>direction of the net force</span></div>
+      <div class="legend"><span class="f"><i></i>net force</span></div>
       <div class="read" id="readdem"></div>
     </div>
 
@@ -115,7 +116,7 @@
       <h3>qsDEM</h3>
       <canvas id="cqs" width="445" height="322"></canvas>
       <div class="legend">
-        <span class="f"><i></i>direction of the net force</span>
+        <span class="f"><i></i>net force</span>
         <span class="e"><i></i>stiffness S</span>
         <span class="s"><i></i>step &Delta;X</span>
       </div>
