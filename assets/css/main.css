@@ -57,16 +57,14 @@ header.site::after {
   position: absolute;
   bottom: 0;
   left: var(--page-pad);
-  width: calc(min(var(--page-max), 100%) - 2 * var(--page-pad));
+  right: var(--page-pad);
   border-bottom: 1px solid var(--rule);
 }
 
 main {
   width: 100%;
   max-width: var(--page-max);
-  /* anchored left, not centred, so the first word of the body text starts on the same
-     gutter as the brand and the nav tabs in the header above it */
-  margin: 0;
+  margin: 0 auto;
   /* top padding gives the content room to breathe under the nav tabs; the homepage has no
      <main>, so its full-bleed sweep still butts straight against the header */
   padding: 82px var(--page-pad) 72px;

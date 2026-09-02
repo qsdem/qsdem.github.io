@@ -51,10 +51,10 @@ The site width is defined once, in `assets/css/main.css`:
 }
 ```
 
-Both the header and `main` are **anchored left** on the `--page-pad` gutter, so the brand, the nav
-tabs and the first word of body text share one left edge at every window width. The header spans the
-full viewport; `main` is capped at `--page-max` and carries `82px` of top padding so text sits clear
-of the tabs. Neither is centred: centring `main` would push the text inward and break that edge.
+The **header spans the full viewport and is left-anchored** on the `--page-pad` gutter, so the brand
+and tabs sit at the left edge at any window width. `main` is capped at `--page-max`, **centred**, and
+carries `82px` of top padding so text sits clear of the tabs. The two are deliberately not aligned
+with each other.
 
 A thin `--rule` line sits under the header on every page except the homepage. It is a pseudo-element
 rather than a border, so it spans exactly the text column instead of bleeding to the window edges;
