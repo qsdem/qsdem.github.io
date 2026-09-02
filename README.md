@@ -56,6 +56,10 @@ tabs and the first word of body text share one left edge at every window width. 
 full viewport; `main` is capped at `--page-max` and carries `82px` of top padding so text sits clear
 of the tabs. Neither is centred: centring `main` would push the text inward and break that edge.
 
+A thin `--rule` line sits under the header on every page except the homepage. It is a pseudo-element
+rather than a border, so it spans exactly the text column instead of bleeding to the window edges;
+`index.html` switches it off because its full-bleed sweep meets the header directly.
+
 **Every new page must wrap its content in `<main>`** so it inherits this. Do not set a
 `max-width` on `main` in a page's own `<style>` block; change the tokens above instead.
 

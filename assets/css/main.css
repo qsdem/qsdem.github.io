@@ -40,11 +40,25 @@ body {
    only <main> is capped and centred. `width: 100%` also keeps it stretched when the body is a
    flex column, as it is on the homepage. */
 header.site {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 64px;
   width: 100%;
   padding: 26px var(--page-pad);
+}
+
+/* Thin rule between the nav tabs and the page content. Drawn as a pseudo-element rather than a
+   border so it spans exactly the text column (gutter to gutter, capped at --page-max) instead of
+   bleeding to the window edges. The homepage switches it off: its full-bleed sweep meets the
+   header directly. */
+header.site::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: var(--page-pad);
+  width: calc(min(var(--page-max), 100%) - 2 * var(--page-pad));
+  border-bottom: 1px solid var(--rule);
 }
 
 main {

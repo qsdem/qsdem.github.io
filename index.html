@@ -14,6 +14,9 @@
      Every other page keeps the white default from main.css. */
   :root { --bg: #000000; --ink: #f1efeb; --muted: #9aa0a8; }
 
+  /* no separator here: the sweep runs straight into the header */
+  header.site::after { display: none; }
+
   /* Fill the viewport below the header. The frame is 16:9, so on a wide screen one copy is
      taller than the space left over and you see a single full frame. On a portrait phone or
      tablet one copy would occupy a thin band, so the frame REPEATS down the page instead of
