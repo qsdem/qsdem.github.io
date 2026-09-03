@@ -23,8 +23,13 @@
     background: #000;              /* fixed positioning comes from main.css */
     padding: 30px 40px 20px;
   }
-  nav a { color: #fff; }                       /* all white on black, easier to read than the blue */
-  nav a[aria-current="page"] { color: #fff; }
+  /* all white on black, easier to read than the blue. :visited has to be named explicitly:
+     main.css's `a:visited` outranks a bare `nav a`, so without it a tab the reader has already
+     opened comes back blue on the black page. */
+  nav a,
+  nav a:visited,
+  nav a[aria-current="page"],
+  nav a[aria-current="page"]:visited { color: #fff; }
   nav .sep { color: #777; }
 
   /* Fills the page under the nav. One 16:9 copy is taller than that on a wide screen, so a
