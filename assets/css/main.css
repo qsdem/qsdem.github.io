@@ -38,8 +38,8 @@ body {
   line-height: 1.5;
   color: #222;
   background: #fff;
-  /* no top padding: the sticky nav owns it, so its background covers content scrolling under it */
-  padding: 0 40px 30px;
+  /* top padding reserves the space the fixed nav occupies */
+  padding: var(--nav-h) 40px 30px;
   max-width: 960px;
 }
 
@@ -54,14 +54,17 @@ a {
 a:hover { text-decoration: underline; }
 a:visited { color: #003399; }
 
-/* Top nav: stays put while the page scrolls */
+/* Top nav: pinned to the viewport at every width. `fixed` rather than `sticky` because sticky
+   silently fails in a few mobile browsers and inside some flex/overflow ancestors. */
 nav {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 5;
   background: #fff;
   font-size: 15px;
-  padding: 30px 0 20px;
+  padding: 30px 40px 20px;
   margin: 0;
 }
 
@@ -129,14 +132,23 @@ h1 {
 
 /* Mobile */
 @media (max-width: 700px) {
-  body { padding: 0 20px 20px; }
-  nav { padding: 20px 0; }
+  :root { --nav-h: 63px; }
+  body { padding: var(--nav-h) 20px 20px; }
+  nav { padding: 20px 20px; }
 
   .columns {
     flex-direction: column;
-    gap: 24px;
+    gap: 0;                      /* no transparent gap for content to show through */
   }
 
-  /* stacked: the sidebar is above the content, so pinning it would cover the page */
-  .sidebar { position: static; width: 100%; }
+  /* stacked, but still pinned under the nav: it needs its own background and stacking context
+     so the main column slides underneath it rather than showing through */
+  .sidebar {
+    position: sticky;
+    top: var(--nav-h);
+    z-index: 4;                  /* below the nav (5), above the content */
+    width: 100%;
+    background: #fff;
+    padding-bottom: 22px;
+  }
 }

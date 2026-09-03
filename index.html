@@ -12,7 +12,7 @@
   html, body { background: #000; }
   body {
     max-width: none;
-    padding: 0;
+    padding: var(--nav-h) 0 0;     /* room for the fixed nav */
     color: #eee;
     display: flex;
     flex-direction: column;
@@ -20,10 +20,8 @@
     min-height: 100svh;
   }
   nav {
-    position: sticky; top: 0; z-index: 5;      /* stays put while the page scrolls */
-    background: #000;
+    background: #000;              /* fixed positioning comes from main.css */
     padding: 30px 40px 20px;
-    margin: 0;
   }
   nav a { color: #fff; }                       /* all white on black, easier to read than the blue */
   nav a[aria-current="page"] { color: #fff; }
