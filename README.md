@@ -21,22 +21,25 @@ Plain static HTML with no build step. Edit a file and push; GitHub Pages redeplo
 block so the black sky in the render frames meets the page with no seam, and its `.sweep` container
 is the one deliberate exception to the layout width below: it spans the full viewport.
 
-The ten frames in `assets/img/sed04km/` are evenly spaced across the sediment run
-`SWEEP/sediment/runs/subduction_N191890_sed04km.h5` (600x20 km plate, 30 deg wedge, 0.4 km sediment
-cap, 191,890 particles, 200 km of convergence, 73.6 km of slab). All share one 16:9 crop of
-x 150-450 km, y 10-178.75 km, the bottom lifted clear of the floor whose boundary layer was visible
-at y = 0. Rendered by `../9.2/geometrytest/frames_16x9.py`, which takes any run HDF5, so swapping
-the homepage to a different run is one command plus the two file lists in `index.html`. Two widths per frame, 3840 and 1920, so `srcset`
-can spare phones the desktop file. About 39 MB for the desktop set, which is why frame 0 ships in
-the HTML and the other nine are attached by script after first paint.
+The ten frames in `assets/img/sed06km/` are evenly spaced across the sediment run
+`SWEEP/sediment/runs/subduction_N193052_sed06km.h5` (600x20 km plate, 30 deg wedge, 0.6 km sediment
+cap, 193,052 particles, 200 km of convergence, 80.7 km of slab). All share one 16:9 crop of
+x 150-450 km, y 20-188.75 km. The bottom clears the floor boundary layer; the top was raised from
+the 0.4 km run's 178.75 because the thicker cap lifts the plate crest to 169.6 km. Rendered by
+`../9.2/geometrytest/frames_16x9.py`, which takes any run HDF5, so swapping the homepage to a
+different run is one command plus the two file lists in `index.html`. Two widths per frame, 3840
+and 1920, so `srcset` can spare phones the desktop file.
 
 Transitions fade the incoming frame in **on top of** the outgoing one, which stays opaque
 underneath. Fading both at once would let the black container show through and dip the whole image
 dark at every step.
 
-The sweep fills the page under the nav. One 16:9 copy is taller than that space on a wide screen,
-so a desktop sees a whole frame; on a portrait phone the frame repeats down the page instead of
-leaving black, via `background-repeat: repeat-y`, which keeps one decoded bitmap per frame.
+The sweep fills the page under the nav. A landscape window needs barely more than one frame, so a
+script picks `background-size: cover` there; tiling in that case left a sliver of the next frame
+whose black sky met this frame's red mantle bottom, reading as a faint red line. On a portrait phone
+or tablet, where more than about one and a half frames fit, it switches to `background-repeat:
+repeat-y` so the frame repeats down the page instead of leaving black, which keeps one decoded
+bitmap per frame however many tiles are on screen.
 
 ## Styling
 

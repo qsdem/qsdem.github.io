@@ -40,9 +40,10 @@
   .sweep .layer {
     position: absolute;
     inset: 0;
-    background-repeat: repeat-y;
-    background-size: 100% auto;
-    background-position: top center;
+    /* repeat vs cover is set by script from the container's shape, see fit() */
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
     opacity: 0;
     transition: opacity 260ms linear;
     will-change: opacity;
@@ -72,28 +73,28 @@
 // image dark at every step.
 (function () {
   var BIG = [
-    'assets/img/sed04km/00_step00007_3840.webp',
-    'assets/img/sed04km/01_step01120_3840.webp',
-    'assets/img/sed04km/02_step02226_3840.webp',
-    'assets/img/sed04km/03_step03339_3840.webp',
-    'assets/img/sed04km/04_step04452_3840.webp',
-    'assets/img/sed04km/05_step05558_3840.webp',
-    'assets/img/sed04km/06_step06671_3840.webp',
-    'assets/img/sed04km/07_step07784_3840.webp',
-    'assets/img/sed04km/08_step08890_3840.webp',
-    'assets/img/sed04km/09_step10000_3840.webp'
+    'assets/img/sed06km/00_step00007_3840.webp',
+    'assets/img/sed06km/01_step01120_3840.webp',
+    'assets/img/sed06km/02_step02226_3840.webp',
+    'assets/img/sed06km/03_step03339_3840.webp',
+    'assets/img/sed06km/04_step04452_3840.webp',
+    'assets/img/sed06km/05_step05558_3840.webp',
+    'assets/img/sed06km/06_step06671_3840.webp',
+    'assets/img/sed06km/07_step07784_3840.webp',
+    'assets/img/sed06km/08_step08890_3840.webp',
+    'assets/img/sed06km/09_step10000_3840.webp'
   ];
   var SMALL = [
-    'assets/img/sed04km/00_step00007_1920.webp',
-    'assets/img/sed04km/01_step01120_1920.webp',
-    'assets/img/sed04km/02_step02226_1920.webp',
-    'assets/img/sed04km/03_step03339_1920.webp',
-    'assets/img/sed04km/04_step04452_1920.webp',
-    'assets/img/sed04km/05_step05558_1920.webp',
-    'assets/img/sed04km/06_step06671_1920.webp',
-    'assets/img/sed04km/07_step07784_1920.webp',
-    'assets/img/sed04km/08_step08890_1920.webp',
-    'assets/img/sed04km/09_step10000_1920.webp'
+    'assets/img/sed06km/00_step00007_1920.webp',
+    'assets/img/sed06km/01_step01120_1920.webp',
+    'assets/img/sed06km/02_step02226_1920.webp',
+    'assets/img/sed06km/03_step03339_1920.webp',
+    'assets/img/sed06km/04_step04452_1920.webp',
+    'assets/img/sed06km/05_step05558_1920.webp',
+    'assets/img/sed06km/06_step06671_1920.webp',
+    'assets/img/sed06km/07_step07784_1920.webp',
+    'assets/img/sed06km/08_step08890_1920.webp',
+    'assets/img/sed06km/09_step10000_1920.webp'
   ];
   var HOLD = 620;    // ms each frame is held
   var FADE = 260;    // ms of fade, must match the CSS transition
@@ -106,8 +107,26 @@
 
   function paint(layer, url) { layer.style.backgroundImage = 'url("' + url + '")'; }
 
+  // A landscape window needs barely more than one frame, and tiling there leaves a thin sliver of
+  // the next frame whose black sky meets this frame's red mantle bottom, a faint red line. So tile
+  // only when the container is genuinely taller than about one and a half frames, which is the
+  // portrait case the repetition was added for.
+  var sweepEl = document.getElementById('sweep');
+  function fit() {
+    var r = sweepEl.getBoundingClientRect();
+    var tiles = r.width ? r.height / (r.width * 9 / 16) : 1;
+    var tiled = tiles > 1.5;
+    layers.forEach(function (l) {
+      l.style.backgroundRepeat = tiled ? 'repeat-y' : 'no-repeat';
+      l.style.backgroundSize = tiled ? '100% auto' : 'cover';
+      l.style.backgroundPosition = tiled ? 'top center' : 'center';
+    });
+  }
+
   paint(layers[0], FRAMES[0]);
   layers[0].style.opacity = '1';
+  fit();
+  window.addEventListener('resize', fit);
 
   function preload() {
     return Promise.all(FRAMES.map(function (u) {
