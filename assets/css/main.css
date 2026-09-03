@@ -46,13 +46,14 @@ body {
 /* height of the nav once it is stuck: 30 top + ~23 text + 20 bottom */
 :root { --nav-h: 73px; }
 
+/* the same blue the bonded plate is drawn in on the homepage frames: cmcrameri imola at 0.0 */
 a {
-  color: #003399;
+  color: #1a33b3;
   text-decoration: none;
 }
 
 a:hover { text-decoration: underline; }
-a:visited { color: #003399; }
+a:visited { color: #1a33b3; }
 
 /* Top nav: pinned to the viewport at every width. `fixed` rather than `sticky` because sticky
    silently fails in a few mobile browsers and inside some flex/overflow ancestors. */

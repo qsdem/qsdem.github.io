@@ -44,7 +44,7 @@ bitmap per frame however many tiles are on screen.
 ## Styling
 
 The site mirrors `braydennoh.github.io/style.css` exactly: the same self-hosted Myriad Pro, the
-same 15px / 1.5 body on a 960px left-aligned column with 30x40 padding, the same `#003399` links,
+same 15px / 1.5 body on a 960px left-aligned column with 30x40 padding, the same `#1a33b3` links (the plate blue, imola at 0.0),
 the same 13px dot-separated top nav, and the same two-column layout.
 
 **Apply, Wiki and About have a left sidebar.** `.columns` is a flex row of a fixed 280px
