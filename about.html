@@ -71,8 +71,8 @@
   <div class="main">
 
       <p>In commonly used
-        <a href="https://www.emerald.com/jgeot/article-abstract/29/1/47/399512/A-discrete-numerical-model-for-granular-assemblies?redirectedFrom=fulltext">dynamic DEM</a>,
-        the grain's position is updated by Newton's second law of motion. In other words, the grain only
+        <a href="https://www.emerald.com/jgeot/article-abstract/29/1/47/399512/A-discrete-numerical-model-for-granular-assemblies?redirectedFrom=fulltext">dynamic discrete element model (DEM)</a>,
+        the grain's position is updated by Newton's second law of motion. The grain only
         knows which way the force is pushing it, which is perfect for modeling fast, high-inertial events
         like avalanches, but not so much for slow, low-inertial systems like tectonic deformation.</p>
 
@@ -192,11 +192,6 @@ function clampOverlap(c) {                             // no deeper than DMAX in
   return c;
 }
 const DROP = {x: APEX.x + 60, y: 100};
-function angleFX(q) {
-  const lf = Math.hypot(q.F.x, q.F.y), lx = Math.hypot(q.dx, q.dy);
-  if (lf < 1e-9 || lx < 1e-12) return 0;
-  return Math.acos(Math.max(-1, Math.min(1, (q.F.x * q.dx + q.F.y * q.dy) / (lf * lx)))) * 180 / Math.PI;
-}
 function eig2(S) {
   const tr = S.sxx + S.syy, d = Math.sqrt(Math.max(0, (S.sxx - S.syy) ** 2 + 4 * S.sxy * S.sxy));
   return {l1: (tr + d) / 2, l2: (tr - d) / 2, th: 0.5 * Math.atan2(2 * S.sxy, S.sxx - S.syy)};
@@ -435,8 +430,7 @@ function frame(now) {
     `|F| / mg <b>${fmt(qsRes.fr)}</b> &nbsp; contacts <b>${qsRes.cs.length}</b><br>` +
     `S / k<sub>n</sub> = <span class="mat"><span>${fmt(qsRes.S.sxx / K)}</span><span>${fmt(qsRes.S.sxy / K)}</span>` +
     `<span>${fmt(qsRes.S.sxy / K)}</span><span>${fmt(qsRes.S.syy / K)}</span></span>` +
-    ` &nbsp; &Delta;X = (<b>${fmt(qsRes.dx)}</b>, <b>${fmt(qsRes.dy)}</b>) px<br>` +
-    `angle between F and &Delta;X <b>${fmt(angleFX(qsRes), 0)}&deg;</b>`;
+    ` &nbsp; &Delta;X = (<b>${fmt(qsRes.dx)}</b>, <b>${fmt(qsRes.dy)}</b>) px`;
 
   requestAnimationFrame(frame);
 }
