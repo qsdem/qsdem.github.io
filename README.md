@@ -47,7 +47,12 @@ the same 13px dot-separated top nav, and the same two-column layout.
 **Apply, Wiki and About have a left sidebar.** `.columns` is a flex row of a fixed 280px
 `.sidebar` and a flexible `.main`, with a 40px gap. The page heading (`h1`) and that page's standing
 text live in the sidebar (the access terms on Apply, the model description on About); the content
-lives in `.main`. Below 700px the columns stack and the sidebar goes full width, as in the reference.
+lives in `.main`. Below 700px the columns stack and the sidebar goes full width.
+
+The nav is `position: fixed` rather than `sticky`, because sticky fails silently in some mobile
+browsers and inside certain flex ancestors; `body` therefore carries a `--nav-h` top padding to
+reserve its space. The sidebar is sticky under the nav at every width, mobile included, where it
+needs its own background and z-index so the content slides underneath instead of showing through.
 
 `index.html` is the exception: no sidebar and no 960px column. It overrides the body to a black
 full-bleed page whose nav links are white for legibility, with the looping sweep filling everything
