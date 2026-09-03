@@ -38,9 +38,13 @@ body {
   line-height: 1.5;
   color: #222;
   background: #fff;
-  padding: 30px 40px;
+  /* no top padding: the sticky nav owns it, so its background covers content scrolling under it */
+  padding: 0 40px 30px;
   max-width: 960px;
 }
+
+/* height of the nav once it is stuck: 30 top + ~23 text + 20 bottom */
+:root { --nav-h: 73px; }
 
 a {
   color: #003399;
@@ -50,10 +54,15 @@ a {
 a:hover { text-decoration: underline; }
 a:visited { color: #003399; }
 
-/* Top nav */
+/* Top nav: stays put while the page scrolls */
 nav {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #fff;
   font-size: 15px;
-  margin-bottom: 20px;
+  padding: 30px 0 20px;
+  margin: 0;
 }
 
 nav a { margin-right: 4px; }
@@ -76,9 +85,13 @@ h1 {
 .columns {
   display: flex;
   gap: 40px;
+  align-items: flex-start;     /* a stretched flex item cannot stick */
 }
 
+/* the side panel stays put too, parked just under the nav */
 .sidebar {
+  position: sticky;
+  top: var(--nav-h);
   width: 280px;
   flex-shrink: 0;
   font-size: 14px;
@@ -116,12 +129,14 @@ h1 {
 
 /* Mobile */
 @media (max-width: 700px) {
-  body { padding: 20px 20px; }
+  body { padding: 0 20px 20px; }
+  nav { padding: 20px 0; }
 
   .columns {
     flex-direction: column;
     gap: 24px;
   }
 
-  .sidebar { width: 100%; }
+  /* stacked: the sidebar is above the content, so pinning it would cover the page */
+  .sidebar { position: static; width: 100%; }
 }
