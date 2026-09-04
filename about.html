@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>About &mdash; qsDEM</title>
 <link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/theme.css">
+<script src="assets/js/appearance.js"></script>
 <style>
   /* explorable only; type and colour come from main.css */
   .eq {
@@ -17,32 +19,63 @@
   .eq .sum { font-size: 1.3em; font-style: normal; vertical-align: -0.09em; }
   .gk { font-style: normal; }   /* upright Greek: italic alpha renders as a Latin 'a' in these serifs */
 
+  /* Plot colours only. Page chrome and the Appearance panel live in assets/css/theme.css,
+     and the canvases re-read these on every frame, so the theme switch restyles them for free. */
   :root {
     --panel: #ffffff; --wall-fill: #eef0f2; --wall: #3a3d42;
-    --grain: #2f6fdd; --force: #d13b2f; --step: #123f8f; --ellipse: #5c6470;
-    --trail: rgba(47,111,221,0.35); --ghost: rgba(47,111,221,0.65);
-    --ink: #222; --muted: #555;
+    --grain: #dfe6f2; --grain-line: #6b7789;
+    --chain: #262a32; --force: #d13b2f; --stiff: #4a7fc1;
+    --handle: #9aa3b0;
   }
+  :root[data-theme="dark"] {
+    --panel: #101319; --wall-fill: #262b34; --wall: #b9c1cd;
+    --grain: #2f3b4f; --grain-line: #8493a8;
+    --chain: #e3e9f4; --force: #ff6f61; --stiff: #6ea8ff;
+    --handle: #8493a8;
+  }
+  .eq { font-size: var(--fs); }
 
   /* each method is one self-contained column, so on a narrow screen they stack as
-     DEM title, DEM plot, DEM numbers, then the same for qsDEM */
-  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; margin-top: 20px; }
-  .pair h3 { font-size: 14px; font-weight: bold; margin: 0 0 5px; }
-  canvas {
-    display: block; width: 100%; height: auto; aspect-ratio: 445 / 322;
-    border: 1px solid #ddd; background: var(--panel); touch-action: none; cursor: grab;
+     DEM title, DEM plot, DEM control, DEM numbers, then the same for qsDEM */
+  /* One grid for BOTH panels rather than two independent columns: every row's height is the
+     max of its two cells, so the canvases, controls, legends and readouts stay aligned however
+     the text wraps. Explicit areas keep the stacking order right when it collapses to one column. */
+  .pair {
+    display: grid; column-gap: 16px; row-gap: 0; margin-top: 20px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "hA hB" "cA cB" "kA kB" "gA gB" "rA rB";
   }
-  .legend { display: flex; gap: 10px; flex-wrap: nowrap; white-space: nowrap; font-size: 11.5px; color: #555; margin: 8px 0 6px; }
-  .legend span { white-space: nowrap; }
-  .legend i { display: inline-block; width: 14px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 4px; }
-  .legend .f i { border-color: var(--force); } .legend .s i { border-color: var(--step); }
-  .legend .e i { border-color: var(--ellipse); }
-  .read { font-size: 12.5px; font-variant-numeric: tabular-nums; color: #555; line-height: 1.7; }
-  .read b { color: #222; font-weight: bold; }
-  .mat { display: inline-grid; grid-template-columns: auto auto; gap: 0 10px; padding: 1px 8px;
-         border-left: 1px solid #222; border-right: 1px solid #222; margin: 2px 0; color: #222; }
+  .pair h3 { font-size: 14px; font-weight: bold; margin: 0 0 5px; align-self: end; }
+  .aA { grid-area: hA; } .aB { grid-area: hB; }
+  .bA { grid-area: cA; } .bB { grid-area: cB; }
+  .cA { grid-area: kA; } .cB { grid-area: kB; }
+  .dA { grid-area: gA; } .dB { grid-area: gB; }
+  .eA { grid-area: rA; } .eB { grid-area: rB; }
+  canvas {
+    display: block; width: 100%; height: auto; aspect-ratio: 1 / 1;
+    border: 1px solid var(--rule); background: var(--panel); touch-action: none; cursor: default;
+  }
+  .legend { font-size: 11.5px; color: var(--fg-dim); margin: 8px 0 6px; }
+  .legend .sw { display: inline-block; width: 14px; height: 0; border-top: 3px solid var(--force);
+                vertical-align: middle; margin-right: 4px; }
+  .read { font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--fg-dim); line-height: 1.7; }
+  .read b { color: var(--fg); font-weight: bold; }
 
-  @media (max-width: 900px) { .pair { grid-template-columns: 1fr; gap: 26px; } }
+  /* one knob per method, sitting directly under the panel it belongs to */
+  .ctl { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--fg-dim); margin: 2px 0 8px; }
+  .ctl label { white-space: nowrap; flex: 0 0 auto; }
+  .ctl input[type=range] { flex: 1 1 auto; min-width: 0; accent-color: var(--link); }
+  .ctl output { font-variant-numeric: tabular-nums; color: var(--fg); font-weight: bold;
+                min-width: 4.2em; text-align: right; }
+
+
+  @media (max-width: 900px) {
+    .pair {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "hA" "cA" "kA" "gA" "rA" "hB" "cB" "kB" "gB" "rB";
+    }
+    .pair .aB { margin-top: 26px; }
+  }
 </style>
 </head>
 <body>
@@ -99,117 +132,206 @@
         vector &Delta;<i>X</i> is rotated away from the stiffest boundaries, automatically steering the grain
         down the optimal path of least resistance.</p>
 
-      <p>To see what this looks like, below is a simple demonstration comparing standard dynamic DEM with
-        qsDEM. The blue ball can be dragged anywhere in the boundary, which gravity will act on. Notice how
-        standard DEM causes the net force to drive the grain directly, which requires damping to settle. In
-        qsDEM, the grain does not bounce, as non-inertial systems carry no momentum.</p>
-  
+      <p>To see what this looks like, below is a simple sandbox comparing DEM with qsDEM. Slide the
+        right wall to load the pile.</p>
+
 
   <div class="pair">
-    <div class="col">
-      <h3>DEM</h3>
-      <canvas id="cdem" width="445" height="322"></canvas>
-      <div class="legend"><span class="f"><i></i>net force</span></div>
-      <div class="read" id="readdem"></div>
+    <h3 class="aA">DEM</h3>
+    <h3 class="aB">qsDEM</h3>
+
+    <canvas class="bA" id="cdem" width="264" height="264"></canvas>
+    <canvas class="bB" id="cqs" width="264" height="264"></canvas>
+
+    <div class="ctl cA">
+      <label for="damp">artificial damping</label>
+      <input type="range" id="damp" min="0" max="10" step="1" value="4">
+      <output id="dampv">4</output>
+    </div>
+    <div class="ctl cB">
+      <label for="wall">wall</label>
+      <input type="range" id="wall" min="132" max="232" step="1" value="172">
+      <output id="wallv">150 px</output>
     </div>
 
-    <div class="col">
-      <h3>qsDEM</h3>
-      <canvas id="cqs" width="445" height="322"></canvas>
-      <div class="legend">
-        <span class="f"><i></i>net force</span>
-        <span class="e"><i></i>stiffness S</span>
-        <span class="s"><i></i>step &Delta;X</span>
-      </div>
-      <div class="read" id="readqs"></div>
-    </div>
+    <div class="legend dA"><i class="sw"></i>net force, driven to <i>F</i> = 0</div>
+    <div class="legend dB"><i class="sw"></i>net force, driven to <i>F</i> = 0</div>
+
+    <div class="read eA" id="readdem"></div>
+    <div class="read eB" id="readqs"></div>
   </div>
+
+  </div>
+
 </div>
 
 <script>
 'use strict';
 // ------------------------------------------------------------------ model
-const W = 445, H = 322;   // height cut to 75%; width unchanged
-const R = 22;              // grain radius (px)
-const K = 2000;            // contact stiffness (force per px of overlap)
-const M = 1;               // mass
-const G = 2400;            // gravity (px/s^2) -> equilibrium overlap M*G/K = 1.2 px
-const REG = K / 20;        // qsDEM diagonal regularisation (production: reg_t = kn/20)
-const CAP = 0.4 * R;       // qsDEM step cap (production: 0.2 R)
-const DMAX = 15;           // deepest overlap a drag may create
-const DT = 1 / 120;        // DEM time step: 19% of the 2/sqrt(K/M) = 0.045 s stability limit
-const TOL = 0.01;          // force gate |F| / mg
-const DAMP = 4.0;          // DEM artificial damping, fixed
-const ALPHA = 0.75;        // qsDEM modification factor, fixed
-const RATE_DEM = 100;      // DEM time steps per second of wall clock
-const RATE_QS = 50;        // qsDEM iterations per second of wall clock
-const APEX = {x: 157, y: 277};   // left margin 45 px = bottom margin 45 px
-const ANG_L = 68 * Math.PI / 180;   // steep left wall
-const ANG_R = 22 * Math.PI / 180;   // shallow right wall
+// Kishino's bi-axial element test, shrunk to ten discs and two degrees of freedom per grain.
+// Rotation is dropped and the contacts are frictionless, so k_t = 0 and the 3x3 stiffness of
+// eq.11 collapses to the 2x2 translational block S = sum_c k_n n n^T. Kishino ran his own walls
+// at zero friction too.
+const W = 264, H = 264;
+const XL = 22, FLOOR = 240;              // fixed left wall and floor; the top is open
+const XR0 = 172, XR_MIN = 132, XR_MAX = 232;
+const KN = 100000;                       // contact stiffness (force per px of overlap)
+const G = 2400;                          // gravity (force per unit mass)
+const REG = KN / 5;                      // diagonal regularisation, the Levenberg term of eq.12
+const ALPHA = 0.75;                      // Kishino's modification factor, his own value
+const CAPF = 0.2;                        // step cap, as a fraction of the grain radius (production value)
+const DT = 1 / 1600;                     // DEM time step: 14% of the 2/sqrt(2kn/m) pair limit
+const TOL = 0.05;                        // force gate on max |F| / mg; Kishino's own test ran near 0.24
+const KE_TOL = 0.5;                      // DEM also has to stop moving, not just balance
+const RATE = 8000;                       // solver passes per second, IDENTICAL for both panels
+const WALL_RATE = 0.015;                 // px of wall travel per pass, Kishino's limited boundary movement
 
-const tL = {x: -Math.cos(ANG_L), y: -Math.sin(ANG_L)};
-const tR = {x:  Math.cos(ANG_R), y: -Math.sin(ANG_R)};
-const OBS = [
-  {p: APEX, t: tL, n: {x: -tL.y, y: tL.x}},                                  // left wall, n into the wedge
-  {p: APEX, t: tR, n: {x:  tR.y, y: -tR.x}},                                 // right wall
-  {p: {x: W, y: 0}, t: {x: 0, y: 1}, n: {x: -1, y: 0}, hidden: true}          // keeps the grain on screen
+// Bidisperse at radii 0.5 and 0.3 of the production spec, scaled 30x to 15 and 9 px, with
+// Kishino's number ratio (1+sqrt5)/4. Built the way the subduction runs are: a periodic pack
+// quenched to phi = 0.86 by minimising sum(overlap^2), then a 150 x 99 px rectangle carved out
+// of it, then relaxed under gravity so both panels open in force balance. See 9.1/g5_walls and
+// 8.31/geom_sweep/g5_450x100_400x15/subduction.py (quench_plate, build_plate). 13 large and 18
+// small survive the carve; the deepest contact in the starting pile is buried 3.6% of a radius.
+const GRAINS = [
+  {r:  9, x: 163.3247, y: 231.2928},
+  {r:  9, x:  81.6761, y: 231.2055},
+  {r: 15, x: 101.1423, y: 204.4564},
+  {r:  9, x:  57.8632, y: 164.3854},
+  {r: 15, x:  58.5629, y: 225.4122},
+  {r:  9, x: 145.5783, y: 231.0852},
+  {r:  9, x: 118.3814, y: 156.4097},
+  {r:  9, x: 125.6505, y: 172.7941},
+  {r:  9, x: 163.0550, y: 167.3557},
+  {r:  9, x: 163.1275, y: 185.3000},
+  {r:  9, x: 146.3582, y: 179.0488},
+  {r: 15, x: 157.0895, y: 129.5273},
+  {r:  9, x: 113.2544, y: 139.2380},
+  {r:  9, x:  48.4421, y: 149.0735},
+  {r:  9, x: 110.4098, y: 182.3646},
+  {r: 15, x: 142.2609, y: 155.5001},
+  {r:  9, x:  95.3242, y: 139.5811},
+  {r: 15, x: 122.5712, y: 225.2332},
+  {r:  9, x:  73.6161, y: 172.9346},
+  {r: 15, x:  72.0324, y: 145.0781},
+  {r: 15, x: 128.4500, y: 120.7504},
+  {r:  9, x:  79.1919, y: 213.5188},
+  {r:  9, x:  86.3309, y: 185.6588},
+  {r:  9, x:  99.4895, y: 231.0696},
+  {r: 15, x: 157.0854, y: 208.4035},
+  {r: 15, x:  95.5964, y: 163.5700},
+  {r:  9, x:  30.9049, y: 152.7280},
+  {r: 15, x: 129.8545, y: 196.3133},
+  {r: 15, x:  64.2509, y: 194.9204},
+  {r: 15, x:  36.4861, y: 205.7569},
+  {r: 15, x:  36.9268, y: 175.9159}
 ];
+const N = GRAINS.length;
+const RAD = GRAINS.map(g => g.r);
+const MASS = RAD.map(r => (r / 9) * (r / 9));    // disc of unit depth, so m goes as r^2
 
-function contacts(c) {
-  const out = [];
-  for (const ob of OBS) {
-    const d = R - ((c.x - ob.p.x) * ob.n.x + (c.y - ob.p.y) * ob.n.y);
-    if (d > 0) out.push({n: ob.n, d});
+function mkWorld() {
+  return {
+    p: GRAINS.map(g => ({x: g.x, y: g.y})),
+    v: GRAINS.map(() => ({x: 0, y: 0})),
+    cs: [], F: [], S: [],
+    res: 0, ke: 0, passes: 0, settled: 0
+  };
+}
+
+// Every contact the grain has, with n pointing the way that contact pushes THIS grain.
+// The three walls are half-planes, so a grain squeezed above the wall tops is still confined.
+function assemble(w, xr) {
+  const cs = [];
+  for (let i = 0; i < N; i++) cs.push([]);
+  for (let i = 0; i < N; i++) {
+    const g = w.p[i], ri = RAD[i];
+    let d = ri - (FLOOR - g.y); if (d > 0) cs[i].push({nx: 0, ny: -1, d: d});
+    d = ri - (g.x - XL);        if (d > 0) cs[i].push({nx: 1, ny: 0, d: d});
+    d = ri - (xr - g.x);        if (d > 0) cs[i].push({nx: -1, ny: 0, d: d});
   }
-  return out;
-}
-function netForce(cs) {
-  let fx = 0, fy = M * G;                              // canvas y points down, so gravity is +y
-  for (const c of cs) { fx += K * c.d * c.n.x; fy += K * c.d * c.n.y; }
-  return {x: fx, y: fy};
-}
-function stiffness(cs) {                               // Kishino eq. 11 plus the production regularisation
-  let sxx = REG, sxy = 0, syy = REG;
-  for (const c of cs) { sxx += K * c.n.x * c.n.x; sxy += K * c.n.x * c.n.y; syy += K * c.n.y * c.n.y; }
-  return {sxx, sxy, syy};
-}
-function qsSolve(pos) {                                // Kishino eq. 12
-  const cs = contacts(pos), F = netForce(cs), S = stiffness(cs);
-  const det = S.sxx * S.syy - S.sxy * S.sxy;           // > 0 always, thanks to REG
-  let dx = ALPHA * ( S.syy * F.x - S.sxy * F.y) / det;
-  let dy = ALPHA * (-S.sxy * F.x + S.sxx * F.y) / det;
-  const l = Math.hypot(dx, dy);
-  if (l > CAP) { dx *= CAP / l; dy *= CAP / l; }
-  return {cs, F, S, det, dx, dy, fr: Math.hypot(F.x, F.y) / (M * G)};
-}
-function demSolve(st) {
-  const cs = contacts(st), F = netForce(cs);
-  return {cs, F, fr: Math.hypot(F.x, F.y) / (M * G)};
-}
-function clampOverlap(c) {                             // no deeper than DMAX into any wall
-  for (let it = 0; it < 3; it++) {
-    for (const k of contacts(c)) if (k.d > DMAX) { c.x += (k.d - DMAX) * k.n.x; c.y += (k.d - DMAX) * k.n.y; }
+  for (let i = 0; i < N; i++) {
+    for (let j = i + 1; j < N; j++) {
+      const dx = w.p[i].x - w.p[j].x, dy = w.p[i].y - w.p[j].y;
+      const s = RAD[i] + RAD[j], r2 = dx * dx + dy * dy;
+      if (r2 < s * s && r2 > 1e-12) {
+        const L = Math.sqrt(r2), d = s - L, nx = dx / L, ny = dy / L;
+        cs[i].push({nx: nx, ny: ny, d: d, j: j});
+        cs[j].push({nx: -nx, ny: -ny, d: d, j: i});
+      }
+    }
   }
-  return c;
+  const F = [], S = [];
+  let res = 0;
+  for (let i = 0; i < N; i++) {
+    let fx = 0, fy = MASS[i] * G;                    // canvas y points down, so gravity is +y
+    let sxx = REG, sxy = 0, syy = REG;
+    for (const c of cs[i]) {
+      fx += KN * c.d * c.nx; fy += KN * c.d * c.ny;
+      sxx += KN * c.nx * c.nx; sxy += KN * c.nx * c.ny; syy += KN * c.ny * c.ny;
+    }
+    F.push({x: fx, y: fy});
+    S.push({sxx: sxx, sxy: sxy, syy: syy});
+    const fr = Math.hypot(fx, fy) / (MASS[i] * G);
+    if (fr > res) res = fr;
+  }
+  w.cs = cs; w.F = F; w.S = S; w.res = res;
 }
-const DROP = {x: APEX.x + 60, y: 100};
-function eig2(S) {
-  const tr = S.sxx + S.syy, d = Math.sqrt(Math.max(0, (S.sxx - S.syy) ** 2 + 4 * S.sxy * S.sxy));
-  return {l1: (tr + d) / 2, l2: (tr - d) / 2, th: 0.5 * Math.atan2(2 * S.sxy, S.sxx - S.syy)};
+
+// One qsDEM iteration. Kishino eq.12 per grain, then EVERY grain moves at once off the
+// stiffnesses that were assembled before any of them moved. That simultaneity is the reason
+// the modification factor has to be less than one.
+function qsMove(w) {
+  const d = [];
+  for (let i = 0; i < N; i++) {
+    const S = w.S[i], f = w.F[i];
+    const det = S.sxx * S.syy - S.sxy * S.sxy;       // > 0 always, thanks to REG
+    let dx = ALPHA * ( S.syy * f.x - S.sxy * f.y) / det;
+    let dy = ALPHA * (-S.sxy * f.x + S.sxx * f.y) / det;
+    const cap = CAPF * RAD[i], l = Math.hypot(dx, dy);
+    if (l > cap) { dx *= cap / l; dy *= cap / l; }
+    d.push({x: dx, y: dy});
+  }
+  for (let i = 0; i < N; i++) { w.p[i].x += d[i].x; w.p[i].y += d[i].y; }
+}
+
+// One explicit DEM time step, same assembled forces, plus the viscous term that has no physical
+// counterpart in a slow granular pile and exists only to bleed off kinetic energy.
+function demMove(w, damp) {
+  let ke = 0;
+  for (let i = 0; i < N; i++) {
+    const m = MASS[i], f = w.F[i], v = w.v[i];
+    v.x += (f.x / m - damp * v.x) * DT;
+    v.y += (f.y / m - damp * v.y) * DT;
+    w.p[i].x += v.x * DT; w.p[i].y += v.y * DT;
+    ke += 0.5 * m * (v.x * v.x + v.y * v.y);
+  }
+  w.ke = ke;
+}
+
+// One pass costs one force-and-stiffness assembly either way, which is what makes the pass
+// count a fair comparison. qsDEM's assembly is modestly dearer: it fills S alongside F.
+function pass(w, xr, isDem, damp) {
+  assemble(w, xr);
+  if (w.settled !== null) return;
+  if (w.res < TOL && (!isDem || w.ke < KE_TOL)) { w.settled = w.passes; return; }
+  if (isDem) demMove(w, damp); else qsMove(w);
+  w.passes++;
+}
+
+function maxContactForce(w) {
+  let m = 1e-9;
+  for (let i = 0; i < N; i++) for (const c of w.cs[i]) if (KN * c.d > m) m = KN * c.d;
+  return m;
 }
 
 // ------------------------------------------------------------------ drawing
-// Both arrows are fixed-length direction indicators drawn from the grain's edge: |F| spans two orders of
-// magnitude across these states and a true-to-scale step is shorter than the grain's own radius, so the
-// numbers stay in the readout and the dashed circle shows where the step lands.
-const FLEN = 46, XLEN = 40;
-// The stiffness ellipse is normalised to a fixed major axis, so its shape (stiff across the contact
-// normal, soft along the wall) stays legible outside the grain whatever the absolute stiffness is.
-const ELL_MAJOR = 46, ELL_MIN_RATIO = 0.08;
+// Arrow lengths scale with magnitude and vanish near balance, so a settled panel is quiet and a
+// loaded one lights up, instead of a settled panel advertising a force it no longer has.
+const LMAX = 24, FREF = 8;
+const GLYPH = 0.86;                                  // stiffness glyph half-length, as a fraction of the radius
 
 function css(n) { return getComputedStyle(document.body).getPropertyValue(n).trim(); }
 function fmt(v, d = 2) { return (Math.abs(v) < 1e-12 ? 0 : v).toFixed(d); }
-function lerp(a, b, t) { return {x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t}; }
 
 function setupCanvas(cv) {
   const dpr = window.devicePixelRatio || 1;
@@ -220,222 +342,222 @@ function setupCanvas(cv) {
 }
 
 // the shaft stops at the base of the head, so nothing pokes through the tip
-function arrow(ctx, x0, y0, x1, y1, color, w) {
+function arrow(ctx, x0, y0, x1, y1, w) {
   const dx = x1 - x0, dy = y1 - y0, l = Math.hypot(dx, dy);
   if (l < 1.2) return;
   const ux = dx / l, uy = dy / l;
-  const head = Math.min(4.5 + 2.1 * w, l * 0.85);
+  const head = Math.min(4 + 2 * w, l * 0.85);
   const bx = x1 - ux * head, by = y1 - uy * head, hw = head * 0.5;
-  ctx.save();
-  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = w; ctx.lineCap = 'butt';
+  ctx.lineWidth = w;
   if (l > head + 0.5) { ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(bx, by); ctx.stroke(); }
   ctx.beginPath();
   ctx.moveTo(x1, y1);
   ctx.lineTo(bx - uy * hw, by + ux * hw);
   ctx.lineTo(bx + uy * hw, by - ux * hw);
   ctx.closePath(); ctx.fill();
+}
+
+// the unbalanced force on every grain, drawn from the grain's edge outward
+function drawForces(ctx, w) {
+  ctx.save();
+  ctx.strokeStyle = css('--force'); ctx.fillStyle = css('--force'); ctx.lineCap = 'butt';
+  for (let i = 0; i < N; i++) {
+    const f = w.F[i], l = Math.hypot(f.x, f.y);
+    if (l < 1e-12) continue;
+    const len = LMAX * Math.min(1, Math.sqrt(l / (MASS[i] * G) / FREF));
+    if (len < 2.5) continue;
+    const c = w.p[i], r = RAD[i];
+    arrow(ctx, c.x + f.x / l * r, c.y + f.y / l * r,
+               c.x + f.x / l * (r + len), c.y + f.y / l * (r + len), 2);
+  }
   ctx.restore();
 }
 
-// drawn from the centre outward; the grain is painted afterwards and hides the shaft inside it,
-// so the arrow reads as leaving the circle's edge with no gap
-function dirArrow(ctx, c, vx, vy, color, len, w) {
-  const l = Math.hypot(vx, vy);
-  if (l < 1e-12) return;
-  const ux = vx / l, uy = vy / l;
-  arrow(ctx, c.x, c.y, c.x + ux * (R + len), c.y + uy * (R + len), color, w);
-}
-
-function drawWorld(ctx) {
+function drawWorld(ctx, xr) {
   ctx.clearRect(0, 0, W, H);
   ctx.save();
   ctx.fillStyle = css('--panel');
   ctx.fillRect(0, 0, W, H);
-  const far = 1400;
   ctx.fillStyle = css('--wall-fill');
-  for (const ob of OBS) {
-    if (ob.hidden) continue;
-    const a = {x: ob.p.x - ob.t.x * far, y: ob.p.y - ob.t.y * far};
-    const b = {x: ob.p.x + ob.t.x * far, y: ob.p.y + ob.t.y * far};
-    ctx.beginPath();
-    ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
-    ctx.lineTo(b.x - ob.n.x * far, b.y - ob.n.y * far); ctx.lineTo(a.x - ob.n.x * far, a.y - ob.n.y * far);
-    ctx.closePath(); ctx.fill();
-  }
+  ctx.fillRect(0, 0, XL, H);                         // outside the left wall
+  ctx.fillRect(xr, 0, W - xr, H);                    // outside the sliding wall
+  ctx.fillRect(XL, FLOOR, xr - XL, H - FLOOR);       // under the floor
   ctx.strokeStyle = css('--wall'); ctx.lineWidth = 2.5;
-  ctx.lineJoin = 'round'; ctx.lineCap = 'butt';
-  ctx.beginPath();
-  ctx.moveTo(APEX.x + tL.x * far, APEX.y + tL.y * far);
-  ctx.lineTo(APEX.x, APEX.y);
-  ctx.lineTo(APEX.x + tR.x * far, APEX.y + tR.y * far);
+  ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
+  ctx.beginPath();                                   // one path, so both corners join cleanly
+  ctx.moveTo(XL, 0);
+  ctx.lineTo(XL, FLOOR);
+  ctx.lineTo(xr, FLOOR);
+  ctx.lineTo(xr, 0);
   ctx.stroke();
-  ctx.restore();
-}
-
-function drawPath(ctx, pts, color) {
-  if (pts.length < 2) return;
-  ctx.save();
-  ctx.strokeStyle = color; ctx.lineWidth = 1.3;
-  ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
-  for (const p of pts) ctx.lineTo(p.x, p.y);
-  ctx.stroke(); ctx.restore();
-}
-
-function drawGrain(ctx, c, cs) {
-  ctx.save();
-  ctx.beginPath(); ctx.arc(c.x, c.y, R, 0, 6.2832);
-  ctx.fillStyle = css('--grain'); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.85)';
-  for (const k of cs) {
+  // only the grip is drawn differently, as the cue that this wall is the one you can drag
+  ctx.strokeStyle = css('--handle'); ctx.lineWidth = 1.5;
+  for (let k = -1; k <= 1; k++) {
     ctx.beginPath();
-    ctx.arc(c.x - k.n.x * (R - k.d / 2), c.y - k.n.y * (R - k.d / 2), Math.min(4, 1.5 + k.d / 3), 0, 6.2832);
-    ctx.fill();
+    ctx.moveTo(xr + 4, 24 + k * 8); ctx.lineTo(xr + 13, 24 + k * 8);
+    ctx.stroke();
   }
   ctx.restore();
 }
 
-function drawEllipse(ctx, c, S) {
-  const e = eig2(S);
-  const ratio = e.l1 > 0 ? Math.max(e.l2 / e.l1, ELL_MIN_RATIO) : 1;
+function drawGrains(ctx, w) {
   ctx.save();
-  ctx.strokeStyle = css('--ellipse'); ctx.lineWidth = 1.6;
-  ctx.beginPath(); ctx.ellipse(c.x, c.y, ELL_MAJOR, ELL_MAJOR * ratio, e.th, 0, 6.2832);
-  ctx.stroke(); ctx.restore();
+  ctx.strokeStyle = css('--grain-line'); ctx.lineWidth = 1;
+  ctx.fillStyle = css('--grain');
+  for (let i = 0; i < N; i++) {
+    ctx.beginPath(); ctx.arc(w.p[i].x, w.p[i].y, RAD[i], 0, 6.2832);
+    ctx.fill(); ctx.stroke();
+  }
+  ctx.restore();
 }
 
-function ghost(ctx, c, color) {
+// Kishino drew his fabric as bars whose thickness tracks the contact force (his figs.4, 6, 12, 13).
+// Drawn over the discs, not under them, or the opaque fill would hide the whole network.
+function drawChains(ctx, w) {
+  const pmax = maxContactForce(w);
   ctx.save();
-  ctx.setLineDash([3, 3]); ctx.strokeStyle = color; ctx.lineWidth = 1.3;
-  ctx.beginPath(); ctx.arc(c.x, c.y, R, 0, 6.2832); ctx.stroke(); ctx.restore();
+  ctx.strokeStyle = css('--chain'); ctx.lineCap = 'round'; ctx.globalAlpha = 0.65;
+  for (let i = 0; i < N; i++) {
+    for (const c of w.cs[i]) {
+      if (c.j !== undefined && c.j < i) continue;    // pair contacts are stored twice
+      const a = w.p[i];
+      let bx, by;
+      if (c.j !== undefined) { bx = w.p[c.j].x; by = w.p[c.j].y; }
+      else { bx = a.x - c.nx * RAD[i]; by = a.y - c.ny * RAD[i]; }
+      ctx.lineWidth = 0.5 + 4.5 * Math.min(1, KN * c.d / pmax);
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(bx, by); ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+
+// The stiffness of every grain at once, drawn as the two principal axes of S rather than as an
+// ellipse outline, which at these grain sizes would just read as a second grain edge. The long
+// arm points the stiff way, the short arm shows how free the grain is in the other direction.
+function drawStiffness(ctx, w) {
+  ctx.save();
+  ctx.strokeStyle = css('--stiff'); ctx.lineWidth = 1.3; ctx.lineCap = 'round';
+  for (let i = 0; i < N; i++) {
+    const S = w.S[i];
+    const tr = S.sxx + S.syy;
+    const q = Math.sqrt(Math.max(0, (S.sxx - S.syy) * (S.sxx - S.syy) + 4 * S.sxy * S.sxy));
+    const l1 = (tr + q) / 2, l2 = (tr - q) / 2;
+    const th = 0.5 * Math.atan2(2 * S.sxy, S.sxx - S.syy);
+    const ratio = l1 > 0 ? l2 / l1 : 1;
+    const a = RAD[i] * GLYPH, b = a * Math.max(ratio, 0.12);
+    const cx = w.p[i].x, cy = w.p[i].y, ct = Math.cos(th), st = Math.sin(th);
+    ctx.beginPath();
+    ctx.moveTo(cx - ct * a, cy - st * a); ctx.lineTo(cx + ct * a, cy + st * a);
+    ctx.moveTo(cx + st * b, cy - ct * b); ctx.lineTo(cx - st * b, cy + ct * b);
+    ctx.stroke();
+  }
+  ctx.restore();
 }
 
 // ------------------------------------------------------------------ state
 const cdem = document.getElementById('cdem'), ctxD = setupCanvas(cdem);
 const cqs  = document.getElementById('cqs'),  ctxQ = setupCanvas(cqs);
 const readD = document.getElementById('readdem'), readQ = document.getElementById('readqs');
+const sDamp = document.getElementById('damp'), oDamp = document.getElementById('dampv');
+const sWall = document.getElementById('wall'), oWall = document.getElementById('wallv');
 
-let dem, demPrev, demSteps, demSettled, demRes, demTrail;
-let qs, qsPrev, qsIters, qsConv, qsRes, qsPath;
-let accD = 0, accQ = 0, last = performance.now(), dragging = false;
+let dem, qs, xr, xrTarget;
+let acc = 0, last = performance.now(), dragging = false;
 
-function reset(p) {
-  dem = {x: p.x, y: p.y, vx: 0, vy: 0}; demPrev = {x: p.x, y: p.y};
-  demSteps = 0; demSettled = null; demRes = demSolve(dem); demTrail = [{x: p.x, y: p.y}];
-  qs = {x: p.x, y: p.y}; qsPrev = {x: p.x, y: p.y};
-  qsIters = 0; qsConv = null; qsRes = qsSolve(qs); qsPath = [{x: p.x, y: p.y}];
-  accD = 0; accQ = 0;
+function reset() {
+  dem = mkWorld(); qs = mkWorld();
+  xr = XR0; xrTarget = XR0;
+  sWall.value = String(XR0);
+  oWall.value = (XR0 - XL) + ' px';
+  assemble(dem, xr); assemble(qs, xr);
+  acc = 0; last = performance.now();
 }
-reset(DROP);
+reset();
 
-function stepDem() {                                   // one explicit DEM time step
-  if (demSettled === null) {
-    demPrev = {x: dem.x, y: dem.y};
-    demRes = demSolve(dem);
-    dem.vx += (demRes.F.x / M - DAMP * dem.vx) * DT;
-    dem.vy += (demRes.F.y / M - DAMP * dem.vy) * DT;
-    dem.x += dem.vx * DT; dem.y += dem.vy * DT;
-    demSteps++;
-    if (demSteps % 2 === 0) { demTrail.push({x: dem.x, y: dem.y}); if (demTrail.length > 600) demTrail.shift(); }
-    const ke = 0.5 * M * (dem.vx * dem.vx + dem.vy * dem.vy);
-    const after = demSolve(dem);
-    if (after.fr < TOL && ke < 0.5 && after.cs.length >= 2) demSettled = demSteps;
-  } else { demPrev = {x: dem.x, y: dem.y}; }
+function disturb() {                                 // a moving boundary reopens both solves
+  dem.settled = null; dem.passes = 0;
+  qs.settled = null;  qs.passes = 0;
+}
+function setWall(x) {                                // slider and canvas drag share one target
+  xrTarget = Math.max(XR_MIN, Math.min(XR_MAX, x));
+  sWall.value = String(Math.round(xrTarget));
+  oWall.value = Math.round(xrTarget - XL) + ' px';
 }
 
-function stepQs() {                                    // one qsDEM force-balance iteration
-  if (qsConv === null) {
-    qsRes = qsSolve(qs);
-    if (qsRes.fr < TOL && qsRes.cs.length >= 2) { qsConv = qsIters; qsPrev = {x: qs.x, y: qs.y}; }
-    else {
-      qsPrev = {x: qs.x, y: qs.y};
-      qs.x += qsRes.dx; qs.y += qsRes.dy;
-      qsIters++;
-      qsPath.push({x: qs.x, y: qs.y}); if (qsPath.length > 500) qsPath.shift();
-    }
-  } else { qsPrev = {x: qs.x, y: qs.y}; }
-}
-
-// ------------------------------------------------------------------ shared drag: both grains follow
+// ------------------------------------------------------------------ input: one wall, both panels
 function canvasPoint(cv, ev) {
   const r = cv.getBoundingClientRect();
   return {x: (ev.clientX - r.left) * W / r.width, y: (ev.clientY - r.top) * H / r.height};
 }
-function attachDrag(cv, getLocal) {
-  let off = null;
+function attach(cv) {                                // the wall can also be grabbed on either canvas
   cv.addEventListener('pointerdown', ev => {
-    const p = canvasPoint(cv, ev), g = getLocal();
-    if (Math.hypot(p.x - g.x, p.y - g.y) > R + 12) return;
-    dragging = true; off = {x: g.x - p.x, y: g.y - p.y};
-    cv.setPointerCapture(ev.pointerId); cv.style.cursor = 'grabbing';
+    if (Math.abs(canvasPoint(cv, ev).x - xr) > 14) return;
+    dragging = true;
+    cv.setPointerCapture(ev.pointerId);
+    cv.style.cursor = 'ew-resize';
     ev.preventDefault();
   });
   cv.addEventListener('pointermove', ev => {
-    if (!dragging || !off) return;
     const p = canvasPoint(cv, ev);
-    reset(clampOverlap({x: p.x + off.x, y: p.y + off.y}));       // both panels take the same state
+    if (dragging) { setWall(p.x); return; }
+    cv.style.cursor = Math.abs(p.x - xr) < 14 ? 'ew-resize' : 'default';
   });
-  const end = () => { if (dragging) { dragging = false; off = null; cv.style.cursor = 'grab'; last = performance.now(); } };
+  const end = () => {
+    if (dragging) { dragging = false; cv.style.cursor = 'default'; last = performance.now(); }
+  };
   cv.addEventListener('pointerup', end);
   cv.addEventListener('pointercancel', end);
 }
-attachDrag(cdem, () => dem);
-attachDrag(cqs, () => qs);
+attach(cdem);
+attach(cqs);
+
+sDamp.addEventListener('input', () => { oDamp.value = sDamp.value; disturb(); });
+sWall.addEventListener('input', () => { setWall(Number(sWall.value)); });
 
 // ------------------------------------------------------------------ loop
 function frame(now) {
   let dt = (now - last) / 1000; last = now;
   if (!isFinite(dt) || dt < 0) dt = 0;
   dt = Math.min(dt, 0.25);
-  if (dragging) { accD = 0; accQ = 0; }
-  else {
-    let guard = 0;
-    accD += dt * RATE_DEM;
-    while (accD >= 1 && guard++ < 400) { accD -= 1; stepDem(); }
-    guard = 0;
-    accQ += dt * RATE_QS;
-    while (accQ >= 1 && guard++ < 400) { accQ -= 1; stepQs(); }
-  }
-  const pd = lerp(demPrev, dem, dragging ? 1 : Math.min(accD, 1));
-  const pq = lerp(qsPrev, qs, dragging ? 1 : Math.min(accQ, 1));
 
-  // ---- DEM panel
-  drawWorld(ctxD);
-  drawPath(ctxD, demTrail, css('--trail'));
-  dirArrow(ctxD, pd, demRes.F.x, demRes.F.y, css('--force'), FLEN, 2.5);
-  drawGrain(ctxD, pd, demRes.cs);
+  const damp = Number(sDamp.value);
+  acc += dt * RATE;
+  let guard = 0;
+  while (acc >= 1 && guard++ < 20000) {
+    acc -= 1;
+    if (xr !== xrTarget) {                           // the wall advances by at most WALL_RATE a pass
+      const step = Math.min(WALL_RATE, Math.abs(xrTarget - xr));
+      xr += Math.sign(xrTarget - xr) * step;
+      if (Math.abs(xrTarget - xr) < 1e-9) xr = xrTarget;
+      disturb();                                     // so the pass count measures the settle, not the load
+    }
+    pass(dem, xr, true, damp);                       // both panels, same wall, same pass count
+    pass(qs, xr, false, damp);
+  }
+
+  // ---- DEM panel: no stiffness ellipse, because DEM never forms S
+  drawWorld(ctxD, xr);
+  drawGrains(ctxD, dem);
+  drawChains(ctxD, dem);
+  drawForces(ctxD, dem);
 
   // ---- qsDEM panel
-  drawWorld(ctxQ);
-  drawPath(ctxQ, qsPath, css('--trail'));
-  if (qsConv === null) ghost(ctxQ, {x: qsPrev.x + qsRes.dx, y: qsPrev.y + qsRes.dy}, css('--ghost'));
-  if (qsConv === null) dirArrow(ctxQ, pq, qsRes.dx, qsRes.dy, css('--step'), XLEN, 3);
-  dirArrow(ctxQ, pq, qsRes.F.x, qsRes.F.y, css('--force'), FLEN, 2.5);
-  drawGrain(ctxQ, pq, qsRes.cs);
-  drawEllipse(ctxQ, pq, qsRes.S);              // drawn over the grain, so it is never hidden behind it
-  for (const k of qsRes.cs) {
-    ctxQ.save(); ctxQ.strokeStyle = css('--wall'); ctxQ.lineWidth = 1;
-    ctxQ.beginPath();
-    ctxQ.moveTo(pq.x - k.n.x * R, pq.y - k.n.y * R);
-    ctxQ.lineTo(pq.x - k.n.x * (R + 13), pq.y - k.n.y * (R + 13));
-    ctxQ.stroke(); ctxQ.restore();
-  }
+  drawWorld(ctxQ, xr);
+  drawGrains(ctxQ, qs);
+  drawChains(ctxQ, qs);
+  drawStiffness(ctxQ, qs);
+  drawForces(ctxQ, qs);
 
   // ---- readouts
-  const keD = 0.5 * M * (dem.vx * dem.vx + dem.vy * dem.vy);
-  readD.innerHTML =
-    `time steps <b>${demSteps}</b> &nbsp; sim time <b>${fmt(demSteps * DT)}</b> s<br>` +
-    `|F| / mg <b>${fmt(demRes.fr)}</b> &nbsp; contacts <b>${demRes.cs.length}</b><br>` +
-    `kinetic energy <b>${fmt(keD / 1000, 1)}</b> &times;10<sup>3</sup>`;
-  readQ.innerHTML =
-    `iterations <b>${qsIters}</b><br>` +
-    `|F| / mg <b>${fmt(qsRes.fr)}</b> &nbsp; contacts <b>${qsRes.cs.length}</b><br>` +
-    `S / k<sub>n</sub> = <span class="mat"><span>${fmt(qsRes.S.sxx / K)}</span><span>${fmt(qsRes.S.sxy / K)}</span>` +
-    `<span>${fmt(qsRes.S.sxy / K)}</span><span>${fmt(qsRes.S.syy / K)}</span></span>` +
-    ` &nbsp; &Delta;X = (<b>${fmt(qsRes.dx)}</b>, <b>${fmt(qsRes.dy)}</b>) px`;
+  const tag = w => w.settled !== null ? '<b>' + w.settled + '</b> passes (settled)'
+                                      : '<b>' + w.passes + '</b> passes (running)';
+  readD.innerHTML = 'max |F| / mg <b>' + fmt(dem.res, 3) + '</b><br>' + tag(dem);
+  readQ.innerHTML = 'max |F| / mg <b>' + fmt(qs.res, 3) + '</b><br>' + tag(qs);
 
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
 </script>
+
 </body>
 </html>

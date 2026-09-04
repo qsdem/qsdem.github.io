@@ -1,0 +1,91 @@
+/* qsDEM -- shared theming and the Appearance panel, used by about.html, apply.html and wiki.html.
+   Loaded AFTER main.css so it can re-point the colours main.css hard-codes, and BEFORE each
+   page's own <style> so a page can still override anything here.
+
+   Every colour is a custom property. That is what lets the About page's canvases follow the
+   theme for free: they read --panel, --grain, --chain and the rest on every frame, so flipping
+   --data-theme restyles the plots along with the page, with nothing to redraw by hand.
+
+   Pages that draw canvases add their own plot colours (--panel, --grain, ...) in both the light
+   and dark blocks of their own <style>; only page chrome lives here. */
+
+:root {
+  /* tells the browser to render native controls dark too: checkboxes, radios, range thumbs,
+     text fields and scrollbars, none of which CSS colours reach directly */
+  color-scheme: light;
+  --fs: 15px;                    /* body text size, set by the Appearance panel */
+  --bg: #ffffff;
+  --fg: #222222;
+  --fg-dim: #555555;
+  --link: #1a33b3;               /* the plate blue from the homepage frames, imola at 0.0 */
+  --rule: #dddddd;
+  --box-bg: #fafbfc;
+  --warn: #a33333;
+  --field-bg: #ffffff;
+  --field-border: #bbbbbb;
+  --field-focus: #666666;
+  --btn-bg: #222222;
+  --btn-fg: #ffffff;
+  --btn-bg-hover: #444444;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #15181d;
+  --fg: #e6e8ec;
+  --fg-dim: #a4adba;
+  --link: #8ab4ff;
+  --rule: #333a45;
+  --box-bg: #1c2027;
+  --warn: #ff8a7a;
+  --field-bg: #1c2027;
+  --field-border: #48505c;
+  --field-focus: #8ab4ff;
+  --btn-bg: #e6e8ec;
+  --btn-fg: #15181d;
+  --btn-bg-hover: #c9cfd8;
+}
+
+/* ---- main.css hard-codes these, so they have to be re-pointed at the properties ---- */
+body { max-width: 1180px; background: var(--bg); color: var(--fg); }
+nav { background: var(--bg); }
+a, a:visited, nav a, nav a:visited { color: var(--link); }
+nav a[aria-current="page"], nav a[aria-current="page"]:visited { color: var(--fg); }
+nav .sep { color: var(--fg-dim); }
+h1, .main h3, .sidebar h3 { color: var(--fg); }
+.sidebar .contact { color: var(--fg-dim); }
+.sidebar .separator { border-top-color: var(--rule); }
+
+/* only the reading column scales, the way Wikipedia's text-size control behaves */
+.main { font-size: var(--fs); }
+
+/* the Appearance panel is a third flex child, so the row has to be allowed to wrap */
+.columns { flex-wrap: wrap; }
+
+/* ---- Appearance panel: a sticky column on the right, Wikipedia style ---- */
+.appearance {
+  position: sticky; top: var(--nav-h); width: 190px; flex-shrink: 0;
+  font-size: 13px; color: var(--fg-dim);
+  border: 1px solid var(--rule); background: var(--box-bg); padding: 12px 14px;
+}
+.appearance h2 { font-size: 13px; font-weight: bold; color: var(--fg); margin: 0 0 11px; }
+.appearance .grp { margin-bottom: 13px; }
+.appearance .grp:last-child { margin-bottom: 0; }
+.appearance .grp > span { display: block; font-size: 12px; margin-bottom: 4px; }
+.appearance label { display: block; line-height: 1.95; color: var(--fg); cursor: pointer; }
+.appearance input { margin-right: 7px; accent-color: var(--link); vertical-align: -1px; }
+/* each Text choice previews its own size */
+.appearance .t1 { font-size: 11.5px; }
+.appearance .t2 { font-size: 13px; }
+.appearance .t3 { font-size: 15.5px; }
+
+/* below this a third column squeezes the content, so the panel wraps underneath it instead */
+@media (max-width: 1080px) {
+  .appearance { position: static; width: 100%; margin-top: 22px; }
+}
+
+/* main.css stacks .columns here and gives .sidebar its own sticky background */
+@media (max-width: 700px) {
+  .sidebar { background: var(--bg); }
+  .appearance { margin-top: 18px; }
+}
