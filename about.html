@@ -119,12 +119,11 @@
         <span class="gk">&alpha;</span> that prevents overshooting the target.</p>
 
       <p>What exactly is the contact stiffness matrix (<i>S</i>)? This is the summation of stiffness
-        contributions from every constraint it is currently touching.</p>
-
-      <p>Intuitively, before the grain moves, the stiffness matrix (<i>S</i>) acts as a map of its local
-        confines, and by multiplying the force by the inverse of the stiffness, the forward step
-        &Delta;<b><i>u</i></b> is rotated away from the stiffest boundaries, automatically steering the grain
-        down the optimal path of least resistance.</p>
+        contributions from every constraint it is currently touching. Intuitively, before the grain moves,
+        the stiffness matrix (<i>S</i>) acts as a map of its local confines, and by multiplying the force by
+        the inverse of the stiffness, the forward step &Delta;<b><i>u</i></b> is rotated away from the
+        stiffest boundaries, automatically steering the grain down the optimal path of least
+        resistance.</p>
 
       <p>To see what this looks like, below is a simple sandbox comparing DEM with qsDEM. Slide the
         right wall to load the pile.</p>
