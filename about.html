@@ -112,24 +112,18 @@
 
       <p>Kishino's quasi-static DEM (qsDEM) solves low-inertial systems by removing mass and time entirely.
         qsDEM replaces the time-integration of Newton's law with a geometric matrix inversion. When a grain
-        experiences an unbalanced net force, qsDEM calculates the forward step (&Delta;<i>X</i>)
-        required to deform the surrounding constraints to cancel out the unbalanced force. It solves this by
-        using the contact stiffness matrix (<i>S</i>), and the optimal step forward is calculated by
-        multiplying the net force by the inverse of this matrix,</p>
-
-      <span class="eq">&Delta;<i>X</i> <span class="op">=</span> <span class="gk">&alpha;</span>&thinsp;<i>S</i><sup>&minus;1</sup>&thinsp;<i>F</i><sub>net</sub></span>
-
-      <p><span class="gk">&alpha;</span> is a relaxation factor, which is a numerical stability term to prevent overshooting
-        the target.</p>
+        experiences an unbalanced generalized force (<b><i>f</i></b>), qsDEM calculates the forward step
+        (&Delta;<b><i>u</i></b>) required to deform the surrounding constraints to cancel out the unbalanced
+        force. It solves this by using the contact stiffness matrix (<i>S</i>), and the optimal step forward
+        is calculated by multiplying the force by the inverse of this matrix, scaled by a relaxation factor
+        <span class="gk">&alpha;</span> that prevents overshooting the target.</p>
 
       <p>What exactly is the contact stiffness matrix (<i>S</i>)? This is the summation of stiffness
         contributions from every constraint it is currently touching.</p>
 
-      <span class="eq"><i>S</i> <span class="op">=</span> <span class="sum">&Sigma;</span><sub><i>c</i></sub>&thinsp;<i>T<sub>c</sub></i>&thinsp;<i>S<sub>c</sub></i>&thinsp;<i>T<sub>c</sub></i><sup>T</sup></span>
-
       <p>Intuitively, before the grain moves, the stiffness matrix (<i>S</i>) acts as a map of its local
-        confines, and by multiplying the force by the inverse of the stiffness, the forward step's movement
-        vector &Delta;<i>X</i> is rotated away from the stiffest boundaries, automatically steering the grain
+        confines, and by multiplying the force by the inverse of the stiffness, the forward step
+        &Delta;<b><i>u</i></b> is rotated away from the stiffest boundaries, automatically steering the grain
         down the optimal path of least resistance.</p>
 
       <p>To see what this looks like, below is a simple sandbox comparing DEM with qsDEM. Slide the
