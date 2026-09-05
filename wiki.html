@@ -7,6 +7,39 @@
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="stylesheet" href="assets/css/theme.css">
 <script src="assets/js/appearance.js"></script>
+<style>
+  /* contents list in the sidebar */
+  .toc h3 { font-size: 13px; font-weight: bold; margin: 0 0 7px; }
+  .toc ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
+  .toc li { counter-increment: toc; margin-bottom: 4px; line-height: 1.45; }
+  .toc a::before { content: counter(toc) "\00a0\00a0"; color: var(--fg-dim); }
+
+  /* article head, and an anchor that clears the fixed nav */
+  .art { font-size: 22px; font-weight: normal; margin: 0 0 16px; color: var(--fg);
+         scroll-margin-top: calc(var(--nav-h) + 12px); }
+
+  /* same equation convention as the About page */
+  .eq {
+    display: flex; justify-content: center; align-items: flex-start;
+    flex-wrap: wrap; margin: 18px 0;
+    font-family: "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
+    font-size: var(--fs); line-height: 1.45;
+  }
+  .eq i { font-style: italic; }
+  .eq b { font-weight: bold; }          /* bold italic is the vector, in place of an arrow */
+  .eq .op { font-style: normal; padding: 0 .3em; }
+  .gk { font-style: normal; }           /* upright Greek: italic alpha renders as a Latin 'a' */
+  .eqn { color: var(--fg-dim); font-size: .8em; font-family: "Myriad Pro", Arial, sans-serif;
+         font-style: normal; padding-left: 1.4em; }
+
+  /* the two braced terms of eq. 3, drawn as a rule with a caption under it */
+  .ub { text-align: center; }
+  .ub .lab {
+    display: block; margin-top: 3px; padding-top: 3px; border-top: 1px solid var(--rule);
+    font-family: "Myriad Pro", Arial, sans-serif; font-size: .72em; font-style: normal;
+    color: var(--fg-dim); letter-spacing: .01em;
+  }
+</style>
 </head>
 <body>
 
@@ -19,9 +52,113 @@
 <div class="columns">
   <div class="sidebar">
     <h1>Wiki</h1>
+    <div class="toc">
+      <h3>Contents</h3>
+      <ol>
+        <li><a href="#kishino-solver">Kishino solver</a></li>
+      </ol>
+    </div>
   </div>
 
   <div class="main">
+
+    <h2 class="art" id="kishino-solver">Kishino solver</h2>
+
+    <p>qsDEM is a quasi-static model for finding the force equilibrium in an assembly of
+      contacting grains, based on Yuji Kishino's
+      <a href="https://www.sciencedirect.com/science/article/pii/B9780444705235500242">1988
+      paper</a>.</p>
+
+    <p>Each grain in two dimensions carries three degrees of freedom, two translations and one
+      rotation, so the quantity being solved for is a generalized displacement and the quantity
+      being driven to zero is a generalized force.</p>
+
+    <span class="eq">
+      <span>&Delta;<b><i>u</i></b></span>
+      <span class="op">=</span>
+      <span>(&Delta;<i>x</i>,&thinsp; &Delta;<i>y</i>,&thinsp; &Delta;<span class="gk">&theta;</span>)<sup>T</sup></span>
+      <span class="op">,</span>
+      <span><b><i>f</i></b></span>
+      <span class="op">=</span>
+      <span>(<i>F<sub>x</sub></i>,&thinsp; <i>F<sub>y</sub></i>,&thinsp; <i>M</i>)<sup>T</sup></span>
+      <span class="eqn">(1)</span>
+    </span>
+
+    <p>The stiffness matrix is assembled one contact at a time. A contact <i>c</i> on grain
+      <i>i</i>, with unit normal <b><i>n</i></b>, unit tangent <b><i>t</i></b> and lever arm
+      <i>R<sub>i</sub></i>, relates the grain's generalized displacement to the relative
+      displacement at that contact through a matrix <i>B<sub>c</sub></i> whose normal row is
+      (<i>n<sub>x</sub></i>, <i>n<sub>y</sub></i>, 0) and whose tangential row is
+      (<i>t<sub>x</sub></i>, <i>t<sub>y</sub></i>, <i>R<sub>i</sub></i>). With normal and
+      tangential contact stiffnesses <i>k<sub>n</sub></i> and <i>k<sub>t</sub></i>, the grain's
+      stiffness is the sum over its current contacts.</p>
+
+    <span class="eq">
+      <span><i>S</i></span>
+      <span class="op">=</span>
+      <span>&sum;<sub><i>c</i></sub>&thinsp;<i>B<sub>c</sub></i><sup>T</sup>&thinsp;<i>k<sub>c</sub></i>&thinsp;<i>B<sub>c</sub></i></span>
+      <span class="eqn">(2)</span>
+    </span>
+
+    <p>This is a symmetric 3&thinsp;&times;&thinsp;3 matrix, and the lever arm in the tangential
+      row is what couples rotation to translation. A grain cannot slide against a contact without
+      also feeling a moment, and cannot spin without shearing its contacts. When a grain is
+      subjected to an unbalanced generalized force, it must move to reach equilibrium. If we
+      assume the grain's neighbors are temporarily frozen in place, one step brings its net force
+      and moment to zero.</p>
+
+    <span class="eq">
+      <span>&Delta;<b><i>u</i></b></span>
+      <span class="op">=</span>
+      <span><i>S</i><sup>&minus;1</sup>&thinsp;<b><i>f</i></b></span>
+      <span class="eqn">(3)</span>
+    </span>
+
+    <p>In the simulation, all grains are moving simultaneously. If every grain took its
+      full ideal step at once, they would overshoot their targets and artificially overlap. To
+      maintain stability, the movement is scaled by a relaxation factor
+      <span class="gk">&alpha;</span> &isin; (0,&thinsp;1) to take a safe, partial step.</p>
+
+    <span class="eq">
+      <span><b><i>u</i></b><sup>(<i>k</i>+1)</sup></span>
+      <span class="op">=</span>
+      <span><b><i>u</i></b><sup>(<i>k</i>)</sup></span>
+      <span class="op">+</span>
+      <span><span class="gk">&alpha;</span>&thinsp;<i>S</i><sup>&minus;1</sup>&thinsp;<b><i>f</i></b><sup>(<i>k</i>)</sup></span>
+      <span class="eqn">(4)</span>
+    </span>
+
+    <p>Because thousands of interacting grains are adjusting their positions at the same time
+      (computed in parallel on the GPU), this update step (<i>k</i>) must be repeated iteratively
+      until the entire assembly reaches a global force balance. However, this basic iterative
+      solver is memoryless because each movement is based entirely on the instantaneous force at
+      that exact moment. As a result, the solver spends much of its time zig-zagging back and
+      forth against tight constraints rather than making steady progress toward equilibrium.</p>
+
+    <p>To fix this inefficiency, a memory is introduced to the update rule based on Polyak
+      momentum, accumulating a fraction <span class="gk">&beta;</span> of the previous step into
+      the current one.</p>
+
+    <span class="eq">
+      <span>&Delta;<b><i>u</i></b><sup>(<i>k</i>)</sup></span>
+      <span class="op">=</span>
+      <span class="ub">
+        <span class="gk">&alpha;</span>&thinsp;<i>S</i><sup>&minus;1</sup>&thinsp;<b><i>f</i></b><sup>(<i>k</i>)</sup>
+        <span class="lab">Kishino step</span>
+      </span>
+      <span class="op">+</span>
+      <span class="ub">
+        <span class="gk">&beta;</span>&thinsp;&Delta;<b><i>u</i></b><sup>(<i>k</i>&minus;1)</sup>
+        <span class="lab">Momentum</span>
+      </span>
+      <span class="eqn">(5)</span>
+    </span>
+
+    <p>This momentum term acts as a low pass filter, averaging out the conflicting, zig-zagging
+      bounces between stiff neighbors while letting steps taken in a consistent direction add up
+      constructively. On a 100,000 grain assembly this cuts the time to reach a given force
+      tolerance by about a third.</p>
+
   </div>
 </div>
 </body>
