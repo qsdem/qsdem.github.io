@@ -39,12 +39,12 @@ body {
   color: #222;
   background: #fff;
   /* top padding reserves the space the fixed nav occupies */
-  padding: var(--nav-h) 40px 30px;
+  padding: var(--nav-h) 60px 30px;
   max-width: 960px;
 }
 
-/* height of the nav once it is stuck: 30 top + ~23 text + 20 bottom */
-:root { --nav-h: 73px; }
+/* height of the nav once it is stuck: 39 top + ~23 text + 26 bottom */
+:root { --nav-h: 88px; }
 
 /* the darkest colour of cmcrameri lipari (t = 0), the map the homepage crush is coloured on */
 a {
@@ -65,7 +65,7 @@ nav {
   z-index: 5;
   background: #fff;
   font-size: 15px;
-  padding: 30px 40px 20px;
+  padding: 39px 60px 26px;
   margin: 0;
 }
 
@@ -133,9 +133,9 @@ h1 {
 
 /* Mobile */
 @media (max-width: 700px) {
-  :root { --nav-h: 63px; }
-  body { padding: var(--nav-h) 20px 20px; }
-  nav { padding: 20px 20px; }
+  :root { --nav-h: 75px; }
+  body { padding: var(--nav-h) 30px 20px; }
+  nav { padding: 26px 30px; }
 
   .columns {
     flex-direction: column;
