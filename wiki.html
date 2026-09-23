@@ -17,6 +17,7 @@
   /* article head, and an anchor that clears the fixed nav */
   .art { font-size: 22px; font-weight: normal; margin: 0 0 16px; color: var(--fg);
          scroll-margin-top: calc(var(--nav-h) + 12px); }
+  h2.art ~ h2.art { margin-top: 44px; border-top: 1px solid var(--rule); padding-top: 30px; }
 
   /* same equation convention as the About page */
   .eq {
@@ -56,6 +57,7 @@
       <h3>Contents</h3>
       <ol>
         <li><a href="#kishino-solver">Kishino solver</a></li>
+        <li><a href="#sph-mantle">SPH mantle</a></li>
       </ol>
     </div>
   </div>
@@ -151,6 +153,77 @@
       </span>
       <span class="eqn">(5)</span>
     </span>
+
+    <h2 class="art" id="sph-mantle">SPH mantle</h2>
+
+    <p>In qsDEM, we model the viscous mantle with smoothed particle hydrodynamics (SPH). SPH was
+      developed for compressible astrophysical flows, and
+      <a href="https://doi.org/10.1006/jcph.1997.5776">Morris, Fox and Zhu (1997)</a> adapted it
+      to viscous flow at low Reynolds number, which is the regime of the mantle. We use their
+      formulation with one change. Because qsDEM has no time, the viscosity is replaced by a
+      time-independent drag parameter.</p>
+
+    <p>An SPH particle carries a fixed amount of mass and moves with the flow, but unlike a DEM
+      grain it has no edge. Its mass (<i>m</i>) is spread over a small region around it, densest
+      at the center and fading to nothing at a distance set by the smoothing length (<i>h</i>),
+      following a kernel function (<i>W</i>). Intuitively, an SPH particle is a soft cloud rather
+      than a ball. qsDEM uses the Wendland kernel,</p>
+
+    <span class="eq">
+      <span><i>W</i>(<i>r</i>,&thinsp;<i>h</i>)</span><span class="op">=</span>
+      <span>7&thinsp;/&thinsp;(4<span class="gk">&pi;</span><i>h</i><sup>2</sup>)&thinsp;(1 &minus; <i>r</i>/2<i>h</i>)<sup>4</sup>&thinsp;(1 + 2<i>r</i>/<i>h</i>)</span>
+      <span class="op">,</span><span><i>r</i> &lt; 2<i>h</i></span>
+      <span class="eqn">(6)</span>
+    </span>
+
+    <p>and zero beyond 2<i>h</i>. The density at a particle is the total mass of the particles
+      around it, each weighted by the kernel at its distance,</p>
+
+    <span class="eq">
+      <span><span class="gk">&rho;</span><sub><i>i</i></sub></span><span class="op">=</span>
+      <span>&sum;<sub><i>j</i></sub>&thinsp;<i>m<sub>j</sub></i>&thinsp;<i>W</i>(|<b><i>r</i></b><sub><i>i</i></sub> &minus; <b><i>r</i></b><sub><i>j</i></sub>|,&thinsp; <i>h</i>)</span>
+      <span class="eqn">(7)</span>
+    </span>
+
+    <p>so density is a measure of how crowded the neighborhood is. The pressure is set by how
+      much denser the particle is than the fluid at rest (<span class="gk">&rho;</span><sub>0</sub>), with
+      <i>K</i> as the bulk modulus of the fluid,</p>
+
+    <span class="eq">
+      <span><i>p<sub>i</sub></i></span><span class="op">=</span>
+      <span><i>K</i>&thinsp;(<span class="gk">&rho;</span><sub><i>i</i></sub>&thinsp;/&thinsp;<span class="gk">&rho;</span><sub>0</sub> &minus; 1)</span>
+      <span class="op">,</span><span><span class="gk">&rho;</span><sub><i>i</i></sub> &gt; <span class="gk">&rho;</span><sub>0</sub></span>
+      <span class="eqn">(8)</span>
+    </span>
+
+    <p>and zero otherwise. The pressure acts on each particle through its gradient, pushing it
+      away from neighbors at higher pressure.</p>
+
+    <span class="eq">
+      <span><b><i>F</i></b><sub><i>i</i></sub></span><span class="op">=</span>
+      <span>&minus;&thinsp;&sum;<sub><i>j</i></sub>&thinsp;<i>m<sub>i</sub>m<sub>j</sub></i>&thinsp;(<i>p<sub>i</sub></i>&thinsp;/&thinsp;<span class="gk">&rho;</span><sub><i>i</i></sub><sup>2</sup> <span class="op">+</span> <i>p<sub>j</sub></i>&thinsp;/&thinsp;<span class="gk">&rho;</span><sub><i>j</i></sub><sup>2</sup>)&thinsp;&nabla;<sub><i>i</i></sub><i>W<sub>ij</sub></i></span>
+      <span class="eqn">(9)</span>
+    </span>
+
+    <p>Viscosity is defined as a drag between neighboring particles proportional to their
+      relative velocity (Morris, Fox and Zhu, 1997),</p>
+
+    <span class="eq">
+      <span><b><i>F</i></b><sub><i>i</i></sub></span><span class="op">=</span>
+      <span>&sum;<sub><i>j</i></sub>&thinsp;<i>V<sub>i</sub>V<sub>j</sub></i>&thinsp;(<span class="gk">&mu;</span><sub><i>i</i></sub> + <span class="gk">&mu;</span><sub><i>j</i></sub>)&thinsp;
+        <i>r<sub>ij</sub></i>&thinsp;(&part;<i>W<sub>ij</sub></i>/&part;<i>r</i>)&thinsp;/&thinsp;(<i>r<sub>ij</sub></i><sup>2</sup> + 0.01<i>h</i><sup>2</sup>)&thinsp;
+        (<b><i>v</i></b><sub><i>i</i></sub> &minus; <b><i>v</i></b><sub><i>j</i></sub>)</span>
+      <span class="eqn">(10)</span>
+    </span>
+
+    <p>where <i>V</i> = <i>m</i>/<span class="gk">&rho;</span> is the particle volume and <span class="gk">&mu;</span> is
+      the viscosity. In qsDEM there is no time and no velocity. Each loading step advances the wall
+      by a fixed increment and the solver finds the equilibrium, so the relative velocity in (10) is
+      replaced by the relative displacement accumulated within the current step, and the viscosity
+      by a drag parameter. The physics is the same, a drag on the rearrangement of neighbors, but
+      the drag parameter is a force per unit displacement rather than per unit velocity. Recovering
+      a true viscosity from it would require knowing how much real time one loading step stands
+      for, which qsDEM does not define.</p>
 
   </div>
 </div>
