@@ -35,6 +35,13 @@
     width: 234px;
     max-width: 100%;
     height: auto;
+  }
+  /* The link shrink-wraps the logo, so only the logo is clickable rather than the whole width
+     of the sidebar beside it. */
+  .logo-link {
+    display: block;
+    width: max-content;
+    max-width: 100%;
     margin-top: 18px;
   }
 
@@ -76,10 +83,14 @@
       than 10<sup>&minus;2</sup> and satisfies force balance without fictitious forces or
       accelerations.</p>
     <div class="contact">
-      Developed and maintained by Brayden Noh and Brendan Meade.
+      Developed and maintained by
+      <a href="https://braydennoh.github.io/">Brayden Noh</a> and
+      <a href="https://brendanjmeade.github.io/">Brendan Meade</a>.
     </div>
-    <img class="logo" src="assets/img/main-logo-dark.svg" width="234" height="95"
-         alt="Earth and Planetary Sciences at Harvard University">
+    <a class="logo-link" href="https://eps.harvard.edu/people/brendan-meade/">
+      <img class="logo" src="assets/img/main-logo-dark.svg" width="234" height="95"
+           alt="Earth and Planetary Sciences at Harvard University">
+    </a>
   </div>
 
   <div class="main">
