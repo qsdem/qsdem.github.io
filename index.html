@@ -37,10 +37,23 @@
      gutter, where nothing can be seen of it. */
   .logo-link {
     display: block;
-    width: max-content;
-    max-width: 100%;
-    margin-top: 18px;
+    flex: 0 0 auto;
     margin-left: -9.2px;
+  }
+  /* The EPS logo and the Harvard shield on one row, centred on each other.  The shield is drawn
+     at the logo's own height, 76px (its 95 units at 0.8x), so the two read as a pair: 64px wide,
+     and the row spans about 258px of the 336px sidebar. */
+  .affil {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 18px;
+  }
+  .shield {
+    display: block;
+    flex: 0 0 auto;
+    height: 76px;
+    width: auto;
   }
 
   /* The hero files are exactly 1x, 2x and 3x the 780px column (780, 1560 and 2340 wide), so
@@ -85,10 +98,14 @@
       <a href="https://braydennoh.github.io/">Brayden Noh</a> and
       <a href="https://brendanjmeade.github.io/">Brendan Meade</a>.
     </div>
-    <a class="logo-link" href="https://eps.harvard.edu/people/brendan-meade/">
-      <img class="logo" src="assets/img/main-logo-dark.svg" width="234" height="95"
-           alt="Earth and Planetary Sciences at Harvard University">
-    </a>
+    <div class="affil">
+      <a class="logo-link" href="https://eps.harvard.edu/people/brendan-meade/">
+        <img class="logo" src="assets/img/main-logo-dark.svg" width="234" height="95"
+             alt="Earth and Planetary Sciences at Harvard University">
+      </a>
+      <img class="shield" src="assets/img/harvard-shield.png" width="251" height="298"
+           alt="Harvard University shield">
+    </div>
   </div>
 
   <div class="main">
