@@ -1,20 +1,24 @@
 'use strict';
-/* qsDEM -- the Appearance panel: text size and light/dark, shared by every page that has the
-   .columns shell. Load it from <head> WITHOUT defer:
+/* qsDEM -- the Appearance panel: text size (Small / Standard / Large), on every page.  Load it
+   from <head> WITHOUT defer:
 
      <script src="assets/js/appearance.js"></script>
 
-   The top half has to run before the body paints, or a reader who chose dark last visit sees a
-   white flash first. The panel itself is injected rather than written into each page's markup,
-   because it is a preference control that does nothing without JavaScript: if the script fails
-   there should be no panel offering choices it cannot honour. */
+   The top half has to run before the body paints, or a reader who chose Large last visit sees
+   the page jump from the default size.  The panel itself is injected rather than written into
+   each page's markup, because a control that does nothing without JavaScript should not be on
+   the page when the script fails.
+
+   The site is light only.  There is no colour control, and a colour stored by an older version
+   of this script is deliberately ignored, so nobody who once picked Dark is left in a dark page
+   with no switch back to light. */
 
 (function () {
   var root = document.documentElement;
   var SIZE = {small: '13.5px', standard: '15px', large: '17px'};
 
   // Storage throws outright in some contexts, not just return null: a private window, a browser
-  // set to block site data, a file:// page in Safari. Every access has to be guarded.
+  // set to block site data, a file:// page in Safari.  Every access has to be guarded.
   function read(key, fallback) {
     try {
       var v = localStorage.getItem(key);
@@ -25,12 +29,10 @@
     try { localStorage.setItem(key, value); } catch (e) {}
   }
 
-  var theme = read('qsdem-theme', 'light') === 'dark' ? 'dark' : 'light';
-  var text = SIZE[read('qsdem-text', 'standard')] ? read('qsdem-text', 'standard') : 'standard';
+  var stored = read('qsdem-text', 'standard');
+  var text = SIZE[stored] ? stored : 'standard';
 
   function apply() {
-    if (theme === 'dark') root.setAttribute('data-theme', 'dark');
-    else root.removeAttribute('data-theme');
     root.style.setProperty('--fs', SIZE[text]);
   }
 
@@ -48,26 +50,18 @@
         '<label class="t1"><input type="radio" name="ap-text" value="small">Small</label>' +
         '<label class="t2"><input type="radio" name="ap-text" value="standard">Standard</label>' +
         '<label class="t3"><input type="radio" name="ap-text" value="large">Large</label>' +
-      '</div>' +
-      '<div class="grp"><span>Color</span>' +
-        '<label><input type="radio" name="ap-color" value="light">Light</label>' +
-        '<label><input type="radio" name="ap-color" value="dark">Dark</label>' +
       '</div>';
     host.appendChild(aside);
 
-    bind('ap-text', text, function (v) { text = v; write('qsdem-text', v); });
-    bind('ap-color', theme, function (v) { theme = v; write('qsdem-theme', v); });
-  }
-
-  function bind(name, current, onPick) {
-    var els = document.querySelectorAll('input[name="' + name + '"]');
+    var els = aside.querySelectorAll('input[name="ap-text"]');
     for (var i = 0; i < els.length; i++) {
-      (function (el) {
-        el.checked = (el.value === current);
-        el.addEventListener('change', function () {
-          if (el.checked) { onPick(el.value); apply(); }
-        });
-      })(els[i]);
+      els[i].checked = (els[i].value === text);
+      els[i].addEventListener('change', function () {
+        if (!this.checked) return;
+        text = this.value;
+        write('qsdem-text', text);
+        apply();
+      });
     }
   }
 

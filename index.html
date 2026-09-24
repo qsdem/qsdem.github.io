@@ -8,14 +8,6 @@
 <link rel="stylesheet" href="assets/css/theme.css">
 <script src="assets/js/appearance.js"></script>
 <style>
-  /* HOMEPAGE ONLY: no Appearance panel, so the hero runs from the sidebar's right edge all the
-     way to where that panel used to end. Hidden rather than left unbuilt: appearance.js still
-     has to run, because its top half applies a reader's stored text size and light/dark choice
-     before the first paint, and skipping it would flash the homepage in the wrong palette.
-     display:none takes the panel out of the flex row along with its 40px gap, which is what
-     widens .main from 550 to 780. */
-  .appearance { display: none; }
-
   /* The wordmark in the sidebar is the qsDEM crush itself: the letters as a bonded grain pack,
      pressed flat, coloured by cumulative non-affine displacement on lipari.  An H.264 MP4 rather
      than a GIF, because a GIF's 256-colour palette bands that gradient and would run tens of MB

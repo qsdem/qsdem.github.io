@@ -19,19 +19,13 @@
   .eq .sum { font-size: 1.3em; font-style: normal; vertical-align: -0.09em; }
   .gk { font-style: normal; }   /* upright Greek: italic alpha renders as a Latin 'a' in these serifs */
 
-  /* Plot colours only. Page chrome and the Appearance panel live in assets/css/theme.css,
-     and the canvases re-read these on every frame, so the theme switch restyles them for free. */
+  /* Plot colours only. Page chrome lives in assets/css/theme.css. The canvases re-read these on
+     every frame, so the plots stay on the page's palette. */
   :root {
     --panel: #ffffff; --wall-fill: #eef0f2; --wall: #3a3d42;
     --grain: #dfe6f2; --grain-line: #6b7789;
     --chain: #262a32; --force: #d13b2f; --stiff: #4a7fc1;
     --handle: #9aa3b0;
-  }
-  :root[data-theme="dark"] {
-    --panel: #101319; --wall-fill: #262b34; --wall: #b9c1cd;
-    --grain: #2f3b4f; --grain-line: #8493a8;
-    --chain: #e3e9f4; --force: #ff6f61; --stiff: #6ea8ff;
-    --handle: #8493a8;
   }
   .eq { font-size: var(--fs); }
 
