@@ -58,7 +58,8 @@
 
   /* The hero is the whole strength x stiffness matrix running: all 290 saved frames of the 20
      runs at 30 fps, holding the flat plates and the finished state 1.5 s each, like the crush.
-     It is 3120 wide, 4x the 780px column, because H.264 stores colour at half resolution: at
+     Stiffness runs across and strength down, 4 wide by 5 tall, so each panel gets a quarter of
+     the column rather than a fifth. It is 3120 wide, 4x the 780px column, because H.264 stores colour at half resolution: at
      3120 the colour is 1560 wide, pixel for pixel on a Retina screen, where a 1560 video smeared
      the yellow cracks into the blue. Each frame is an area average of a render 4x larger again,
      with the mantle's gaps filled, so the grain lattice cannot crawl. CRF 12 and tagged BT.709;
@@ -112,10 +113,11 @@
 
   <div class="main">
     <video class="hero hero-video" autoplay muted loop playsinline preload="auto" role="img"
-           poster="assets/img/matrix_poster.webp" width="3120" height="1466"
-           aria-label="A grid of qsDEM subduction runs, twenty panels: a flat dark blue plate
-                       pushed into a red mantle, sinking steeply and breaking up at the left,
-                       shallow and intact at the right.">
+           poster="assets/img/matrix_poster.webp" width="3120" height="2300"
+           aria-label="A grid of qsDEM subduction runs, twenty panels, stiffness increasing to
+                       the right and strength downward: a flat dark blue plate pushed into a red
+                       mantle, breaking up along the weak top rows, most of all at the stiff right,
+                       and sinking intact in the strong rows below.">
       <source src="assets/img/matrix.mp4" type="video/mp4">
     </video>
   </div>
