@@ -54,7 +54,7 @@ h1, .main h3, .sidebar h3 { color: var(--fg); }
   font-size: 13px; color: var(--fg-dim);
   border: 1px solid var(--rule); background: var(--box-bg); padding: 12px 14px;
 }
-.appearance h2 { font-size: 13px; font-weight: bold; color: var(--fg); margin: 0 0 11px; }
+.appearance h2 { font-size: 13px; font-weight: normal; color: var(--fg); margin: 0 0 11px; }
 .appearance .grp > span { display: block; font-size: 12px; margin-bottom: 4px; }
 .appearance label { display: block; line-height: 1.95; color: var(--fg); cursor: pointer; }
 .appearance input { margin-right: 7px; accent-color: var(--link); vertical-align: -1px; }
