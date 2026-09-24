@@ -59,7 +59,9 @@
   /* The hero files are exactly 1x, 2x and 3x the 780px column (780, 1560 and 2340 wide), so
      the browser draws them pixel for pixel instead of rescaling them. They are lossless because
      lossy WebP keeps colour at half resolution, which smears the yellow specks into the blue.
-     A lossy 1920 copy scaled down to 1560 looked soft for both reasons. width/height are
+     A lossy 1920 copy scaled down to 1560 looked soft for both reasons. Each file is an area
+     average of one 1200 dpi render (12x the 1560 copy), with the mantle's gaps filled: a panel
+     here is only ~150px wide, so any grain lattice left in the image aliases into moire. width/height are
      declared to reserve the right box before the image arrives, which stops the page jumping
      as it loads. */
   .hero {
