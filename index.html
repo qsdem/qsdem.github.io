@@ -56,10 +56,10 @@
     width: auto;
   }
 
-  /* The hero is the whole strength x stiffness matrix running: all 290 saved frames of the 20
+  /* The hero is the whole strength x stiffness matrix running: all 290 saved frames of the 16
      runs at 30 fps, holding the flat plates and the finished state 1.5 s each, like the crush.
-     Stiffness runs across and strength down, 4 wide by 5 tall, so each panel gets a quarter of
-     the column rather than a fifth. It is 3120 wide, 4x the 780px column, because H.264 stores colour at half resolution: at
+     Stiffness runs across and strength down, 4 by 4, so each panel gets a quarter of the
+     column; the strongest row (ts 550) is left out, as it sinks just like the row above it. It is 3120 wide, 4x the 780px column, because H.264 stores colour at half resolution: at
      3120 the colour is 1560 wide, pixel for pixel on a Retina screen, where a 1560 video smeared
      the yellow cracks into the blue. Each frame is an area average of a render 4x larger again,
      with the mantle's gaps filled, so the grain lattice cannot crawl. CRF 12 and tagged BT.709;
@@ -113,8 +113,8 @@
 
   <div class="main">
     <video class="hero hero-video" autoplay muted loop playsinline preload="auto" role="img"
-           poster="assets/img/matrix_poster.webp" width="3120" height="2300"
-           aria-label="A grid of qsDEM subduction runs, twenty panels, stiffness increasing to
+           poster="assets/img/matrix_poster.webp" width="3120" height="1836"
+           aria-label="A grid of qsDEM subduction runs, sixteen panels, stiffness increasing to
                        the right and strength downward: a flat dark blue plate pushed into a red
                        mantle, breaking up along the weak top rows, most of all at the stiff right,
                        and sinking intact in the strong rows below.">
@@ -135,7 +135,7 @@
     v.currentTime = 0;
   }
   // The matrix, by contrast, stops on its last frame: the finished runs are the informative still,
-  // where its first frame is twenty identical flat plates.
+  // where its first frame is sixteen identical flat plates.
   var h = document.querySelector('.hero-video');
   if (h && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     h.removeAttribute('autoplay');
