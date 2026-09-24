@@ -47,7 +47,7 @@
 }
 
 /* ---- main.css hard-codes these, so they have to be re-pointed at the properties ---- */
-body { max-width: 1220px; background: var(--bg); color: var(--fg); }
+body { max-width: 1276px; background: var(--bg); color: var(--fg); }
 nav { background: var(--bg); }
 a, a:visited, nav a, nav a:visited { color: var(--link); }
 nav a[aria-current="page"], nav a[aria-current="page"]:visited { color: var(--fg); }
@@ -80,7 +80,7 @@ h1, .main h3, .sidebar h3 { color: var(--fg); }
 .appearance .t3 { font-size: 15.5px; }
 
 /* below this a third column squeezes the content, so the panel wraps underneath it instead */
-@media (max-width: 1080px) {
+@media (max-width: 1176px) {
   .appearance { position: static; width: 100%; margin-top: 22px; }
 }
 
