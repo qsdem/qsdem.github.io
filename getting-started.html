@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting Started &mdash; qsDEM</title>
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/theme.css">
+<script src="assets/js/appearance.js"></script>
+<style>
+  /* Code colors. Each one clears 4.5:1 on --box-bg. */
+  :root {
+    --code-comment: #62666b;
+    --code-keyword: #7b2a5c;
+    --code-string: #2b653b;
+    --code-number: #1d4f8f;
+    --code-name: #031326;
+  }
+
+  /* The contents list: the Wiki's, with one nested level. */
+  .toc h3 { font-size: 13px; font-weight: bold; margin: 0 0 7px; }
+  .toc ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
+  .toc > ol > li { counter-increment: toc; margin-bottom: 5px; line-height: 1.45; }
+  .toc > ol > li > a::before { content: counter(toc) "\00a0\00a0"; color: var(--fg-dim); }
+  .toc ol ol { margin: 3px 0 4px 1.3em; }
+  .toc ol ol li { margin-bottom: 2px; }
+  .toc a.here { color: var(--fg); }
+
+  /* The sidebar holds a long list here, so it scrolls on its own in a short window. */
+  .sidebar { max-height: calc(100vh - var(--nav-h)); overflow-y: auto; }
+
+  /* Section heads, anchored clear of the fixed nav. */
+  .art, .sub { scroll-margin-top: calc(var(--nav-h) + 12px); color: var(--fg); font-weight: normal; }
+  .art { font-size: 22px; margin: 0 0 16px; }
+  h2.art ~ h2.art { margin-top: 44px; border-top: 1px solid var(--rule); padding-top: 30px; }
+  .main h3.sub { font-size: 17px; font-weight: normal; margin: 30px 0 10px; }
+
+  /* The Wiki's equation convention. */
+  .eq {
+    display: flex; justify-content: center; align-items: flex-start;
+    flex-wrap: wrap; margin: 18px 0;
+    font-family: "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
+    font-size: var(--fs); line-height: 1.45;
+  }
+  .eq i { font-style: italic; }
+  .eq b { font-weight: bold; }
+  .eq .op { font-style: normal; padding: 0 .3em; }
+  .gk { font-style: normal; }
+  .eqn { color: var(--fg-dim); font-size: .8em; font-family: "Myriad Pro", Arial, sans-serif;
+         font-style: normal; padding-left: 1.4em; }
+
+  /* Code cells. 12px monospace fits an 88-character line in the 780px column. */
+  pre, code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  .main p code { font-size: .87em; }
+  pre.code, pre.shell, pre.out {
+    font-size: calc(var(--fs) * 0.8); line-height: 1.5; tab-size: 4;
+    overflow-x: auto; margin: 14px 0 18px;
+  }
+  pre.code, pre.shell {
+    position: relative; padding: 12px 14px;
+    background: var(--box-bg); border: 1px solid var(--rule);
+  }
+  pre.out {
+    color: var(--fg-dim); padding: 2px 0 2px 14px; margin-top: -6px;
+    border-left: 2px solid var(--rule);
+  }
+  .code .cm { color: var(--code-comment); font-style: italic; }
+  .code .kw { color: var(--code-keyword); }
+  .code .st { color: var(--code-string); }
+  .code .nu { color: var(--code-number); }
+  .code .dc { color: var(--code-keyword); }
+  .code .fn { color: var(--code-name); font-weight: bold; }
+  .copy {
+    position: absolute; top: 6px; right: 6px;
+    font: 11px/1 "Myriad Pro", Arial, sans-serif; color: var(--fg-dim);
+    background: var(--bg); border: 1px solid var(--rule); padding: 4px 7px 3px;
+    cursor: pointer; opacity: 0; transition: opacity .15s;
+  }
+  pre.code:hover .copy, .copy:focus-visible { opacity: 1; }
+  @media (hover: none) { .copy { opacity: 1; } }
+
+  /* Figures: line art at its drawn size, the movie across the column. */
+  figure { margin: 22px 0 26px; }
+  figure img, figure video { display: block; max-width: 100%; height: auto; }
+  figure.art-apparatus img { width: 518px; }
+  figure.art-results img { width: 780px; }
+  figure.movie video { width: 100%; background: var(--bg); }
+  figure.movie video.toggle { cursor: pointer; }
+  figcaption { font-size: calc(var(--fs) * 0.87); color: var(--fg-dim); margin-top: 8px; line-height: 1.5; }
+
+  /* Stacked on a phone, the contents list scrolls away instead of pinning under the nav. */
+  @media (max-width: 700px) {
+    .sidebar { position: static; max-height: none; overflow: visible; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">qsDEM</a> <span class="sep">&middot;</span>
+  <a href="getting-started.html" aria-current="page">Getting Started</a> <span class="sep">&middot;</span>
+  <a href="wiki.html">Wiki</a> <span class="sep">&middot;</span>
+  <a href="about.html">About</a>
+</nav>
+<div class="columns">
+  <div class="sidebar">
+    <h1>Getting Started</h1>
+    <div class="toc">
+      <h3>Contents</h3>
+      <ol>
+        <li><a href="#setup">Setup</a></li>
+        <li><a href="#kishino">The Kishino solver</a>
+          <ol>
+            <li><a href="#contact">Contact law</a></li>
+            <li><a href="#forces">Forces and stiffness</a></li>
+            <li><a href="#iteration">The iteration</a></li>
+            <li><a href="#step">A load step</a></li>
+          </ol>
+        </li>
+        <li><a href="#biaxial">The biaxial test</a>
+          <ol>
+            <li><a href="#apparatus">Apparatus</a></li>
+            <li><a href="#specimen">Specimen</a></li>
+            <li><a href="#compression">Compression</a></li>
+            <li><a href="#results">Results</a></li>
+            <li><a href="#million">One million grains</a></li>
+          </ol>
+        </li>
+        <li><a href="#sph-mantle">SPH mantle</a></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <h2 class="art" id="setup">Setup</h2>
+
+<pre class="shell">pip install numpy scipy numba matplotlib</pre>
+
+<!-- cell: Setup -->
+<pre class="code"><code>import numpy as np
+from numba import njit
+from scipy.spatial import cKDTree
+import matplotlib.pyplot as plt
+from matplotlib.collections import EllipseCollection</code></pre>
+<!-- /cell -->
+
+    <h2 class="art" id="kishino">The Kishino solver</h2>
+
+    <p>qsDEM is a quasi-static model for finding the force equilibrium in an assembly of
+      contacting grains, based on Yuji Kishino's
+      <a href="https://www.sciencedirect.com/science/article/pii/B9780444705235500242">1988
+      paper</a>. Each grain in two dimensions carries three degrees of freedom, two translations
+      and one rotation, so the quantity being solved for is a generalized displacement and the quantity
+      being driven to zero is a generalized force.</p>
+
+    <span class="eq">
+      <span>&Delta;<b><i>u</i></b></span>
+      <span class="op">=</span>
+      <span>(&Delta;<i>x</i>,&thinsp; &Delta;<i>y</i>,&thinsp; &Delta;<span class="gk">&theta;</span>)<sup>T</sup></span>
+      <span class="op">,</span>
+      <span><b><i>f</i></b></span>
+      <span class="op">=</span>
+      <span>(<i>F<sub>x</sub></i>,&thinsp; <i>F<sub>y</sub></i>,&thinsp; <i>M</i>)<sup>T</sup></span>
+      <span class="eqn">(1)</span>
+    </span>
+
+    <p>The stiffness matrix is assembled one contact at a time. A contact <i>c</i> on grain
+      <i>i</i>, with unit normal <b><i>n</i></b>, unit tangent <b><i>t</i></b> and lever arm
+      <i>R<sub>i</sub></i>, relates the grain's generalized displacement to the relative
+      displacement at that contact through a matrix <i>B<sub>c</sub></i> whose normal row is
+      (<i>n<sub>x</sub></i>, <i>n<sub>y</sub></i>, 0) and whose tangential row is
+      (<i>t<sub>x</sub></i>, <i>t<sub>y</sub></i>, <i>R<sub>i</sub></i>). With normal and
+      tangential contact stiffnesses <i>k<sub>n</sub></i> and <i>k<sub>t</sub></i>, the grain's
+      stiffness is the sum over its current contacts.</p>
+
+    <span class="eq">
+      <span><i>S</i></span>
+      <span class="op">=</span>
+      <span>&sum;<sub><i>c</i></sub>&thinsp;<i>B<sub>c</sub></i><sup>T</sup>&thinsp;<i>k<sub>c</sub></i>&thinsp;<i>B<sub>c</sub></i></span>
+      <span class="eqn">(2)</span>
+    </span>
+
+    <p>A grain cannot slide against a contact without also feeling a moment, and cannot spin
+      without shearing its contacts. When a grain is subjected to an unbalanced generalized
+      force, it must move to reach equilibrium. If we assume the grain's neighbors are
+      temporarily frozen in place, one step brings its net force and moment to zero.</p>
+
+    <span class="eq">
+      <span>&Delta;<b><i>u</i></b></span>
+      <span class="op">=</span>
+      <span><i>S</i><sup>&minus;1</sup>&thinsp;<b><i>f</i></b></span>
+      <span class="eqn">(3)</span>
+    </span>
+
+    <p>In the simulation, all grains are moving simultaneously. If every grain took its
+      full ideal step at once, they would overshoot their targets and artificially overlap. To
+      maintain stability, the movement is scaled by a relaxation factor
+      <span class="gk">&alpha;</span> &isin; (0,&thinsp;1) to take a safe, partial step.</p>
+
+    <span class="eq">
+      <span><b><i>u</i></b><sup>(<i>k</i>+1)</sup></span>
+      <span class="op">=</span>
+      <span><b><i>u</i></b><sup>(<i>k</i>)</sup></span>
+      <span class="op">+</span>
+      <span><span class="gk">&alpha;</span>&thinsp;<i>S</i><sup>&minus;1</sup>&thinsp;<b><i>f</i></b><sup>(<i>k</i>)</sup></span>
+      <span class="eqn">(4)</span>
+    </span>
+
+    <p>Because thousands of interacting grains are adjusting their positions at the same time
+      (in qsDEM, computed in parallel on the GPU), this update step (<i>k</i>) must be repeated
+      iteratively until the entire assembly reaches a global force balance. The subsections
+      below write (1) to (4) as code.</p>
+
+    <h3 class="sub" id="contact">Contact law</h3>
+
+    <p>Two grains touch when they overlap, <span class="gk">&delta;</span> =
+      <i>R<sub>i</sub></i> + <i>R<sub>j</sub></i> &minus; <i>d</i> &gt; 0. The normal force is
+      a linear spring. The tangential force is a spring on the sliding
+      &Delta;<i>u<sub>t</sub></i> accumulated since the load step began, starting from the
+      value <i>f<sub>t</sub></i><sup>0</sup> it had then, and it is capped by Coulomb
+      friction.</p>
+
+    <span class="eq">
+      <span><i>f<sub>n</sub></i> = <i>k<sub>n</sub></i>&thinsp;<span class="gk">&delta;</span></span>
+      <span class="op">,</span>
+      <span><i>f<sub>t</sub></i> = <i>f<sub>t</sub></i><sup>0</sup> + <i>k<sub>t</sub></i>&thinsp;&Delta;<i>u<sub>t</sub></i></span>
+      <span class="op">,</span>
+      <span>|<i>f<sub>t</sub></i>| &le; <span class="gk">&mu;</span>&thinsp;<i>f<sub>n</sub></i></span>
+      <span class="eqn">(5)</span>
+    </span>
+
+    <p><code>add_contact</code> applies (5) to one contact of grain <i>i</i>. It adds the
+      contact's force and moment to <b><i>f</i></b> and its term
+      <i>B<sub>c</sub></i><sup>T</sup>&thinsp;<i>k<sub>c</sub></i>&thinsp;<i>B<sub>c</sub></i>
+      of (2), with <i>k<sub>c</sub></i> = diag(<i>k<sub>n</sub></i>,&thinsp;<i>k<sub>t</sub></i>),
+      to <i>S</i>.</p>
+
+<!-- cell: Contact law -->
+<pre class="code"><code>KN, KT = 1.0e6, 0.5e6         # normal and tangential contact stiffness
+REG = 0.05 * KN               # diagonal term that keeps each local stiffness invertible
+
+@njit
+def add_contact(i, nx, ny, ov, dut, ft0, mu, R, F, S):
+    # nx, ny: unit normal from the center of grain i towards the contact
+    # ov: overlap, dut: sliding of the partner since the step began
+    # ft0: tangential force when the step began
+    tx, ty = -ny, nx                          # unit tangent
+    pn = KN * ov                              # normal force
+    ft = ft0 + KT * dut                       # tangential force
+    ft = min(max(ft, -mu * pn), mu * pn)
+    F[i, 0] += -pn * nx + ft * tx
+    F[i, 1] += -pn * ny + ft * ty
+    F[i, 2] += R[i] * ft                      # moment about the center
+    kt = KT if mu &gt; 0.0 else 0.0
+    S[i, 0, 0] += KN * nx * nx + kt * tx * tx
+    S[i, 0, 1] += KN * nx * ny + kt * tx * ty
+    S[i, 1, 1] += KN * ny * ny + kt * ty * ty
+    S[i, 0, 2] += kt * R[i] * tx
+    S[i, 1, 2] += kt * R[i] * ty
+    S[i, 2, 2] += kt * R[i] * R[i]
+    return ft</code></pre>
+<!-- /cell -->
+
+    <p><code>REG</code> adds <i>k<sub>n</sub></i>/20 to the diagonal of every <i>S</i>. It
+      keeps <i>S</i> invertible for a grain with a single contact, which is free to roll, and
+      for a grain with none. It changes how far a grain steps, not where the iteration ends,
+      because the answer is <b><i>f</i></b> = 0 whatever <i>S</i> is. <i>S</i> also leaves out
+      a small geometric term from the turning of the contact normal, of order
+      <i>f<sub>n</sub></i>/<i>d</i>.</p>
+
+    <h3 class="sub" id="forces">Forces and stiffness</h3>
+
+    <p>One pass over the contacts gives every grain its unbalanced force and its stiffness.
+      Each grain-grain contact is added twice, once to each grain with the other held fixed.
+      The reaction on <i>j</i> is the same call with the normal reversed. The walls are
+      neighbors that never move. The side walls are frictionless in this test, so their
+      contacts carry no tangential force and add no tangential stiffness.</p>
+
+<!-- cell: Forces and stiffness -->
+<pre class="code"><code># unit normal from a grain towards each wall: left, right, bottom, top
+WALL_N = np.array([[-1.0, 0.0], [1.0, 0.0], [0.0, -1.0], [0.0, 1.0]])
+
+@njit
+def forces_and_stiffness(pos, rot, pos0, rot0, R, ci, cj, ft0, ftw0, walls, mu, muw):
+    N = len(R)
+    F = np.zeros((N, 3))
+    S = np.zeros((N, 3, 3))
+    for i in range(N):
+        S[i, 0, 0] = REG
+        S[i, 1, 1] = REG
+        S[i, 2, 2] = REG * R[i] ** 2
+    du, dth = pos - pos0, rot - rot0          # motion since the step began
+    ft, ftw = np.zeros(len(ci)), np.zeros((N, 4))   # tangential forces
+    Fw, nw = np.zeros(4), np.zeros(4)         # force on each wall, grains touching it
+    pn_sum, n_touch = 0.0, 0
+    for c in range(len(ci)):
+        i, j = ci[c], cj[c]
+        dx, dy = pos[j, 0] - pos[i, 0], pos[j, 1] - pos[i, 1]
+        dist = np.sqrt(dx * dx + dy * dy)
+        ov = R[i] + R[j] - dist
+        if ov &lt;= 0.0:
+            continue
+        nx, ny = dx / dist, dy / dist         # normal from i to j
+        dut = ((du[j, 0] - du[i, 0]) * -ny + (du[j, 1] - du[i, 1]) * nx
+               - R[i] * dth[i] - R[j] * dth[j])
+        ft[c] = add_contact(i, nx, ny, ov, dut, ft0[c], mu, R, F, S)
+        add_contact(j, -nx, -ny, ov, dut, ft0[c], mu, R, F, S)
+        pn_sum += KN * ov
+        n_touch += 1
+    for i in range(N):
+        for k in range(4):
+            a = k // 2                        # x for the side walls, y for the platens
+            ov = R[i] + WALL_N[k, a] * (pos[i, a] - walls[k])
+            if ov &lt;= 0.0:
+                continue
+            nx, ny = WALL_N[k, 0], WALL_N[k, 1]
+            dut = du[i, 0] * ny - du[i, 1] * nx - R[i] * dth[i]
+            ftw[i, k] = add_contact(i, nx, ny, ov, dut, ftw0[i, k], muw[k], R, F, S)
+            Fw[k] += KN * ov
+            nw[k] += 1.0
+    return F, S, ft, ftw, Fw, nw, pn_sum / max(n_touch, 1)</code></pre>
+<!-- /cell -->
+
+    <h3 class="sub" id="iteration">The iteration</h3>
+
+    <p><code>kishino</code> applies the update (4) to every grain at once. The factor
+      <span class="gk">&alpha;</span> halves whenever the squared residual rises by more than
+      5% in one iteration, and otherwise grows by 5%, within 0.02 to 0.75. No grain steps more
+      than a fifth of its radius in one iteration.</p>
+
+    <p>A stress-controlled wall is handled the same way, as in Kishino (1988). It is one more
+      block, with one degree of freedom. Its unbalanced force is the difference between the
+      force it carries, <i>F<sub>w</sub></i>, and its target <span class="gk">&sigma;</span><i>L</i>.
+      Its stiffness with the grains held fixed is <i>k<sub>n</sub></i> times the number of
+      grains touching it, <i>n<sub>w</sub></i>.</p>
+
+    <span class="eq">
+      <span>&Delta;<i>w</i></span>
+      <span class="op">=</span>
+      <span><span class="gk">&alpha;</span>&thinsp;(<i>F<sub>w</sub></i> &minus; <span class="gk">&sigma;</span><i>L</i>)&thinsp;/&thinsp;(<i>k<sub>n</sub></i>&thinsp;<i>n<sub>w</sub></i>)</span>
+      <span class="eqn">(6)</span>
+    </span>
+
+    <p>The iteration stops when three residuals are all below <code>tol</code> =
+      10<sup>&minus;3</sup>. The first is <code>fr</code>, the RMS unbalanced force and moment
+      per grain over the mean contact force. The second is the error of each servo wall. The
+      third is the net force on the whole specimen over the load it carries. The third check is
+      not redundant. Residuals that are small on every grain but point the same way add up,
+      and without the check the top and bottom platens in this test disagree by 1 to 2%.</p>
+
+<!-- cell: Kishino iteration -->
+<pre class="code"><code>@njit
+def solve3(S, f):
+    a, b, c, d, e, g = S[0, 0], S[0, 1], S[0, 2], S[1, 1], S[1, 2], S[2, 2]
+    A, B, C = d * g - e * e, c * e - b * g, b * e - c * d
+    D, E, G = a * g - c * c, b * c - a * e, a * d - b * b
+    det = a * A + b * B + c * C
+    return ((A * f[0] + B * f[1] + C * f[2]) / det,
+            (B * f[0] + D * f[1] + E * f[2]) / det,
+            (C * f[0] + E * f[1] + G * f[2]) / det)
+
+OUTWARD = np.array([-1.0, 1.0, -1.0, 1.0])   # outward direction of each wall
+WALL_CAP = 0.02                               # largest wall move in one iteration
+
+@njit
+def kishino(pos, rot, pos0, rot0, R, ci, cj, ft0, ftw0, walls, sigma, mu, muw,
+            alpha, n_iter, tol, pos_list, skin):
+    N = len(R)
+    prev = np.inf
+    fr = werr = net = np.inf
+    for it in range(n_iter):
+        F, S, ft, ftw, Fw, nw, mean_pn = forces_and_stiffness(
+            pos, rot, pos0, rot0, R, ci, cj, ft0, ftw0, walls, mu, muw)
+        r2, sx, sy = 0.0, 0.0, 0.0
+        for i in range(N):
+            r2 += F[i, 0] ** 2 + F[i, 1] ** 2 + (F[i, 2] / R[i]) ** 2
+            sx += F[i, 0]
+            sy += F[i, 1]
+        fr = np.sqrt(r2 / N) / max(mean_pn, 1e-12)
+        H, W = walls[3] - walls[2], walls[1] - walls[0]
+        target = sigma * np.array([H, H, W, W])   # force each servo wall should carry
+        werr = 0.0
+        for k in range(4):
+            if sigma[k] &gt; 0.0:
+                werr = max(werr, abs(Fw[k] / target[k] - 1.0))
+        net = max(abs(sx) / max(Fw[0], Fw[1], 1e-12),     # net force over the load
+                  abs(sy) / max(Fw[2], Fw[3], 1e-12))
+        if fr &lt; tol and werr &lt; tol and net &lt; tol:
+            return it, fr, werr, net, alpha, 1
+        alpha = max(0.02, 0.5 * alpha) if r2 &gt; 1.05 * prev else min(0.75, 1.05 * alpha)
+        prev = r2
+        moved = 0.0
+        for i in range(N):
+            dx, dy, dw = solve3(S[i], F[i])
+            step = np.sqrt(dx * dx + dy * dy)
+            if step &gt; 0.2 * R[i]:
+                dx, dy = dx * 0.2 * R[i] / step, dy * 0.2 * R[i] / step
+            pos[i, 0] += alpha * dx
+            pos[i, 1] += alpha * dy
+            rot[i] += alpha * min(max(dw, -0.05), 0.05)
+            moved = max(moved, (pos[i, 0] - pos_list[i, 0]) ** 2
+                        + (pos[i, 1] - pos_list[i, 1]) ** 2)
+        for k in range(4):
+            if sigma[k] &gt; 0.0:
+                u = alpha * (Fw[k] - target[k]) / (KN * max(nw[k], 1.0))
+                walls[k] += OUTWARD[k] * min(max(u, -WALL_CAP), WALL_CAP)
+        if moved &gt; (0.5 * skin) ** 2:
+            return it + 1, fr, werr, net, alpha, 2
+    return n_iter, fr, werr, net, alpha, 0</code></pre>
+<!-- /cell -->
+
+    <h3 class="sub" id="step">A load step</h3>
+
+    <p>Friction makes the result depend on the loading path, so the history is kept one load
+      step at a time. A step begins by recording the positions and rotations, and it starts
+      from the tangential forces committed at the end of the previous step. Every sliding
+      displacement &Delta;<i>u<sub>t</sub></i> in the step is measured from that start. The
+      tangential forces are then a function of the current positions only, so pausing the
+      iteration to rebuild the contact list changes nothing. Once the step has converged, its
+      tangential forces are committed as the history of the next one.</p>
+
+    <p>The contact list holds every pair with a gap below <code>SKIN</code>. A new contact
+      cannot form until some grain has moved <code>SKIN</code>/2, so <code>kishino</code>
+      returns at that point and <code>relax</code> rebuilds the list. Each pair keeps its
+      committed force through the rebuild, matched by its (<i>i</i>, <i>j</i>) key.</p>
+
+<!-- cell: Load step -->
+<pre class="code"><code>SKIN = 0.3                    # pairs with a smaller gap are contact candidates
+
+def contact_list(pos, R):
+    pairs = cKDTree(pos).query_pairs(2.0 * R.max() + SKIN, output_type='ndarray')
+    i, j = pairs.min(axis=1), pairs.max(axis=1)
+    near = np.hypot(*(pos[j] - pos[i]).T) - R[i] - R[j] &lt; SKIN
+    i, j = i[near], j[near]
+    order = np.lexsort((j, i))
+    return i[order], j[order]
+
+class Specimen:
+    def __init__(self, pos, R, walls):
+        self.pos, self.R, self.walls = pos, R, walls
+        self.rot = np.zeros(len(R))
+        self.ci = self.cj = np.zeros(0, dtype=np.int64)
+        self.ft0 = np.zeros(0)                # committed tangential force of each pair
+        self.ftw0 = np.zeros((len(R), 4))     # ... and of each grain-wall contact
+        self.alpha = 0.2
+        self.relist()
+
+    def relist(self):
+        ci, cj = contact_list(self.pos, self.R)
+        old, new = self.ci * len(self.R) + self.cj, ci * len(self.R) + cj
+        ft0 = np.zeros(len(ci))
+        if len(old):
+            k = np.minimum(np.searchsorted(old, new), len(old) - 1)
+            hit = old[k] == new
+            ft0[hit] = self.ft0[k[hit]]
+        self.ci, self.cj, self.ft0, self.pos_list = ci, cj, ft0, self.pos.copy()
+
+def relax(sp, sigma, mu, muw, tol=1e-3, max_iter=500_000):
+    pos0, rot0 = sp.pos.copy(), sp.rot.copy()     # start of the step
+    done, status = 0, 0
+    while status != 1 and done &lt; max_iter:
+        it, fr, werr, net, sp.alpha, status = kishino(
+            sp.pos, sp.rot, pos0, rot0, sp.R, sp.ci, sp.cj, sp.ft0, sp.ftw0, sp.walls,
+            sigma, mu, muw, sp.alpha, max_iter - done, tol, sp.pos_list, SKIN)
+        done += it
+        if status == 2:
+            sp.relist()
+    F, S, ft, ftw, Fw, nw, mean_pn = forces_and_stiffness(
+        sp.pos, sp.rot, pos0, rot0, sp.R, sp.ci, sp.cj, sp.ft0, sp.ftw0, sp.walls,
+        mu, muw)
+    sp.ft0, sp.ftw0 = ft, ftw
+    return dict(iters=done, converged=status == 1, fr=fr, wall_force=Fw)</code></pre>
+<!-- /cell -->
+
+    <h2 class="art" id="biaxial">The biaxial test</h2>
+
+    <p>The solver of the previous section and the test below make up one script,
+      <a href="biaxial/biaxial.py" download>biaxial.py</a>. The same cells as a notebook are in
+      <a href="biaxial/biaxial.ipynb" download>biaxial.ipynb</a>.</p>
+
+    <h3 class="sub" id="apparatus">Apparatus</h3>
+
+    <p>The biaxial apparatus follows Figure 1. The bottom platen is fixed, and the top platen
+      is driven down by <span class="gk">&delta;</span> every step, which is strain control.
+      Both side walls are servo walls, each held at
+      <span class="gk">&sigma;</span><sub>3</sub><i>H</i> like the membrane of a triaxial
+      cell. The platens are rough, and the grains have the same
+      friction between them, <span class="gk">&mu;</span> = 0.5. The side walls are
+      frictionless. Stresses are boundary tractions. <span class="gk">&sigma;</span><sub>1</sub>
+      is the mean platen force over the width <i>W</i>, and
+      <span class="gk">&sigma;</span><sub>3</sub> the mean side-wall force over the height
+      <i>H</i>.</p>
+
+    <figure class="art-apparatus">
+      <img src="biaxial/apparatus.svg" width="518" height="422"
+           alt="A square box of discs. An arrow labeled delta pushes the top platen down.
+                Arrows labeled sigma 3 times H press on both side walls. The bottom platen is
+                hatched as fixed.">
+      <figcaption>Figure 1. The biaxial apparatus. The side walls are released inside every iteration,
+        by (6), so each one carries <span class="gk">&sigma;</span><sub>3</sub><i>H</i> at
+        every converged step.</figcaption>
+    </figure>
+
+    <h3 class="sub" id="specimen">Specimen</h3>
+
+    <p>1024 discs start on a loose grid. Their radii are 0.5 and 0.3, with (1 + &radic;5)/4
+      large grains for every small one, the mixture of
+      <a href="https://doi.org/10.1103/PhysRevE.74.016118">Maloney and Lema&icirc;tre
+      (2006)</a>. The box is squeezed isotropically to <span class="gk">&sigma;</span><sub>0</sub>
+      without friction, with the left and bottom walls fixed and the right and top walls
+      servo-controlled. Preparing without friction gives the densest packing the discs can
+      reach at that pressure. Friction is switched on afterwards, with every tangential force
+      at zero.</p>
+
+    <p>Stresses are forces per unit length. The number that matters is
+      <span class="gk">&sigma;</span><sub>0</sub>/<i>k<sub>n</sub></i> = 0.02, which sets how
+      soft the contacts are. At this pressure the overlaps average 1.5% of the sum of the two
+      radii.</p>
+
+<!-- cell: Specimen -->
+<pre class="code"><code>SIGMA0 = 2.0e4                # confining stress, force per unit length (p/kn = 0.02)
+
+def make_specimen(n_side=32, seed=0):
+    rng = np.random.default_rng(seed)
+    N = n_side * n_side
+    r = (1.0 + np.sqrt(5.0)) / 4.0            # large grains per small grain
+    R = np.where(rng.permutation(N) &lt; round(N * r / (1.0 + r)), 0.5, 0.3)
+    x = (np.arange(n_side) + 0.5) * 1.05
+    X, Y = np.meshgrid(x, x)
+    pos = np.column_stack([X.ravel(), Y.ravel()]) + rng.uniform(-0.02, 0.02, (N, 2))
+    return Specimen(pos, R, np.array([0.0, 1.05 * n_side, 0.0, 1.05 * n_side]))
+
+sp = make_specimen()
+out = relax(sp, np.array([0.0, SIGMA0, 0.0, SIGMA0]), 0.0, np.zeros(4))
+W0, H0 = sp.walls[1] - sp.walls[0], sp.walls[3] - sp.walls[2]
+phi = np.pi * np.sum(sp.R ** 2) / (W0 * H0)
+print(f"{len(sp.R)} grains in {W0:.2f} x {H0:.2f}, packing fraction {phi:.3f}, "
+      f"{out['iters']} iterations")</code></pre>
+<!-- /cell -->
+
+<pre class="out">1024 grains in 24.33 x 24.30, packing fraction 0.879, 67966 iterations</pre>
+
+    <h3 class="sub" id="compression">Compression</h3>
+
+    <p>Each step moves the top platen down by <span class="gk">&delta;</span> = 0.01, 0.04%
+      of the height, and relaxes the specimen with both side walls at
+      <span class="gk">&sigma;</span><sub>3</sub> = <span class="gk">&sigma;</span><sub>0</sub>.
+      244 steps reach 10% axial strain. Axial strain is the relative shortening of the
+      specimen, and volumetric strain the relative loss of its area, positive in
+      compaction.</p>
+
+<!-- cell: Compression -->
+<pre class="code"><code>MU = 0.5                                  # grain-grain friction
+MU_WALL = np.array([0.0, 0.0, 0.5, 0.5])  # smooth side walls, rough platens
+SIGMA3 = SIGMA0                           # confining stress on the side walls
+DELTA = 0.01                              # top platen advance per step
+
+curve = []
+n_steps = int(np.ceil(0.10 * H0 / DELTA))                 # steps to 10% axial strain
+for step in range(1, n_steps + 1):
+    sp.walls[3] -= DELTA
+    out = relax(sp, np.array([SIGMA3, SIGMA3, 0.0, 0.0]), MU, MU_WALL)
+    W, H = sp.walls[1] - sp.walls[0], sp.walls[3] - sp.walls[2]
+    FL, FR, FB, FT = out['wall_force']
+    s1, s3 = 0.5 * (FB + FT) / W, 0.5 * (FL + FR) / H     # platen and side tractions
+    curve.append((1 - H / H0, s1 / s3, 1 - W * H / (W0 * H0)))
+    if step % 50 == 0:
+        print(f"step {step}/{n_steps}: axial strain {curve[-1][0]:.2%}, "
+              f"s1/s3 {s1 / s3:.2f}, {out['iters']} iterations")
+curve = np.array(curve)          # axial strain, stress ratio, volumetric strain</code></pre>
+<!-- /cell -->
+
+<pre class="out">step 50/244: axial strain 2.06%, s1/s3 1.90, 2041 iterations
+step 100/244: axial strain 4.11%, s1/s3 2.65, 2829 iterations
+step 150/244: axial strain 6.17%, s1/s3 2.98, 6856 iterations
+step 200/244: axial strain 8.23%, s1/s3 2.27, 43407 iterations</pre>
+
+    <h3 class="sub" id="results">Results</h3>
+
+<!-- cell: Results -->
+<pre class="code"><code>ea, ratio, ev = curve[:, 0] * 100, curve[:, 1], curve[:, 2] * 100
+k = np.argmax(ratio)
+phi_peak = np.degrees(np.arcsin((ratio[k] - 1) / (ratio[k] + 1)))
+print(f"peak s1/s3 = {ratio[k]:.2f} at {ea[k]:.1f}% axial strain "
+      f"(friction angle {phi_peak:.0f} degrees)")
+
+fig, ax = plt.subplots(1, 3, figsize=(12, 3.8), layout='constrained')
+ax[0].plot(ea, ratio, lw=0.8, color='k')
+ax[0].set(xlabel='axial strain (%)', ylabel=r'stress ratio  $\sigma_1/\sigma_3$')
+ax[1].plot(ea, ev, lw=0.8, color='k')
+ax[1].set(xlabel='axial strain (%)', ylabel='volumetric strain (%), compaction +')
+lim = np.percentile(np.abs(sp.rot), 98)
+discs = EllipseCollection(2 * sp.R, 2 * sp.R, np.zeros(len(sp.R)), units='x',
+                          offsets=sp.pos, offset_transform=ax[2].transData,
+                          cmap='RdBu_r', clim=(-lim, lim), array=sp.rot)
+ax[2].add_collection(discs)
+ax[2].set(xlim=sp.walls[:2], ylim=sp.walls[2:], aspect='equal', title='grain rotation')
+plt.show()</code></pre>
+<!-- /cell -->
+
+<pre class="out">peak s1/s3 = 3.05 at 7.0% axial strain (friction angle 30 degrees)</pre>
+
+    <figure class="art-results">
+      <img src="biaxial/results.svg" width="780" height="254"
+           alt="Left, the stress ratio rises from 1 to a peak of 3.05 at 7% axial strain and
+                then drops in steps. Middle, the volumetric strain rises to 3% compaction and
+                falls to 1% dilation. Right, grain rotations concentrate in an X of two
+                crossing bands.">
+      <figcaption>Figure 2. The output of the cell above, redrawn for this page. Stress ratio and
+        volumetric strain against axial strain, and the grain rotations at 10% axial strain,
+        red counterclockwise and blue clockwise.</figcaption>
+    </figure>
+
+    <p>The peak gives a friction angle <span class="gk">&phi;</span> =
+      arcsin[(<span class="gk">&sigma;</span><sub>1</sub> &minus;
+      <span class="gk">&sigma;</span><sub>3</sub>)/(<span class="gk">&sigma;</span><sub>1</sub>
+      + <span class="gk">&sigma;</span><sub>3</sub>)] of 30&deg; for grains with
+      <span class="gk">&mu;</span> = 0.5. The specimen compacts at first, because the
+      contacts are soft at this pressure, and then dilates as two conjugate shear bands form.
+      The grain rotations show them as an X. After the peak the stress falls in discrete
+      drops. Each drop is a sudden rearrangement of the bands.</p>
+
+    <h3 class="sub" id="million">One million grains</h3>
+
+    <p>The same test, run on a GPU with one million discs. You can see the conjugate shear
+      bands.</p>
+
+    <figure class="movie">
+      <video id="movie" muted loop playsinline preload="none" width="1560" height="1448"
+             poster="biaxial/platiness_1M_poster.webp"
+             aria-label="Movie of the million-grain biaxial test. Bright crossing bands grow
+                         through a dark blue specimen as it is shortened.">
+        <source src="biaxial/platiness_1M.mp4" type="video/mp4">
+      </video>
+      <figcaption>Figure 3. Each grain is colored by the cumulative non-rigid motion around
+        it.</figcaption>
+    </figure>
+
+    <h2 class="art" id="sph-mantle">SPH mantle</h2>
+
+    <p>In qsDEM, we model the viscous mantle with smoothed particle hydrodynamics (SPH). SPH was
+      developed for compressible astrophysical flows, and
+      <a href="https://doi.org/10.1006/jcph.1997.5776">Morris, Fox and Zhu (1997)</a> adapted it
+      to viscous flow at low Reynolds number, which is the regime of the mantle. We use their
+      formulation with one change. Because qsDEM has no time, the viscosity is replaced by a
+      time-independent drag parameter.</p>
+
+    <p>An SPH particle carries a fixed amount of mass and moves with the flow, but unlike a DEM
+      grain it has no edge. Its mass (<i>m</i>) is spread over a small region around it, densest
+      at the center and fading to nothing at a distance set by the smoothing length (<i>h</i>),
+      following a kernel function (<i>W</i>). Intuitively, an SPH particle is a soft cloud rather
+      than a ball. qsDEM uses the Wendland kernel,</p>
+
+    <span class="eq">
+      <span><i>W</i>(<i>r</i>,&thinsp;<i>h</i>)</span><span class="op">=</span>
+      <span>7&thinsp;/&thinsp;(4<span class="gk">&pi;</span><i>h</i><sup>2</sup>)&thinsp;(1 &minus; <i>r</i>/2<i>h</i>)<sup>4</sup>&thinsp;(1 + 2<i>r</i>/<i>h</i>)</span>
+      <span class="op">,</span><span><i>r</i> &lt; 2<i>h</i></span>
+      <span class="eqn">(7)</span>
+    </span>
+
+    <p>and zero beyond 2<i>h</i>. The density at a particle is the total mass of the particles
+      around it, each weighted by the kernel at its distance,</p>
+
+    <span class="eq">
+      <span><span class="gk">&rho;</span><sub><i>i</i></sub></span><span class="op">=</span>
+      <span>&sum;<sub><i>j</i></sub>&thinsp;<i>m<sub>j</sub></i>&thinsp;<i>W</i>(|<b><i>r</i></b><sub><i>i</i></sub> &minus; <b><i>r</i></b><sub><i>j</i></sub>|,&thinsp; <i>h</i>)</span>
+      <span class="eqn">(8)</span>
+    </span>
+
+    <p>so density is a measure of how crowded the neighborhood is. The pressure is set by how
+      much denser the particle is than the fluid at rest (<span class="gk">&rho;</span><sub>0</sub>), with
+      <i>K</i> as the bulk modulus of the fluid,</p>
+
+    <span class="eq">
+      <span><i>p<sub>i</sub></i></span><span class="op">=</span>
+      <span><i>K</i>&thinsp;(<span class="gk">&rho;</span><sub><i>i</i></sub>&thinsp;/&thinsp;<span class="gk">&rho;</span><sub>0</sub> &minus; 1)</span>
+      <span class="op">,</span><span><span class="gk">&rho;</span><sub><i>i</i></sub> &gt; <span class="gk">&rho;</span><sub>0</sub></span>
+      <span class="eqn">(9)</span>
+    </span>
+
+    <p>and zero otherwise. The pressure acts on each particle through its gradient, pushing it
+      away from neighbors at higher pressure.</p>
+
+    <span class="eq">
+      <span><b><i>F</i></b><sub><i>i</i></sub></span><span class="op">=</span>
+      <span>&minus;&thinsp;&sum;<sub><i>j</i></sub>&thinsp;<i>m<sub>i</sub>m<sub>j</sub></i>&thinsp;(<i>p<sub>i</sub></i>&thinsp;/&thinsp;<span class="gk">&rho;</span><sub><i>i</i></sub><sup>2</sup> <span class="op">+</span> <i>p<sub>j</sub></i>&thinsp;/&thinsp;<span class="gk">&rho;</span><sub><i>j</i></sub><sup>2</sup>)&thinsp;&nabla;<sub><i>i</i></sub><i>W<sub>ij</sub></i></span>
+      <span class="eqn">(10)</span>
+    </span>
+
+    <p>Viscosity is defined as a drag between neighboring particles proportional to their
+      relative velocity (Morris, Fox and Zhu, 1997),</p>
+
+    <span class="eq">
+      <span><b><i>F</i></b><sub><i>i</i></sub></span><span class="op">=</span>
+      <span>&sum;<sub><i>j</i></sub>&thinsp;<i>V<sub>i</sub>V<sub>j</sub></i>&thinsp;(<span class="gk">&mu;</span><sub><i>i</i></sub> + <span class="gk">&mu;</span><sub><i>j</i></sub>)&thinsp;
+        <i>r<sub>ij</sub></i>&thinsp;(&part;<i>W<sub>ij</sub></i>/&part;<i>r</i>)&thinsp;/&thinsp;(<i>r<sub>ij</sub></i><sup>2</sup> + 0.01<i>h</i><sup>2</sup>)&thinsp;
+        (<b><i>v</i></b><sub><i>i</i></sub> &minus; <b><i>v</i></b><sub><i>j</i></sub>)</span>
+      <span class="eqn">(11)</span>
+    </span>
+
+    <p>where <i>V</i> = <i>m</i>/<span class="gk">&rho;</span> is the particle volume and <span class="gk">&mu;</span> is
+      the viscosity. In qsDEM there is no time and no velocity. Each loading step advances the wall
+      by a fixed increment and the solver finds the equilibrium, so the relative velocity in (11) is
+      replaced by the relative displacement accumulated within the current step, and the viscosity
+      by a drag parameter. The physics is the same, a drag on the rearrangement of neighbors, but
+      the drag parameter is a force per unit displacement rather than per unit velocity. Recovering
+      a true viscosity from it would require knowing how much real time one loading step stands
+      for, which qsDEM does not define.</p>
+
+  </div>
+</div>
+<script>
+'use strict';
+(function () {
+  // ---- Python highlighting, applied to the plain code in each cell ----------------------
+  var KW = /^(and|as|assert|break|class|continue|def|del|elif|else|except|False|finally|for|from|global|if|import|in|is|lambda|None|nonlocal|not|or|pass|raise|return|True|try|while|with|yield)$/;
+  var TOKEN = new RegExp([
+    '("""[\\s\\S]*?"""|\'\'\'[\\s\\S]*?\'\'\'|(?:\\b[rbfRBF]{1,2})?"(?:\\\\.|[^"\\\\\\n])*"|(?:\\b[rbfRBF]{1,2})?\'(?:\\\\.|[^\'\\\\\\n])*\')',
+    '(#[^\\n]*)',
+    '(@[A-Za-z_][\\w.]*)',
+    '(\\b\\d[\\d_]*\\.?[\\d_]*(?:[eE][-+]?\\d+)?\\b)',
+    '([A-Za-z_]\\w*)'
+  ].join('|'), 'g');
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function highlight(src) {
+    var out = '', last = 0, prev = '', m, cls, t;
+    TOKEN.lastIndex = 0;
+    while ((m = TOKEN.exec(src)) !== null) {
+      t = m[0];
+      out += esc(src.slice(last, m.index));
+      cls = m[1] ? 'st' : m[2] ? 'cm' : m[3] ? 'dc' : m[4] ? 'nu'
+          : KW.test(t) ? 'kw' : (prev === 'def' || prev === 'class') ? 'fn' : '';
+      out += cls ? '<span class="' + cls + '">' + esc(t) + '</span>' : esc(t);
+      prev = m[5] ? t : '';
+      last = TOKEN.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+
+  var blocks = document.querySelectorAll('pre.code > code');
+  for (var i = 0; i < blocks.length; i++) {
+    var code = blocks[i];
+    var text = code.textContent;
+    code.innerHTML = highlight(text);
+    // ---- a copy button on every cell ----
+    if (navigator.clipboard) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'copy';
+      btn.textContent = 'Copy';
+      btn.addEventListener('click', (function (b, t) {
+        return function () {
+          navigator.clipboard.writeText(t).then(function () {
+            b.textContent = 'Copied';
+            setTimeout(function () { b.textContent = 'Copy'; }, 1400);
+          });
+        };
+      })(btn, text));
+      code.parentNode.appendChild(btn);
+    }
+  }
+
+  // ---- the contents list marks the section being read ----
+  var links = {}, heads = [];
+  var toc = document.querySelectorAll('.toc a[href^="#"]');
+  for (var k = 0; k < toc.length; k++) {
+    var id = toc[k].getAttribute('href').slice(1), h = document.getElementById(id);
+    if (h) { links[id] = toc[k]; heads.push(h); }
+  }
+  var current = null, queued = false;
+  function mark() {
+    queued = false;
+    var navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 88;
+    var here = heads[0];
+    for (var n = 0; n < heads.length; n++) {
+      if (heads[n].getBoundingClientRect().top <= navH + 40) here = heads[n];
+    }
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+      here = heads[heads.length - 1];
+    }
+    if (here !== current) {
+      if (current) links[current.id].classList.remove('here');
+      links[here.id].classList.add('here');
+      current = here;
+    }
+  }
+  window.addEventListener('scroll', function () {
+    if (!queued) { queued = true; requestAnimationFrame(mark); }
+  }, {passive: true});
+  mark();
+
+  // ---- the movie loads and plays only while it is on screen, and a click pauses it ----
+  var v = document.getElementById('movie');
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var held = false;                      // paused by the reader, so scrolling does not restart it
+  function play() { v.preload = 'auto'; v.play().catch(function () {}); }
+  if (still) {
+    v.setAttribute('controls', '');      // no autoplay; the native controls start it
+  } else {
+    v.classList.add('toggle');
+    v.tabIndex = 0;
+    v.title = 'Click to pause or play';
+    var toggle = function () {
+      if (v.paused) { held = false; play(); } else { held = true; v.pause(); }
+    };
+    v.addEventListener('click', toggle);
+    v.addEventListener('keydown', function (e) {
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); }
+    });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { if (!held) play(); }
+          else if (!v.paused) { v.pause(); }
+        });
+      }, {threshold: 0.25}).observe(v);
+    } else {
+      play();
+    }
+  }
+})();
+</script>
+</body>
+</html>
