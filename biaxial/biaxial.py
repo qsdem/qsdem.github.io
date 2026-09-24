@@ -1,6 +1,4 @@
-# qsDEM Getting Started: the Kishino solver and a biaxial test, in plain Python.
-# https://qsdem.github.io/getting-started.html
-# Run it whole (python biaxial.py) or cell by cell: each '# %%' line starts a cell.
+# qsDEM Getting Started, the biaxial test: https://qsdem.github.io/getting-started.html
 
 # %% Setup
 import numpy as np
@@ -11,28 +9,21 @@ from matplotlib.collections import EllipseCollection
 
 # %% Contact law
 KN, KT = 1.0e6, 0.5e6         # normal and tangential contact stiffness
-REG = 0.05 * KN               # keeps every local stiffness invertible
-# numba compiles these numbers into the functions: rerun every cell below after a change
-
+REG = 0.05 * KN               # diagonal term that keeps each local stiffness invertible
 
 @njit
 def add_contact(i, nx, ny, ov, dut, ft0, mu, R, F, S):
-    """Add one contact to grain i: its force and moment to F[i], and its stiffness,
-    with the partner held fixed, to S[i] (upper triangle).
-      nx, ny  unit normal from the center of i towards the contact
-      ov      overlap
-      dut     tangential displacement of the partner relative to i since the step began
-      ft0     tangential force when the step began
-    """
+    # nx, ny: unit normal from the center of grain i towards the contact
+    # ov: overlap, dut: sliding of the partner since the step began
+    # ft0: tangential force when the step began
     tx, ty = -ny, nx                          # unit tangent
-    pn = KN * ov                              # normal force, repulsive
-    ft = ft0 + KT * dut                       # tangential spring,
-    ft = min(max(ft, -mu * pn), mu * pn)      # capped by Coulomb friction
+    pn = KN * ov                              # normal force
+    ft = ft0 + KT * dut                       # tangential force
+    ft = min(max(ft, -mu * pn), mu * pn)
     F[i, 0] += -pn * nx + ft * tx
     F[i, 1] += -pn * ny + ft * ty
     F[i, 2] += R[i] * ft                      # moment about the center
-    kt = KT if mu > 0.0 else 0.0              # no shear stiffness without friction
-    # S += B^T diag(kn, kt) B   with   B = [[nx, ny, 0], [tx, ty, R_i]]
+    kt = KT if mu > 0.0 else 0.0
     S[i, 0, 0] += KN * nx * nx + kt * tx * tx
     S[i, 0, 1] += KN * nx * ny + kt * tx * ty
     S[i, 1, 1] += KN * ny * ny + kt * ty * ty
@@ -45,11 +36,8 @@ def add_contact(i, nx, ny, ov, dut, ft0, mu, R, F, S):
 # unit normal from a grain towards each wall: left, right, bottom, top
 WALL_N = np.array([[-1.0, 0.0], [1.0, 0.0], [0.0, -1.0], [0.0, 1.0]])
 
-
 @njit
 def forces_and_stiffness(pos, rot, pos0, rot0, R, ci, cj, ft0, ftw0, walls, mu, muw):
-    """F[i] = (Fx, Fy, M), the unbalanced force and moment on grain i, and S[i], the
-    3x3 stiffness of grain i with every one of its neighbors held fixed."""
     N = len(R)
     F = np.zeros((N, 3))
     S = np.zeros((N, 3, 3))
@@ -61,7 +49,7 @@ def forces_and_stiffness(pos, rot, pos0, rot0, R, ci, cj, ft0, ftw0, walls, mu, 
     ft, ftw = np.zeros(len(ci)), np.zeros((N, 4))   # tangential forces
     Fw, nw = np.zeros(4), np.zeros(4)         # force on each wall, grains touching it
     pn_sum, n_touch = 0.0, 0
-    for c in range(len(ci)):                  # grain-grain contacts
+    for c in range(len(ci)):
         i, j = ci[c], cj[c]
         dx, dy = pos[j, 0] - pos[i, 0], pos[j, 1] - pos[i, 1]
         dist = np.sqrt(dx * dx + dy * dy)
@@ -72,17 +60,17 @@ def forces_and_stiffness(pos, rot, pos0, rot0, R, ci, cj, ft0, ftw0, walls, mu, 
         dut = ((du[j, 0] - du[i, 0]) * -ny + (du[j, 1] - du[i, 1]) * nx
                - R[i] * dth[i] - R[j] * dth[j])
         ft[c] = add_contact(i, nx, ny, ov, dut, ft0[c], mu, R, F, S)
-        add_contact(j, -nx, -ny, ov, dut, ft0[c], mu, R, F, S)   # the reaction on j
+        add_contact(j, -nx, -ny, ov, dut, ft0[c], mu, R, F, S)
         pn_sum += KN * ov
         n_touch += 1
-    for i in range(N):                        # grain-wall contacts
+    for i in range(N):
         for k in range(4):
             a = k // 2                        # x for the side walls, y for the platens
             ov = R[i] + WALL_N[k, a] * (pos[i, a] - walls[k])
             if ov <= 0.0:
                 continue
             nx, ny = WALL_N[k, 0], WALL_N[k, 1]
-            dut = du[i, 0] * ny - du[i, 1] * nx - R[i] * dth[i]    # walls do not slide
+            dut = du[i, 0] * ny - du[i, 1] * nx - R[i] * dth[i]
             ftw[i, k] = add_contact(i, nx, ny, ov, dut, ftw0[i, k], muw[k], R, F, S)
             Fw[k] += KN * ov
             nw[k] += 1.0
@@ -91,7 +79,6 @@ def forces_and_stiffness(pos, rot, pos0, rot0, R, ci, cj, ft0, ftw0, walls, mu, 
 # %% Kishino iteration
 @njit
 def solve3(S, f):
-    """S^-1 f for a symmetric 3x3 S stored as its upper triangle (Cramer's rule)."""
     a, b, c, d, e, g = S[0, 0], S[0, 1], S[0, 2], S[1, 1], S[1, 2], S[2, 2]
     A, B, C = d * g - e * e, c * e - b * g, b * e - c * d
     D, E, G = a * g - c * c, b * c - a * e, a * d - b * b
@@ -100,26 +87,18 @@ def solve3(S, f):
             (B * f[0] + D * f[1] + E * f[2]) / det,
             (C * f[0] + E * f[1] + G * f[2]) / det)
 
-
 OUTWARD = np.array([-1.0, 1.0, -1.0, 1.0])   # outward direction of each wall
 WALL_CAP = 0.02                               # largest wall move in one iteration
-
 
 @njit
 def kishino(pos, rot, pos0, rot0, R, ci, cj, ft0, ftw0, walls, sigma, mu, muw,
             alpha, n_iter, tol, pos_list, skin):
-    """Iterate until every grain, every servo wall and the specimen as a whole are in
-    balance.  Each iteration moves every grain, all at once, by alpha times the step
-    that would balance it if its neighbors stayed put.  A wall with sigma[k] > 0 is a
-    servo wall: it takes the same kind of step, to carry sigma[k] per unit length.
-    status 1: converged, 2: the contact list is out of date, 0: out of iterations."""
     N = len(R)
     prev = np.inf
     fr = werr = net = np.inf
     for it in range(n_iter):
         F, S, ft, ftw, Fw, nw, mean_pn = forces_and_stiffness(
             pos, rot, pos0, rot0, R, ci, cj, ft0, ftw0, walls, mu, muw)
-        # residuals: every grain, every servo wall, and the net force on the specimen
         r2, sx, sy = 0.0, 0.0, 0.0
         for i in range(N):
             r2 += F[i, 0] ** 2 + F[i, 1] ** 2 + (F[i, 2] / R[i]) ** 2
@@ -132,14 +111,12 @@ def kishino(pos, rot, pos0, rot0, R, ci, cj, ft0, ftw0, walls, sigma, mu, muw,
         for k in range(4):
             if sigma[k] > 0.0:
                 werr = max(werr, abs(Fw[k] / target[k] - 1.0))
-        net = max(abs(sx) / max(Fw[0], Fw[1], 1e-12),     # sum of all grain forces,
-                  abs(sy) / max(Fw[2], Fw[3], 1e-12))     # over the load it balances
+        net = max(abs(sx) / max(Fw[0], Fw[1], 1e-12),     # net force over the load
+                  abs(sy) / max(Fw[2], Fw[3], 1e-12))
         if fr < tol and werr < tol and net < tol:
             return it, fr, werr, net, alpha, 1
-        # relaxation factor: halve it when the residual grows, else let it recover
         alpha = max(0.02, 0.5 * alpha) if r2 > 1.05 * prev else min(0.75, 1.05 * alpha)
         prev = r2
-        # every grain moves by alpha S^-1 F, at most a fifth of its radius
         moved = 0.0
         for i in range(N):
             dx, dy, dw = solve3(S[i], F[i])
@@ -151,8 +128,6 @@ def kishino(pos, rot, pos0, rot0, R, ci, cj, ft0, ftw0, walls, sigma, mu, muw,
             rot[i] += alpha * min(max(dw, -0.05), 0.05)
             moved = max(moved, (pos[i, 0] - pos_list[i, 0]) ** 2
                         + (pos[i, 1] - pos_list[i, 1]) ** 2)
-        # every servo wall moves the same way: with the grains held fixed, its
-        # stiffness is kn times the number of grains touching it
         for k in range(4):
             if sigma[k] > 0.0:
                 u = alpha * (Fw[k] - target[k]) / (KN * max(nw[k], 1.0))
@@ -164,9 +139,7 @@ def kishino(pos, rot, pos0, rot0, R, ci, cj, ft0, ftw0, walls, sigma, mu, muw,
 # %% Load step
 SKIN = 0.3                    # pairs with a smaller gap are contact candidates
 
-
 def contact_list(pos, R):
-    """Pairs i < j with a gap below SKIN, sorted by (i, j)."""
     pairs = cKDTree(pos).query_pairs(2.0 * R.max() + SKIN, output_type='ndarray')
     i, j = pairs.min(axis=1), pairs.max(axis=1)
     near = np.hypot(*(pos[j] - pos[i]).T) - R[i] - R[j] < SKIN
@@ -174,10 +147,7 @@ def contact_list(pos, R):
     order = np.lexsort((j, i))
     return i[order], j[order]
 
-
 class Specimen:
-    """Grains, walls, and the friction history they carry from one step to the next."""
-
     def __init__(self, pos, R, walls):
         self.pos, self.R, self.walls = pos, R, walls
         self.rot = np.zeros(len(R))
@@ -188,7 +158,6 @@ class Specimen:
         self.relist()
 
     def relist(self):
-        """A new contact list, each pair keeping its committed tangential force."""
         ci, cj = contact_list(self.pos, self.R)
         old, new = self.ci * len(self.R) + self.cj, ci * len(self.R) + cj
         ft0 = np.zeros(len(ci))
@@ -198,10 +167,8 @@ class Specimen:
             ft0[hit] = self.ft0[k[hit]]
         self.ci, self.cj, self.ft0, self.pos_list = ci, cj, ft0, self.pos.copy()
 
-
 def relax(sp, sigma, mu, muw, tol=1e-3, max_iter=500_000):
-    """Solve one load step, then commit its friction as the history of the next."""
-    pos0, rot0 = sp.pos.copy(), sp.rot.copy()     # the step starts here
+    pos0, rot0 = sp.pos.copy(), sp.rot.copy()     # start of the step
     done, status = 0, 0
     while status != 1 and done < max_iter:
         it, fr, werr, net, sp.alpha, status = kishino(
@@ -213,29 +180,23 @@ def relax(sp, sigma, mu, muw, tol=1e-3, max_iter=500_000):
     F, S, ft, ftw, Fw, nw, mean_pn = forces_and_stiffness(
         sp.pos, sp.rot, pos0, rot0, sp.R, sp.ci, sp.cj, sp.ft0, sp.ftw0, sp.walls,
         mu, muw)
-    sp.ft0, sp.ftw0 = ft, ftw                     # commit
+    sp.ft0, sp.ftw0 = ft, ftw
     return dict(iters=done, converged=status == 1, fr=fr, wall_force=Fw)
 
 # %% Specimen
 SIGMA0 = 2.0e4                # confining stress, force per unit length (p/kn = 0.02)
 
-
 def make_specimen(n_side=32, seed=0):
-    """n_side^2 discs on a loose, jittered grid in a box of four walls.  Radii 0.5 and
-    0.3, in the ratio large/small = (1 + sqrt 5)/4 (Maloney and Lemaitre, 2006)."""
     rng = np.random.default_rng(seed)
     N = n_side * n_side
-    r = (1.0 + np.sqrt(5.0)) / 4.0
+    r = (1.0 + np.sqrt(5.0)) / 4.0            # large grains per small grain
     R = np.where(rng.permutation(N) < round(N * r / (1.0 + r)), 0.5, 0.3)
     x = (np.arange(n_side) + 0.5) * 1.05
     X, Y = np.meshgrid(x, x)
     pos = np.column_stack([X.ravel(), Y.ravel()]) + rng.uniform(-0.02, 0.02, (N, 2))
     return Specimen(pos, R, np.array([0.0, 1.05 * n_side, 0.0, 1.05 * n_side]))
 
-
 sp = make_specimen()
-# isotropic compaction without friction: left and bottom walls fixed, right and top
-# walls servo-controlled at SIGMA0 (walls are ordered left, right, bottom, top)
 out = relax(sp, np.array([0.0, SIGMA0, 0.0, SIGMA0]), 0.0, np.zeros(4))
 W0, H0 = sp.walls[1] - sp.walls[0], sp.walls[3] - sp.walls[2]
 phi = np.pi * np.sum(sp.R ** 2) / (W0 * H0)
@@ -249,9 +210,9 @@ SIGMA3 = SIGMA0                           # confining stress on the side walls
 DELTA = 0.01                              # top platen advance per step
 
 curve = []
-n_steps = int(np.ceil(0.10 * H0 / DELTA))                 # to 10% axial strain
+n_steps = int(np.ceil(0.10 * H0 / DELTA))                 # steps to 10% axial strain
 for step in range(1, n_steps + 1):
-    sp.walls[3] -= DELTA                                  # strain control at the top
+    sp.walls[3] -= DELTA
     out = relax(sp, np.array([SIGMA3, SIGMA3, 0.0, 0.0]), MU, MU_WALL)
     W, H = sp.walls[1] - sp.walls[0], sp.walls[3] - sp.walls[2]
     FL, FR, FB, FT = out['wall_force']

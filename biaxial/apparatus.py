@@ -1,6 +1,6 @@
-"""apparatus.py -- schematic of the qsDEM biaxial apparatus (9.24/biaxial), drawn after Fig. 1
-of Combe and Roux, PRL 85, 3628 (2000): the box, the wall roles, the loads, the dimension lines
-and the x-y frame, one thin line weight throughout.
+"""apparatus.py -- Figure 1 of the Getting Started page: the qsDEM biaxial apparatus (9.24/biaxial),
+the box, the wall roles, the loads, the dimension lines and the x-y frame, one thin line weight
+throughout.
 
     python apparatus.py        -> apparatus.svg and apparatus.png next to this file
 
@@ -8,7 +8,7 @@ What it shows.  Top platen displacement-controlled (moved down by delta per step
 bottom platen fixed (hatched, mu 0.5), left and right walls stress-controlled servo walls that
 each hold the force sigma_3 x H (frictionless, the membrane).  The disc cluster is 19 real grains
 from the center of the consolidated 10k specimen (bidisperse R 0.5 / 0.3), scaled into the
-sketch; the grain-to-box ratio is not to scale, as in the paper's figure.
+sketch; the grain-to-box ratio is not to scale.
 """
 from pathlib import Path
 import matplotlib

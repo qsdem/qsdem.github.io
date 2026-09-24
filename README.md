@@ -95,7 +95,7 @@ The other files in `biaxial/`:
 
 | file | made by |
 |---|---|
-| `apparatus.svg` | `python biaxial/apparatus.py`, the setup drawn after Fig. 1 of Combe and Roux (2000) |
+| `apparatus.svg` | `python biaxial/apparatus.py`, Figure 1 of the page, the biaxial apparatus |
 | `results.svg` | `python biaxial/make_results.py`, which runs `biaxial.py` (about a minute) and redraws its last cell |
 | `platiness_1M.mp4` | the 1M-grain 9.24 run, see below |
 | `platiness_1M_poster.webp` | the master's last frame, `cwebp -q 88 -m 6 -sharp_yuv` |
