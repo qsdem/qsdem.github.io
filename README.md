@@ -1,14 +1,16 @@
 # qsdem.github.io
 
-Public website for qsDEM. **No solver code lives in this repository** — the code is distributed
-on request through a separate private repository (see the Apply page).
+Public website for qsDEM. **The qsDEM solver does not live in this repository.** The Getting
+Started page carries a separate teaching version of the Kishino method in plain Python,
+`biaxial/biaxial.py`, which imports nothing from qsDEM.
 
 ## Pages
 
 | file | tab | contents |
 |---|---|---|
 | `index.html` | — | **black** page, full-bleed looping sweep of 10 render frames |
-| `apply.html` | Apply | access request form. **Currently a demo: it does not submit anywhere.** |
+| `getting-started.html` | Getting Started | concepts and applications: the Kishino solver as code, the biaxial test, the SPH mantle (see below) |
+| `apply.html` | — | redirect to `getting-started.html`, which replaced the Apply form |
 | `wiki.html` | Wiki | placeholder. Intended to point at a public wiki repo once one exists. |
 | `about.html` | About | what qsDEM is, the method, and the interactive DEM vs qsDEM explorable |
 | `assets/css/main.css` | — | shared styles: brand, nav, and the site layout width |
@@ -47,9 +49,9 @@ The site mirrors `braydennoh.github.io/style.css` exactly: the same self-hosted 
 same 15px / 1.5 body on a 960px left-aligned column with 30x40 padding, `#031326` links (the darkest colour of cmcrameri lipari),
 the same 13px dot-separated top nav, and the same two-column layout.
 
-**Apply, Wiki and About have a left sidebar.** `.columns` is a flex row of a fixed 280px
+**Getting Started, Wiki and About have a left sidebar.** `.columns` is a flex row of a fixed 280px
 `.sidebar` and a flexible `.main`, with a 40px gap. The page heading (`h1`) and that page's standing
-text live in the sidebar (the access terms on Apply, the model description on About); the content
+text live in the sidebar (the contents list on Getting Started and Wiki, the model description on About); the content
 lives in `.main`. Below 700px the columns stack and the sidebar goes full width.
 
 The nav is `position: fixed` rather than `sticky`, because sticky fails silently in some mobile
@@ -71,3 +73,44 @@ canvas, legend and readout, so below 900px they stack as DEM title, DEM plot, DE
 same for qsDEM, rather than interleaving. The standalone version of the same demo
 lives outside this repo at `Research/qsdem2/demos/qsdem_explorable.html`; the two are separate
 files, so a change to one does not propagate to the other.
+
+## Getting Started page
+
+`getting-started.html` is a wiki of qsDEM's concepts and the applications built on them, in four
+sections: Setup, the Kishino solver, the biaxial test, and the SPH mantle. The Kishino and SPH
+text is the Wiki's, without the momentum paragraphs, and the Kishino section adds the solver as
+code cells. Future applications (subduction) go in as sections of their own.
+
+The code cells, the downloadable script and the notebook all come from one file,
+`biaxial/biaxial.py`, where each `# %% Title` line starts a cell. Edit that file, then run
+
+    python biaxial/sync_code.py
+
+which refills every `<!-- cell: Title -->` block in the page and rewrites
+`biaxial/biaxial.ipynb`. The prose around the cells is edited by hand. The page's own
+script highlights the code and adds the Copy buttons, with no library. The output blocks under
+the cells are pasted from a run, so rerun the tutorial when the code changes and update them.
+
+The other files in `biaxial/`:
+
+| file | made by |
+|---|---|
+| `apparatus.svg` | `python biaxial/apparatus.py`, the setup drawn after Fig. 1 of Combe and Roux (2000) |
+| `results.svg` | `python biaxial/make_results.py`, which runs `biaxial.py` (about a minute) and redraws its last cell |
+| `platiness_1M.mp4` | the 1M-grain 9.24 run, see below |
+| `platiness_1M_poster.webp` | the master's last frame, `cwebp -q 88 -m 6 -sharp_yuv` |
+
+The movie is rendered from `../9.24/biaxial/runs/biaxial_N999939.h5` by
+`../9.24/biaxial/render_platiness_web.py`, which is `render_platiness.py` with a white field
+around the specimen and the specimen's wall box underlaid in lipari's darkest colour, so the
+pores read as they do on black:
+
+    python render_platiness_web.py runs/biaxial_N999939.h5 --canvas 1560x1448 --bitrate 40000k
+    ffmpeg -i results/biaxial_N999939_platiness_1560x1448.mp4 -an -vf setpts=PTS/1.3 -r 31.2 \
+        -c:v libx264 -preset slow -crf 30 -pix_fmt yuv420p -profile:v high \
+        -movflags +faststart platiness_1M.mp4
+
+The master runs 21.6 s at 24 fps. `setpts=PTS/1.3 -r 31.2` plays it 1.3 times faster with every
+frame kept, 16.6 s. 1560 px is twice the 780 px column, so a DPR-2 screen draws it pixel for
+pixel, and CRF 30 keeps it at 8.5 MB. The page loads and plays it only while it is on screen,
+and a click pauses it.
