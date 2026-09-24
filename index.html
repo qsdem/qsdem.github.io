@@ -56,14 +56,14 @@
     width: auto;
   }
 
-  /* The hero files are exactly 1x, 2x and 3x the 780px column (780, 1560 and 2340 wide), so
-     the browser draws them pixel for pixel instead of rescaling them. They are lossless because
-     lossy WebP keeps colour at half resolution, which smears the yellow specks into the blue.
-     A lossy 1920 copy scaled down to 1560 looked soft for both reasons. Each file is an area
-     average of one 1200 dpi render (12x the 1560 copy), with the mantle's gaps filled: a panel
-     here is only ~150px wide, so any grain lattice left in the image aliases into moire. width/height are
-     declared to reserve the right box before the image arrives, which stops the page jumping
-     as it loads. */
+  /* The hero is the whole strength x stiffness matrix running: all 290 saved frames of the 20
+     runs at 30 fps, holding the flat plates and the finished state 1.5 s each, like the crush.
+     It is 3120 wide, 4x the 780px column, because H.264 stores colour at half resolution: at
+     3120 the colour is 1560 wide, pixel for pixel on a Retina screen, where a 1560 video smeared
+     the yellow cracks into the blue. Each frame is an area average of a render 4x larger again,
+     with the mantle's gaps filled, so the grain lattice cannot crawl. CRF 12 and tagged BT.709;
+     level 5.1, the same as the crush. width/height reserve the box before the video arrives,
+     which stops the page jumping as it loads. */
   .hero {
     display: block;
     width: 100%;
@@ -111,18 +111,13 @@
   </div>
 
   <div class="main">
-    <img class="hero"
-         src="assets/img/hero_matrix_1560.webp"
-         srcset="assets/img/hero_matrix_780.webp 780w,
-                 assets/img/hero_matrix_1560.webp 1560w,
-                 assets/img/hero_matrix_2340.webp 2340w,
-                 assets/img/hero_matrix_4666.webp 4666w"
-         sizes="(max-width: 700px) calc(100vw - 60px),
-                (max-width: 1276px) calc(100vw - 496px),
-                780px"
-         width="1560" height="733"
-         alt="A grid of qsDEM subduction runs, twenty panels: a dark blue plate bending down into
-              a red mantle, steeply and broken up at the left, shallow and intact at the right.">
+    <video class="hero hero-video" autoplay muted loop playsinline preload="auto" role="img"
+           poster="assets/img/matrix_poster.webp" width="3120" height="1466"
+           aria-label="A grid of qsDEM subduction runs, twenty panels: a flat dark blue plate
+                       pushed into a red mantle, sinking steeply and breaking up at the left,
+                       shallow and intact at the right.">
+      <source src="assets/img/matrix.mp4" type="video/mp4">
+    </video>
   </div>
 
 </div>
@@ -136,6 +131,15 @@
     v.removeAttribute('autoplay');
     v.pause();
     v.currentTime = 0;
+  }
+  // The matrix, by contrast, stops on its last frame: the finished runs are the informative still,
+  // where its first frame is twenty identical flat plates.
+  var h = document.querySelector('.hero-video');
+  if (h && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    h.removeAttribute('autoplay');
+    h.pause();
+    var toEnd = function () { h.currentTime = h.duration; };
+    if (h.readyState >= 1) toEnd(); else h.addEventListener('loadedmetadata', toEnd);
   }
 })();
 </script>
