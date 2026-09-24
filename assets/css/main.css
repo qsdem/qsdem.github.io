@@ -96,7 +96,7 @@ h1 {
 .sidebar {
   position: sticky;
   top: var(--nav-h);
-  width: 280px;
+  width: 336px;
   flex-shrink: 0;
   font-size: 14px;
   line-height: 1.6;

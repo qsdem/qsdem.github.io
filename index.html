@@ -28,21 +28,27 @@
     overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
   }
 
-  /* Native size is 234 wide, which fits the 280px sidebar as drawn; max-width keeps it inside
-     the column once main.css stacks the layout below 700px and the sidebar goes full width. */
+  /* Drawn at 0.8x its native 234 wide.  max-width keeps it inside the column once main.css
+     stacks the layout below 700px and the sidebar goes full width. */
   .logo {
     display: block;
-    width: 234px;
+    width: 187.2px;
     max-width: 100%;
     height: auto;
   }
   /* The link shrink-wraps the logo, so only the logo is clickable rather than the whole width
-     of the sidebar beside it. */
+     of the sidebar beside it.
+     The negative margin is OPTICAL alignment.  The logo's left edge is a pale disc, #EBF4F7 at
+     1.10:1 against white, which reads as empty page, so the artwork the eye takes for the logo
+     starts 11.5 of the file's 234 units in: 9.2 px at this size.  Pulling the link left by that
+     much puts the coloured arcs flush with the text above; the faint disc edge sits in the
+     gutter, where nothing can be seen of it. */
   .logo-link {
     display: block;
     width: max-content;
     max-width: 100%;
     margin-top: 18px;
+    margin-left: -9.2px;
   }
 
   /* The hero files are exactly 1x, 2x and 3x the 780px column (780, 1560 and 2340 wide), so
@@ -71,7 +77,7 @@
     <h1 class="mark">
       <span class="vh">qsDEM</span>
       <video class="mark-video" autoplay muted loop playsinline preload="auto"
-             poster="assets/img/logo_crush_poster.webp" width="2560" height="624"
+             poster="assets/img/logo_crush_poster.webp" width="2560" height="614"
              aria-hidden="true">
         <source src="assets/img/logo_crush.mp4" type="video/mp4">
       </video>
@@ -101,7 +107,7 @@
                  assets/img/hero_matrix_2340.webp 2340w,
                  assets/img/hero_matrix_4666.webp 4666w"
          sizes="(max-width: 700px) calc(100vw - 60px),
-                (max-width: 1220px) calc(100vw - 440px),
+                (max-width: 1276px) calc(100vw - 496px),
                 780px"
          width="1560" height="733"
          alt="A grid of qsDEM subduction runs, twenty panels: a dark blue plate bending down into
