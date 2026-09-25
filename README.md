@@ -97,7 +97,9 @@ To add a post:
 1. Copy a post folder to `blog/<date>-<slug>/` and edit its `index.html`: the `<title>`,
    `description`, `keywords`, canonical and `og:` addresses, the JSON-LD, the sidebar title and
    date, and the article.
-2. Add a card at the top of the list in `blog.html`.
+2. Add a card at the top of the list in `blog.html`, linking to `blog/<date>-<slug>/index.html`.
+   Link the file, not the folder: opened from disk (`file://`), a folder shows a file listing
+   instead of its `index.html`, while GitHub Pages serves either.
 3. Add the post's address to `sitemap.xml`.
 
 A figure wrapped in `<a class="zoom" href="<full-size file>">` opens that file over the page on a
@@ -114,7 +116,7 @@ The posts so far, and where their files come from:
 | post | files in its folder |
 |---|---|
 | Subduction simulation, September 25, 2026 | `matrix_*.webp`, from the PNG the user supplied (`~/Downloads/matrix_ss_subduct.png`) |
-| Lees-Edwards shear test, August 31, 2026 | `lees_edwards.svg` from `lees_edwards.py` next to it, drawn like `biaxial/apparatus.py`. `shear_sweep.mp4` from `../8.31/sheartest/render_row_web.py`, which is `render_row.py`'s September 8 grains cut as one row in the site's type, 3120 px wide, CRF 21 capped at 11 Mb/s to stay under GitHub's 50 MB warning. `shear_sweep_poster.webp` is its last frame at 1560 px |
+| Lees-Edwards shear test, August 31, 2026 | `lees_edwards_ludwig.svg`, the schematic from the Ludwig documentation (University of Edinburgh), credited under the figure. `shear_sweep.mp4` from `../8.31/sheartest/render_row_web.py`, which is `render_row.py`'s September 8 grains cut as one row in the site's type, 3120 px wide, CRF 21 capped at 11 Mb/s to stay under GitHub's 50 MB warning. `shear_sweep_poster.webp` is its last frame at 1560 px |
 
 ## Getting Started page
 

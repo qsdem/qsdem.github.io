@@ -6,7 +6,7 @@
 <title>Lees-Edwards shear test &mdash; qsDEM</title>
 <meta name="description" content="A Lees-Edwards simple shear test in qsDEM, a quasi-static discrete element model (DEM). One hundred thousand bonded discs are sheared to a strain of 1 at four bond strengths, from a dense network of shear bands to a few large open cracks.">
 <meta name="author" content="Brayden Noh">
-<meta name="keywords" content="Lees-Edwards boundary conditions, simple shear, shear test, discrete element method, DEM, bonded particles, bonded DEM, periodic boundary, quasi-static, qsDEM">
+<meta name="keywords" content="Lees-Edwards boundary conditions, simple shear, shear test, discrete element method, DEM, bonded particles, bonded DEM, parallel bond, periodic boundary, quasi-static, qsDEM">
 <link rel="canonical" href="https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="qsDEM">
@@ -36,7 +36,7 @@
  },
  "image": "https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/shear_sweep_poster.webp",
  "mainEntityOfPage": "https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/",
- "keywords": "Lees-Edwards boundary conditions, simple shear, shear test, discrete element method, DEM, bonded particles, bonded DEM, periodic boundary, quasi-static, qsDEM"
+ "keywords": "Lees-Edwards boundary conditions, simple shear, shear test, discrete element method, DEM, bonded particles, bonded DEM, parallel bond, periodic boundary, quasi-static, qsDEM"
 }
 </script>
 <link rel="stylesheet" href="../../assets/css/main.css">
@@ -60,32 +60,52 @@
 
   <div class="main">
     <article class="post-body">
-    <p>This is a simple shear test of the bonded DEM material used for the plate in the
-      subduction model (no fluid, no walls and no gravity), run with the same
-      <a href="../../getting-started.html#kishino">Kishino solver</a>. The grains are the same
-      bonded bidisperse discs (radii 0.5 and 0.3 at a packing fraction of 0.86, with every
-      touching pair bonded), and the friction between grains is tan&nbsp;30&deg;. The box
-      is periodic with Lees-Edwards boundary conditions
-      (<a href="https://doi.org/10.1088/0022-3719/5/15/006">Lees and Edwards, 1972</a>),
-      which let the whole box shear without walls. A grain that leaves through the top
-      comes back in through the bottom, shifted sideways by <i>&gamma;H</i> (where
-      <i>&gamma;</i> is the shear strain and <i>H</i> the box height).</p>
-    <figure class="schematic">
-      <img src="lees_edwards.svg" width="518" height="499" loading="lazy"
-           alt="A square periodic cell with a cluster of discs, seen inside the seams of its
-                copies. The row of copies above is shifted right by gamma H and the row below
-                is shifted left by gamma H. A grain at the top of the cell appears again at
-                the bottom, gamma H to the left.">
+    <p>Lees-Edwards boundary conditions
+      (<a href="https://doi.org/10.1088/0022-3719/5/15/006">Lees and Edwards, 1972</a>) shear a
+      periodic box without any solid boundary, so the whole box is in a pure linear shear, with
+      no boundary effects. The copies of the box above slide one way and the copies below slide
+      the other way (a grain that leaves through the top comes back in through the bottom,
+      shifted sideways by the current offset). For more detail on the boundary, the
+      <a href="https://ludwig.epcc.ed.ac.uk/tutorials/lees-edwards/lees-edwards.html">Ludwig tutorial</a> has a good write-up.</p>
+    <figure>
+      <img src="lees_edwards_ludwig.svg" width="998" height="363" loading="lazy"
+           alt="The central computational system, shaded, surrounded by its periodic copies. The
+                row of copies above slides right at plus u y, and the row below slides left at
+                minus u y.">
+      <figcaption>Schematic from the <a href="https://ludwig.epcc.ed.ac.uk/tutorials/lees-edwards/lees-edwards.html">Ludwig documentation</a>, University of
+        Edinburgh.</figcaption>
     </figure>
-    <p>Each load step shears the box a little (an affine step of
-      <i>&Delta;&gamma;</i> = 5&thinsp;&times;&thinsp;10<sup>&minus;5</sup>), slides the
-      copies above and below by the new offset, and then relaxes every grain back to
-      equilibrium. Below is a sweep of bond strength (tensile and shear strength set equal,
-      with no scatter) at a fixed bond Young's modulus, with one hundred thousand grains in
-      each box, sheared to <i>&gamma;</i> = 1. Each grain is colored by the cumulative
-      non-rigid motion around it. Weak bonds break everywhere into a dense network of shear
-      bands, and stronger bonds fail along fewer and larger cracks that open up (the white
-      areas are empty space).</p>
+    <p>We used 100k particles (bidisperse DEM discs with radii 0.5 and 0.3, the mixture of
+      <a href="https://doi.org/10.1103/PhysRevE.74.016118">Maloney and Lema&icirc;tre, 2006</a>, at
+      a packing fraction of 0.86 and grain friction tan&nbsp;30&deg;), with every touching pair
+      joined by a parallel bond
+      (<a href="https://doi.org/10.1016/j.ijrmms.2004.09.011">Potyondy and Cundall, 2004</a>).
+      <code>ec_bar</code> = 10<sup>7</sup> is the bond's Young's modulus
+      <span class="m"><i class="bar">E</i><sub>c</sub></span>, and <code>strength</code>
+      (10<sup>4</sup> to 10<sup>7</sup>) is its tensile and shear strength
+      <span class="m"><span class="gk bar">&sigma;</span><sub>c</sub> =
+      <span class="gk bar">&tau;</span><sub>c</sub></span> (set equal, with no scatter):</p>
+    <span class="eq">
+      <span><i class="bar">k</i><sub>n</sub> = <i class="bar">E</i><sub>c</sub>&thinsp;/&thinsp;(<i>R</i><sub>i</sub> + <i>R</i><sub>j</sub>)</span>
+      <span class="op">,</span>
+      <span><span class="gk bar">&sigma;</span><sub>max</sub> = &minus;<i class="bar">F</i><sub>n</sub>&thinsp;/&thinsp;<i class="bar">A</i> + |<i class="bar">M</i>|&thinsp;<i class="bar">R</i>&thinsp;/&thinsp;<i class="bar">I</i> &ge; <span class="gk bar">&sigma;</span><sub>c</sub></span>
+      <span class="op">,</span>
+      <span><span class="gk bar">&tau;</span><sub>max</sub> = |<i class="bar">F</i><sub>s</sub>|&thinsp;/&thinsp;<i class="bar">A</i> &ge; <span class="gk bar">&tau;</span><sub>c</sub></span>
+    </span>
+    <p>where <span class="m"><i class="bar">k</i><sub>n</sub></span> is the bond's normal stiffness
+      (the shear stiffness is <span class="m"><i class="bar">k</i><sub>n</sub>/2.5</span>), and
+      <span class="m"><i class="bar">R</i> = min(<i>R</i><sub>i</sub>, <i>R</i><sub>j</sub>),
+      <i class="bar">A</i> = 2<i class="bar">R</i></span> and
+      <span class="m"><i class="bar">I</i> = 2<i class="bar">R</i><sup>3</sup>/3</span> are its radius, area
+      and moment of inertia (per unit depth). A bond breaks once either stress reaches its
+      strength. Each load step shears the box by
+      <span class="m"><span class="gk">&Delta;&gamma;</span></span> =
+      5&thinsp;&times;&thinsp;10<sup>&minus;5</sup> (an affine step), and the
+      <a href="../../getting-started.html#kishino">Kishino solver</a> relaxes every grain back to
+      equilibrium, up to <span class="m"><span class="gk">&gamma;</span></span> = 1. Each grain
+      below is colored by the cumulative non-rigid motion around it. Weak bonds break
+      everywhere into a dense network of shear bands, and stronger bonds fail along fewer and
+      larger cracks that open up (the white areas are empty space).</p>
     <figure>
       <video class="movie" muted loop playsinline preload="none" width="3120" height="850"
              poster="shear_sweep_poster.webp"
@@ -96,7 +116,6 @@
         <source src="shear_sweep.mp4" type="video/mp4">
       </video>
     </figure>
-  
     </article>
   </div>
 </div>

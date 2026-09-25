@@ -20,3 +20,19 @@
 @media (max-width: 700px) {
   .sidebar { position: static; }
 }
+
+/* Equations and inline symbols, the convention of the Getting Started page. */
+.eq {
+  display: flex; justify-content: center; align-items: flex-start;
+  flex-wrap: wrap; row-gap: 6px; margin: 18px 0;
+  font-family: "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
+  font-size: var(--fs); line-height: 1.45;
+}
+.eq i, .m i { font-style: italic; }
+.eq .op { font-style: normal; padding: 0 .5em; }
+.m { font-family: "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif; }
+.gk { font-style: normal; }
+.post-body figcaption { font-size: calc(var(--fs) * 0.87); color: var(--fg-dim); margin-top: 8px; }
+/* a bond quantity (Potyondy and Cundall's bar), drawn as an overline so every letter gets the
+   same bar: a combining macron only sits right on letters with a precomposed form */
+.bar { text-decoration: overline; text-decoration-thickness: 0.055em; }
