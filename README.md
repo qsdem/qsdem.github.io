@@ -78,15 +78,24 @@ files, so a change to one does not propagate to the other.
 ## Blog page
 
 `blog.html` is one page of dated posts, newest first. Each post is a `<details class="post">`:
-its `<summary>` holds the title, the date and a one or two sentence summary, which always show,
-and a click opens the full article underneath. No JavaScript is needed for that. A small script
-opens the post named in the address (`blog.html#<post id>`) and writes a post's id into the
-address when it is opened, so an open post can be shared.
+its `<summary>` holds the title and one line with the date and the author, which always show,
+and a click opens the full article underneath. No JavaScript is needed for that. The page's
+script opens the post named in the address (`blog.html#<post id>`) and writes a post's id into
+the address when it is opened, so an open post can be shared.
 
 To add a post, copy the commented template at the top of the list in `blog.html`, fill it in and
-put it above the newest post. Its id is its date and a slug, `2026-09-25-slug`, and its date goes
-in a `<time datetime>`. Give images `loading="lazy"` and videos `preload="none"`, so a closed post
-downloads nothing. "No posts yet." hides itself once the list holds a post.
+put it above the newest post. Its id is its date and a slug, `2026-09-25-subduction-simulation`,
+and its date goes in a `<time datetime>`. Its files go in a folder of the same name under
+`blog/`. "No posts yet." hides itself once the list holds a post.
+
+A figure wrapped in `<a class="zoom" href="<full-size file>">` opens that file over the page on a
+click, at one image pixel per screen pixel, centered where it was clicked. Scrolling pans it, and
+a click or Escape closes it. Without JavaScript the link opens the file itself. That is how a
+dense figure like the subduction matrix stays sharp: in the 780 px column its labels are only
+about 3 px tall. Its inline copies follow the homepage hero's recipe, PIL LANCZOS to exactly 780,
+1560 and 2340 wide, saved as lossless WebP (method 6), because lossy WebP smears small colored
+specks. The full-size file is lossless WebP too. Give images `loading="lazy"` and videos
+`preload="none"`. Chrome still fetches the image of a closed post near the top of the page.
 
 ## Getting Started page
 
