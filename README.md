@@ -97,20 +97,26 @@ The other files in `biaxial/`:
 |---|---|
 | `apparatus.svg` | `python biaxial/apparatus.py`, Figure 1 of the page, the biaxial apparatus |
 | `results.svg` | `python biaxial/make_results.py`, which runs `biaxial.py` (about a minute) and redraws its last cell |
-| `platiness_1M.mp4` | the 1M-grain 9.24 run, see below |
-| `platiness_1M_poster.webp` | the master's last frame, `cwebp -q 88 -m 6 -sharp_yuv` |
+| `mu_sweep_1M.mp4` | the 1M-grain friction sweep, see below |
+| `mu_sweep_1M_poster.webp` | its last frame at 1560 px, `cwebp -q 88 -m 6 -sharp_yuv -resize 1560 0` |
 
-The movie is rendered from `../9.24/biaxial/runs/biaxial_N999939.h5` by
-`../9.24/biaxial/render_platiness_web.py`, which is `render_platiness.py` with a white field
-around the specimen and the specimen's wall box underlaid in lipari's darkest colour, so the
-pores read as they do on black:
+The movie shows the four 1M runs of the 9.24 friction sweep,
+`../9.24/biaxial/runs/biaxial_N999939_mu{00,10,20,30}.h5`, side by side. It is made by
+`../9.24/biaxial/mu_sheet_web.py`, the site version of `mu_sheet.py`. It keeps the same panels
+and renderer (white page, black pores, one scale for every panel, drawn at 2x like
+`mu_sheet.py`), and sets the labels in Myriad Pro Regular with the page figures' colors. The row
+is 3120 px wide, 4x the 780 px column, like the homepage hero: H.264 keeps color at half
+resolution, so at 3120 the color is 1560 wide, pixel for pixel on a DPR-2 screen. It uses all
+483 frames to 10% strain, at 31.2 fps, 1.3 times `mu_sheet.py`'s 24 fps, and is tagged BT.709
+with TV range like the hero:
 
-    python render_platiness_web.py runs/biaxial_N999939.h5 --canvas 1560x1448 --bitrate 40000k
-    ffmpeg -i results/biaxial_N999939_platiness_1560x1448.mp4 -an -vf setpts=PTS/1.3 -r 31.2 \
-        -c:v libx264 -preset slow -crf 30 -pix_fmt yuv420p -profile:v high \
-        -movflags +faststart platiness_1M.mp4
+    cd ../9.24/biaxial
+    python mu_sheet_web.py         # about 6 min: lossless 1.7 GB master, then the MP4
+    cp results/mu_sweep_1M_web.mp4 <site>/biaxial/mu_sweep_1M.mp4
+    cwebp -q 88 -m 6 -sharp_yuv -resize 1560 0 results/mu_sweep_1M_web_last.png \
+        -o <site>/biaxial/mu_sweep_1M_poster.webp
 
-The master runs 21.6 s at 24 fps. `setpts=PTS/1.3 -r 31.2` plays it 1.3 times faster with every
-frame kept, 16.6 s. 1560 px is twice the 780 px column, so a DPR-2 screen draws it pixel for
-pixel, and CRF 30 keeps it at 8.5 MB. The page loads and plays it only while it is on screen,
-and a click pauses it.
+The MP4 uses `mu_sheet.py`'s own encoding, CRF 21 capped at 14 Mb/s, which gives 30 MB.
+`python mu_sheet_web.py --encode-only --crf C` re-encodes from the master without redrawing.
+CRF 26 gives 18 MB with slightly softer speckle. A 1560 px row gives 10 MB but loses the grain
+texture. The page loads and plays the movie only while it is on screen, and a click pauses it.
