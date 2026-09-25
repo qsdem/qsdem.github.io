@@ -65,9 +65,28 @@
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', build);
-  } else {
+  // The crushing wordmark at the top of a sidebar: a reader who has asked for less motion gets
+  // the intact letters as a still.  The poster is the first frame, so stopping at time 0 shows
+  // exactly the letters before the press arrives.  (The homepage's own wordmark, .mark-video, has
+  // the same rule in index.html.)
+  function still() {
+    if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+    var vs = document.querySelectorAll('.brand-video');
+    for (var i = 0; i < vs.length; i++) {
+      vs[i].removeAttribute('autoplay');
+      vs[i].pause();
+      vs[i].currentTime = 0;
+    }
+  }
+
+  function ready() {
     build();
+    still();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ready);
+  } else {
+    ready();
   }
 })();

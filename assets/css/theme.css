@@ -83,3 +83,9 @@ h1, .main h3, .sidebar h3 { color: var(--fg); }
 @media (max-width: 700px) {
   .sidebar { background: var(--bg); }
 }
+
+/* ---- the crushing qsDEM wordmark at the top of the sidebar ----
+   Every page but the homepage, where the wordmark is the page heading itself (index.html's
+   .mark).  Here it links home, and the page's own h1 follows it. */
+.sidebar .brand { display: block; margin-bottom: 18px; }
+.sidebar .brand-video { display: block; width: 100%; height: auto; }

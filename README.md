@@ -51,6 +51,12 @@ The site mirrors `braydennoh.github.io/style.css` exactly: the same self-hosted 
 same 15px / 1.5 body on a 960px left-aligned column with 30x40 padding, `#031326` links (the darkest colour of cmcrameri lipari),
 the same 13px dot-separated top nav, and the same two-column layout.
 
+**Every sidebar opens with the crushing qsDEM wordmark** (`assets/img/logo_crush.mp4`, poster
+`logo_crush_poster.webp`). On the homepage it is the page heading itself. On Getting Started, Blog,
+About and every post it is a link home above the page's own heading (`.brand`, styled in
+`theme.css`), and `appearance.js` holds it on its first frame for a reader who has asked for
+less motion.
+
 **Getting Started, Blog and About have a left sidebar.** `.columns` is a flex row of a fixed 280px
 `.sidebar` and a flexible `.main`, with a 40px gap. The page heading (`h1`) and that page's standing
 text live in the sidebar (the contents list on Getting Started, the model description on About); the content
