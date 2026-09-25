@@ -1,0 +1,38 @@
+/* qsDEM -- a blog post: one post per page (blog/<date>-<slug>/index.html), its title, date and
+   author in the sidebar and the article in the main column.  Loaded after main.css and
+   theme.css. */
+
+.sidebar .meta { color: var(--fg-dim); font-size: 0.93em; }
+
+.post-body figure { margin: 22px 0 26px; }
+.post-body img, .post-body video { display: block; width: 100%; height: auto; }
+.post-body figure.schematic img { width: 518px; max-width: 100%; }   /* line art at its drawn size */
+.post-body video.movie { background: var(--bg); }
+
+/* A figure linked with class="zoom" opens its full-resolution file over the page, one image
+   pixel per screen pixel, so labels too fine for the column stay sharp (post.js). */
+.post-body a.zoom { display: block; cursor: zoom-in; }
+.lightbox { position: fixed; inset: 0; z-index: 10; overflow: auto; background: var(--bg);
+            cursor: zoom-out; outline: none; }
+.lightbox img { display: block; max-width: none; margin: 0 auto; }
+
+/* stacked on a phone, the title scrolls away instead of pinning under the nav */
+@media (max-width: 700px) {
+  .sidebar { position: static; }
+}
+
+/* Equations and inline symbols, the convention of the Getting Started page. */
+.eq {
+  display: flex; justify-content: center; align-items: flex-start;
+  flex-wrap: wrap; row-gap: 6px; margin: 18px 0;
+  font-family: "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif;
+  font-size: var(--fs); line-height: 1.45;
+}
+.eq i, .m i { font-style: italic; }
+.eq .op { font-style: normal; padding: 0 .5em; }
+.m { font-family: "Iowan Old Style", Palatino, Georgia, "Times New Roman", serif; }
+.gk { font-style: normal; }
+.post-body figcaption { font-size: calc(var(--fs) * 0.87); color: var(--fg-dim); margin-top: 8px; }
+/* a bond quantity (Potyondy and Cundall's bar), drawn as an overline so every letter gets the
+   same bar: a combining macron only sits right on letters with a precomposed form */
+.bar { text-decoration: overline; text-decoration-thickness: 0.055em; }

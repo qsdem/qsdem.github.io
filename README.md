@@ -11,7 +11,9 @@ Started page carries a separate teaching version of the Kishino method in plain 
 | `index.html` | — | **black** page, full-bleed looping sweep of 10 render frames |
 | `getting-started.html` | Getting Started | concepts and applications: the Kishino solver as code, the biaxial test, the SPH mantle (see below) |
 | `apply.html` | — | redirect to `getting-started.html`, which replaced the Apply form |
-| `wiki.html` | Wiki | placeholder. Intended to point at a public wiki repo once one exists. |
+| `blog.html` | Blog | the list of posts, newest first. Each post is its own page under `blog/` (see below) |
+| `sitemap.xml`, `robots.txt` | — | every page for search engines |
+| `wiki.html` | — | redirect to `getting-started.html`, where the Wiki's two articles now live. Its old anchors land on their sections |
 | `about.html` | About | what qsDEM is, the method, and the interactive DEM vs qsDEM explorable |
 | `assets/css/main.css` | — | shared styles: brand, nav, and the site layout width |
 
@@ -49,9 +51,15 @@ The site mirrors `braydennoh.github.io/style.css` exactly: the same self-hosted 
 same 15px / 1.5 body on a 960px left-aligned column with 30x40 padding, `#031326` links (the darkest colour of cmcrameri lipari),
 the same 13px dot-separated top nav, and the same two-column layout.
 
-**Getting Started, Wiki and About have a left sidebar.** `.columns` is a flex row of a fixed 280px
+**Every sidebar opens with the crushing qsDEM wordmark** (`assets/img/logo_crush.mp4`, poster
+`logo_crush_poster.webp`). On the homepage it is the page heading itself. On Getting Started, Blog,
+About and every post it is a link home above the page's own heading (`.brand`, styled in
+`theme.css`), and `appearance.js` holds it on its first frame for a reader who has asked for
+less motion.
+
+**Getting Started, Blog and About have a left sidebar.** `.columns` is a flex row of a fixed 280px
 `.sidebar` and a flexible `.main`, with a 40px gap. The page heading (`h1`) and that page's standing
-text live in the sidebar (the contents list on Getting Started and Wiki, the model description on About); the content
+text live in the sidebar (the contents list on Getting Started, the model description on About); the content
 lives in `.main`. Below 700px the columns stack and the sidebar goes full width.
 
 The nav is `position: fixed` rather than `sticky`, because sticky fails silently in some mobile
@@ -74,12 +82,54 @@ same for qsDEM, rather than interleaving. The standalone version of the same dem
 lives outside this repo at `Research/qsdem2/demos/qsdem_explorable.html`; the two are separate
 files, so a change to one does not propagate to the other.
 
+## Blog page
+
+`blog.html` is the list of posts, newest first. Each card shows only the title, the date and
+the author, and links to the post. Each post is its own page, `blog/<date>-<slug>/index.html`,
+so it has its own address (`https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/`)
+and can be found by search. Its files sit in the same folder. A post page puts its title, date
+and author in the sidebar and the article in the main column. `assets/css/post.css` and
+`assets/js/post.js` are shared by every post.
+
+For search, each post's `<head>` carries a description, keywords, a canonical link, Open Graph
+tags for link previews, and JSON-LD structured data (`BlogPosting`, with the date and the
+author). The visible text uses the words people search for ("Lees-Edwards boundary
+conditions", "DEM"). `sitemap.xml` lists every page and `robots.txt` points to it. Registering
+the site in Google Search Console, and submitting the sitemap there, gets new posts indexed
+sooner.
+
+To add a post:
+
+1. Copy a post folder to `blog/<date>-<slug>/` and edit its `index.html`: the `<title>`,
+   `description`, `keywords`, canonical and `og:` addresses, the JSON-LD, the sidebar title and
+   date, and the article.
+2. Add a card at the top of the list in `blog.html`, linking to `blog/<date>-<slug>/index.html`.
+   Link the file, not the folder: opened from disk (`file://`), a folder shows a file listing
+   instead of its `index.html`, while GitHub Pages serves either.
+3. Add the post's address to `sitemap.xml`.
+
+A figure wrapped in `<a class="zoom" href="<full-size file>">` opens that file over the page on a
+click, at one image pixel per screen pixel, centered where it was clicked. Scrolling pans it, and
+a click or Escape closes it. Without JavaScript the link opens the file itself. That is how a
+dense figure like the subduction matrix stays sharp: in the 780 px column its labels are only
+about 3 px tall. Its inline copies follow the homepage hero's recipe, PIL LANCZOS to exactly 780,
+1560 and 2340 wide, saved as lossless WebP (method 6), because lossy WebP smears small colored
+specks. The full-size file is lossless WebP too. A movie, `<video class="movie"
+preload="none">`, loads and plays only while it is on screen, and a click pauses it.
+
+The posts so far, and where their files come from:
+
+| post | files in its folder |
+|---|---|
+| Subduction simulation, September 25, 2026 | `matrix_*.webp`, from the PNG the user supplied (`~/Downloads/matrix_ss_subduct.png`) |
+| Lees-Edwards shear test, August 31, 2026 | `lees_edwards_ludwig.svg`, the schematic from the Ludwig documentation (University of Edinburgh), credited under the figure. `shear_sweep.mp4` from `../8.31/sheartest/render_row_web.py`, which is `render_row.py`'s September 8 grains cut as one row in the site's type, 3120 px wide, CRF 21 capped at 11 Mb/s to stay under GitHub's 50 MB warning. `shear_sweep_poster.webp` is its last frame at 1560 px |
+
 ## Getting Started page
 
 `getting-started.html` is a wiki of qsDEM's concepts and the applications built on them, in four
 sections: Setup, the Kishino solver, the biaxial test, and the SPH mantle. The Kishino and SPH
-text is the Wiki's, without the momentum paragraphs, and the Kishino section adds the solver as
-code cells. Future applications (subduction) go in as sections of their own.
+text is the old Wiki's articles, without the momentum paragraphs, and the Kishino section adds
+the solver as code cells. Future applications (subduction) go in as sections of their own.
 
 The code cells, the downloadable script and the notebook all come from one file,
 `biaxial/biaxial.py`, where each `# %% Title` line starts a cell. Edit that file, then run

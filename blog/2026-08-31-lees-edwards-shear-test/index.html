@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lees-Edwards shear test &mdash; qsDEM</title>
+<meta name="description" content="A Lees-Edwards simple shear test in qsDEM, a quasi-static discrete element model (DEM). One hundred thousand bonded discs are sheared to a strain of 1 at four bond strengths, from a dense network of shear bands to a few large open cracks.">
+<meta name="author" content="Brayden Noh">
+<meta name="keywords" content="Lees-Edwards boundary conditions, simple shear, shear test, discrete element method, DEM, bonded particles, bonded DEM, parallel bond, periodic boundary, quasi-static, qsDEM">
+<link rel="canonical" href="https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="qsDEM">
+<meta property="og:title" content="Lees-Edwards shear test">
+<meta property="og:description" content="A Lees-Edwards simple shear test in qsDEM, a quasi-static discrete element model (DEM). One hundred thousand bonded discs are sheared to a strain of 1 at four bond strengths, from a dense network of shear bands to a few large open cracks.">
+<meta property="og:url" content="https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/">
+<meta property="og:image" content="https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/shear_sweep_poster.webp">
+<meta property="article:published_time" content="2026-08-31">
+<meta property="article:author" content="Brayden Noh">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "BlogPosting",
+ "headline": "Lees-Edwards shear test",
+ "description": "A Lees-Edwards simple shear test in qsDEM, a quasi-static discrete element model (DEM). One hundred thousand bonded discs are sheared to a strain of 1 at four bond strengths, from a dense network of shear bands to a few large open cracks.",
+ "datePublished": "2026-08-31",
+ "author": {
+  "@type": "Person",
+  "name": "Brayden Noh",
+  "url": "https://braydennoh.github.io/"
+ },
+ "publisher": {
+  "@type": "Organization",
+  "name": "qsDEM",
+  "url": "https://qsdem.github.io/"
+ },
+ "image": "https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/shear_sweep_poster.webp",
+ "mainEntityOfPage": "https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/",
+ "keywords": "Lees-Edwards boundary conditions, simple shear, shear test, discrete element method, DEM, bonded particles, bonded DEM, parallel bond, periodic boundary, quasi-static, qsDEM"
+}
+</script>
+<link rel="stylesheet" href="../../assets/css/main.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<link rel="stylesheet" href="../../assets/css/post.css">
+<script src="../../assets/js/appearance.js"></script>
+</head>
+<body>
+
+<nav>
+  <a href="../../index.html">qsDEM</a> <span class="sep">&middot;</span>
+  <a href="../../getting-started.html">Getting Started</a> <span class="sep">&middot;</span>
+  <a href="../../blog.html" aria-current="page">Blog</a> <span class="sep">&middot;</span>
+  <a href="../../about.html">About</a>
+</nav>
+<div class="columns">
+  <div class="sidebar">
+    <a class="brand" href="../../index.html" aria-label="qsDEM home">
+      <video class="brand-video" autoplay muted loop playsinline preload="auto"
+             poster="../../assets/img/logo_crush_poster.webp" width="2560" height="614"
+             aria-hidden="true">
+        <source src="../../assets/img/logo_crush.mp4" type="video/mp4">
+      </video>
+    </a>
+    <h1>Lees-Edwards shear test</h1>
+    <p class="meta"><time datetime="2026-08-31">August 31, 2026</time> &middot; Written by Brayden Noh</p>
+  </div>
+
+  <div class="main">
+    <article class="post-body">
+    <p>Lees-Edwards boundary conditions
+      (<a href="https://doi.org/10.1088/0022-3719/5/15/006">Lees and Edwards, 1972</a>) shear a
+      periodic box without any solid boundary, so the whole box is in a pure linear shear, with
+      no boundary effects. The copies of the box above slide one way and the copies below slide
+      the other way (a grain that leaves through the top comes back in through the bottom,
+      shifted sideways by the current offset). For more detail on the boundary, the
+      <a href="https://ludwig.epcc.ed.ac.uk/tutorials/lees-edwards/lees-edwards.html">Ludwig tutorial</a> has a good write-up.</p>
+    <figure>
+      <img src="lees_edwards_ludwig.svg" width="998" height="363" loading="lazy"
+           alt="The central computational system, shaded, surrounded by its periodic copies. The
+                row of copies above slides right at plus u y, and the row below slides left at
+                minus u y.">
+      <figcaption>Schematic from the <a href="https://ludwig.epcc.ed.ac.uk/tutorials/lees-edwards/lees-edwards.html">Ludwig documentation</a>, University of
+        Edinburgh.</figcaption>
+    </figure>
+    <p>We used 100k particles (bidisperse DEM discs with radii 0.5 and 0.3, the mixture of
+      <a href="https://doi.org/10.1103/PhysRevE.74.016118">Maloney and Lema&icirc;tre, 2006</a>, at
+      a packing fraction of 0.86 and grain friction tan&nbsp;30&deg;), with every touching pair
+      joined by a parallel bond
+      (<a href="https://doi.org/10.1016/j.ijrmms.2004.09.011">Potyondy and Cundall, 2004</a>).
+      <code>ec_bar</code> = 10<sup>7</sup> is the bond's Young's modulus
+      <span class="m"><i class="bar">E</i><sub>c</sub></span>, and <code>strength</code>
+      (10<sup>4</sup> to 10<sup>7</sup>) is its tensile and shear strength
+      <span class="m"><span class="gk bar">&sigma;</span><sub>c</sub> =
+      <span class="gk bar">&tau;</span><sub>c</sub></span> (set equal, with no scatter):</p>
+    <span class="eq">
+      <span><i class="bar">k</i><sub>n</sub> = <i class="bar">E</i><sub>c</sub>&thinsp;/&thinsp;(<i>R</i><sub>i</sub> + <i>R</i><sub>j</sub>)</span>
+      <span class="op">,</span>
+      <span><span class="gk bar">&sigma;</span><sub>max</sub> = &minus;<i class="bar">F</i><sub>n</sub>&thinsp;/&thinsp;<i class="bar">A</i> + |<i class="bar">M</i>|&thinsp;<i class="bar">R</i>&thinsp;/&thinsp;<i class="bar">I</i> &ge; <span class="gk bar">&sigma;</span><sub>c</sub></span>
+      <span class="op">,</span>
+      <span><span class="gk bar">&tau;</span><sub>max</sub> = |<i class="bar">F</i><sub>s</sub>|&thinsp;/&thinsp;<i class="bar">A</i> &ge; <span class="gk bar">&tau;</span><sub>c</sub></span>
+    </span>
+    <p>where <span class="m"><i class="bar">k</i><sub>n</sub></span> is the bond's normal stiffness
+      (the shear stiffness is <span class="m"><i class="bar">k</i><sub>n</sub>/2.5</span>), and
+      <span class="m"><i class="bar">R</i> = min(<i>R</i><sub>i</sub>, <i>R</i><sub>j</sub>),
+      <i class="bar">A</i> = 2<i class="bar">R</i></span> and
+      <span class="m"><i class="bar">I</i> = 2<i class="bar">R</i><sup>3</sup>/3</span> are its radius, area
+      and moment of inertia (per unit depth). A bond breaks once either stress reaches its
+      strength. Each load step shears the box by
+      <span class="m"><span class="gk">&Delta;&gamma;</span></span> =
+      5&thinsp;&times;&thinsp;10<sup>&minus;5</sup> (an affine step), and the
+      <a href="../../getting-started.html#kishino">Kishino solver</a> relaxes every grain back to
+      equilibrium, up to <span class="m"><span class="gk">&gamma;</span></span> = 1. Each grain
+      below is colored by the cumulative non-rigid motion around it. Weak bonds break
+      everywhere into a dense network of shear bands, and stronger bonds fail along fewer and
+      larger cracks that open up (the white areas are empty space).</p>
+    <figure>
+      <video class="movie" muted loop playsinline preload="none" width="3120" height="850"
+             poster="shear_sweep_poster.webp"
+             aria-label="Movie of four Lees-Edwards shear cells side by side, with bond
+                         strength 10^4, 10^5, 10^6 and 10^7. Bands of deformation form as the
+                         cells shear, a dense network at the lowest strength and a few large
+                         open cracks at the highest.">
+        <source src="shear_sweep.mp4" type="video/mp4">
+      </video>
+    </figure>
+    </article>
+  </div>
+</div>
+<script src="../../assets/js/post.js"></script>
+</body>
+</html>

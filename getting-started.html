@@ -17,7 +17,7 @@
     --code-name: #031326;
   }
 
-  /* The contents list: the Wiki's, with one nested level. */
+  /* The contents list, with one nested level. */
   .toc h3 { font-size: 13px; font-weight: bold; margin: 0 0 7px; }
   .toc ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
   .toc > ol > li { counter-increment: toc; margin-bottom: 5px; line-height: 1.45; }
@@ -35,7 +35,7 @@
   h2.art ~ h2.art { margin-top: 44px; border-top: 1px solid var(--rule); padding-top: 30px; }
   .main h3.sub { font-size: 17px; font-weight: normal; margin: 30px 0 10px; }
 
-  /* The Wiki's equation convention. */
+  /* The equation convention. */
   .eq {
     display: flex; justify-content: center; align-items: flex-start;
     flex-wrap: wrap; margin: 18px 0;
@@ -101,11 +101,18 @@
 <nav>
   <a href="index.html">qsDEM</a> <span class="sep">&middot;</span>
   <a href="getting-started.html" aria-current="page">Getting Started</a> <span class="sep">&middot;</span>
-  <a href="wiki.html">Wiki</a> <span class="sep">&middot;</span>
+  <a href="blog.html">Blog</a> <span class="sep">&middot;</span>
   <a href="about.html">About</a>
 </nav>
 <div class="columns">
   <div class="sidebar">
+    <a class="brand" href="index.html" aria-label="qsDEM home">
+      <video class="brand-video" autoplay muted loop playsinline preload="auto"
+             poster="assets/img/logo_crush_poster.webp" width="2560" height="614"
+             aria-hidden="true">
+        <source src="assets/img/logo_crush.mp4" type="video/mp4">
+      </video>
+    </a>
     <h1>Getting Started</h1>
     <div class="toc">
       <h3>Contents</h3>
