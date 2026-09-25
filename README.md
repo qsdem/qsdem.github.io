@@ -11,7 +11,8 @@ Started page carries a separate teaching version of the Kishino method in plain 
 | `index.html` | — | **black** page, full-bleed looping sweep of 10 render frames |
 | `getting-started.html` | Getting Started | concepts and applications: the Kishino solver as code, the biaxial test, the SPH mantle (see below) |
 | `apply.html` | — | redirect to `getting-started.html`, which replaced the Apply form |
-| `blog.html` | Blog | dated posts, newest first (see below) |
+| `blog.html` | Blog | the list of posts, newest first. Each post is its own page under `blog/` (see below) |
+| `sitemap.xml`, `robots.txt` | — | every page for search engines |
 | `wiki.html` | — | redirect to `getting-started.html`, where the Wiki's two articles now live. Its old anchors land on their sections |
 | `about.html` | About | what qsDEM is, the method, and the interactive DEM vs qsDEM explorable |
 | `assets/css/main.css` | — | shared styles: brand, nav, and the site layout width |
@@ -77,16 +78,27 @@ files, so a change to one does not propagate to the other.
 
 ## Blog page
 
-`blog.html` is one page of dated posts, newest first. Each post is a `<details class="post">`:
-its `<summary>` holds the title and one line with the date and the author, which always show,
-and a click opens the full article underneath. No JavaScript is needed for that. The page's
-script opens the post named in the address (`blog.html#<post id>`) and writes a post's id into
-the address when it is opened, so an open post can be shared.
+`blog.html` is the list of posts, newest first. Each card shows only the title, the date and
+the author, and links to the post. Each post is its own page, `blog/<date>-<slug>/index.html`,
+so it has its own address (`https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/`)
+and can be found by search. Its files sit in the same folder. A post page puts its title, date
+and author in the sidebar and the article in the main column. `assets/css/post.css` and
+`assets/js/post.js` are shared by every post.
 
-To add a post, copy the commented template at the top of the list in `blog.html`, fill it in and
-put it above the newest post. Its id is its date and a slug, `2026-09-25-subduction-simulation`,
-and its date goes in a `<time datetime>`. Its files go in a folder of the same name under
-`blog/`. "No posts yet." hides itself once the list holds a post.
+For search, each post's `<head>` carries a description, keywords, a canonical link, Open Graph
+tags for link previews, and JSON-LD structured data (`BlogPosting`, with the date and the
+author). The visible text uses the words people search for ("Lees-Edwards boundary
+conditions", "DEM"). `sitemap.xml` lists every page and `robots.txt` points to it. Registering
+the site in Google Search Console, and submitting the sitemap there, gets new posts indexed
+sooner.
+
+To add a post:
+
+1. Copy a post folder to `blog/<date>-<slug>/` and edit its `index.html`: the `<title>`,
+   `description`, `keywords`, canonical and `og:` addresses, the JSON-LD, the sidebar title and
+   date, and the article.
+2. Add a card at the top of the list in `blog.html`.
+3. Add the post's address to `sitemap.xml`.
 
 A figure wrapped in `<a class="zoom" href="<full-size file>">` opens that file over the page on a
 click, at one image pixel per screen pixel, centered where it was clicked. Scrolling pans it, and
@@ -94,14 +106,12 @@ a click or Escape closes it. Without JavaScript the link opens the file itself. 
 dense figure like the subduction matrix stays sharp: in the 780 px column its labels are only
 about 3 px tall. Its inline copies follow the homepage hero's recipe, PIL LANCZOS to exactly 780,
 1560 and 2340 wide, saved as lossless WebP (method 6), because lossy WebP smears small colored
-specks. The full-size file is lossless WebP too. Give images `loading="lazy"` and videos
-`preload="none"`. Chrome still fetches the image of a closed post near the top of the page.
-A movie in a post, `<video class="movie">`, plays while its post is open and on screen, and a
-click pauses it.
+specks. The full-size file is lossless WebP too. A movie, `<video class="movie"
+preload="none">`, loads and plays only while it is on screen, and a click pauses it.
 
 The posts so far, and where their files come from:
 
-| post | files in `blog/<post id>/` |
+| post | files in its folder |
 |---|---|
 | Subduction simulation, September 25, 2026 | `matrix_*.webp`, from the PNG the user supplied (`~/Downloads/matrix_ss_subduct.png`) |
 | Lees-Edwards shear test, August 31, 2026 | `lees_edwards.svg` from `lees_edwards.py` next to it, drawn like `biaxial/apparatus.py`. `shear_sweep.mp4` from `../8.31/sheartest/render_row_web.py`, which is `render_row.py`'s September 8 grains cut as one row in the site's type, 3120 px wide, CRF 21 capped at 11 Mb/s to stay under GitHub's 50 MB warning. `shear_sweep_poster.webp` is its last frame at 1560 px |

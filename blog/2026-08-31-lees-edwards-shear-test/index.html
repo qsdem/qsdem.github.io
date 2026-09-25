@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lees-Edwards shear test &mdash; qsDEM</title>
+<meta name="description" content="A Lees-Edwards simple shear test in qsDEM, a quasi-static discrete element model (DEM). One hundred thousand bonded discs are sheared to a strain of 1 at four bond strengths, from a dense network of shear bands to a few large open cracks.">
+<meta name="author" content="Brayden Noh">
+<meta name="keywords" content="Lees-Edwards boundary conditions, simple shear, shear test, discrete element method, DEM, bonded particles, bonded DEM, periodic boundary, quasi-static, qsDEM">
+<link rel="canonical" href="https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="qsDEM">
+<meta property="og:title" content="Lees-Edwards shear test">
+<meta property="og:description" content="A Lees-Edwards simple shear test in qsDEM, a quasi-static discrete element model (DEM). One hundred thousand bonded discs are sheared to a strain of 1 at four bond strengths, from a dense network of shear bands to a few large open cracks.">
+<meta property="og:url" content="https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/">
+<meta property="og:image" content="https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/shear_sweep_poster.webp">
+<meta property="article:published_time" content="2026-08-31">
+<meta property="article:author" content="Brayden Noh">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "BlogPosting",
+ "headline": "Lees-Edwards shear test",
+ "description": "A Lees-Edwards simple shear test in qsDEM, a quasi-static discrete element model (DEM). One hundred thousand bonded discs are sheared to a strain of 1 at four bond strengths, from a dense network of shear bands to a few large open cracks.",
+ "datePublished": "2026-08-31",
+ "author": {
+  "@type": "Person",
+  "name": "Brayden Noh",
+  "url": "https://braydennoh.github.io/"
+ },
+ "publisher": {
+  "@type": "Organization",
+  "name": "qsDEM",
+  "url": "https://qsdem.github.io/"
+ },
+ "image": "https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/shear_sweep_poster.webp",
+ "mainEntityOfPage": "https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/",
+ "keywords": "Lees-Edwards boundary conditions, simple shear, shear test, discrete element method, DEM, bonded particles, bonded DEM, periodic boundary, quasi-static, qsDEM"
+}
+</script>
+<link rel="stylesheet" href="../../assets/css/main.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<link rel="stylesheet" href="../../assets/css/post.css">
+<script src="../../assets/js/appearance.js"></script>
+</head>
+<body>
+
+<nav>
+  <a href="../../index.html">qsDEM</a> <span class="sep">&middot;</span>
+  <a href="../../getting-started.html">Getting Started</a> <span class="sep">&middot;</span>
+  <a href="../../blog.html" aria-current="page">Blog</a> <span class="sep">&middot;</span>
+  <a href="../../about.html">About</a>
+</nav>
+<div class="columns">
+  <div class="sidebar">
+    <h1>Lees-Edwards shear test</h1>
+    <p class="meta"><time datetime="2026-08-31">August 31, 2026</time> &middot; Written by Brayden Noh</p>
+  </div>
+
+  <div class="main">
+    <article class="post-body">
+    <p>This is a simple shear test of the bonded DEM material used for the plate in the
+      subduction model (no fluid, no walls and no gravity), run with the same
+      <a href="../../getting-started.html#kishino">Kishino solver</a>. The grains are the same
+      bonded bidisperse discs (radii 0.5 and 0.3 at a packing fraction of 0.86, with every
+      touching pair bonded), and the friction between grains is tan&nbsp;30&deg;. The box
+      is periodic with Lees-Edwards boundary conditions
+      (<a href="https://doi.org/10.1088/0022-3719/5/15/006">Lees and Edwards, 1972</a>),
+      which let the whole box shear without walls. A grain that leaves through the top
+      comes back in through the bottom, shifted sideways by <i>&gamma;H</i> (where
+      <i>&gamma;</i> is the shear strain and <i>H</i> the box height).</p>
+    <figure class="schematic">
+      <img src="lees_edwards.svg" width="518" height="499" loading="lazy"
+           alt="A square periodic cell with a cluster of discs, seen inside the seams of its
+                copies. The row of copies above is shifted right by gamma H and the row below
+                is shifted left by gamma H. A grain at the top of the cell appears again at
+                the bottom, gamma H to the left.">
+    </figure>
+    <p>Each load step shears the box a little (an affine step of
+      <i>&Delta;&gamma;</i> = 5&thinsp;&times;&thinsp;10<sup>&minus;5</sup>), slides the
+      copies above and below by the new offset, and then relaxes every grain back to
+      equilibrium. Below is a sweep of bond strength (tensile and shear strength set equal,
+      with no scatter) at a fixed bond Young's modulus, with one hundred thousand grains in
+      each box, sheared to <i>&gamma;</i> = 1. Each grain is colored by the cumulative
+      non-rigid motion around it. Weak bonds break everywhere into a dense network of shear
+      bands, and stronger bonds fail along fewer and larger cracks that open up (the white
+      areas are empty space).</p>
+    <figure>
+      <video class="movie" muted loop playsinline preload="none" width="3120" height="850"
+             poster="shear_sweep_poster.webp"
+             aria-label="Movie of four Lees-Edwards shear cells side by side, with bond
+                         strength 10^4, 10^5, 10^6 and 10^7. Bands of deformation form as the
+                         cells shear, a dense network at the lowest strength and a few large
+                         open cracks at the highest.">
+        <source src="shear_sweep.mp4" type="video/mp4">
+      </video>
+    </figure>
+  
+    </article>
+  </div>
+</div>
+<script src="../../assets/js/post.js"></script>
+</body>
+</html>

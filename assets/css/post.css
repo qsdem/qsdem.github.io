@@ -1,0 +1,22 @@
+/* qsDEM -- a blog post: one post per page (blog/<date>-<slug>/index.html), its title, date and
+   author in the sidebar and the article in the main column.  Loaded after main.css and
+   theme.css. */
+
+.sidebar .meta { color: var(--fg-dim); font-size: 0.93em; }
+
+.post-body figure { margin: 22px 0 26px; }
+.post-body img, .post-body video { display: block; width: 100%; height: auto; }
+.post-body figure.schematic img { width: 518px; max-width: 100%; }   /* line art at its drawn size */
+.post-body video.movie { background: var(--bg); }
+
+/* A figure linked with class="zoom" opens its full-resolution file over the page, one image
+   pixel per screen pixel, so labels too fine for the column stay sharp (post.js). */
+.post-body a.zoom { display: block; cursor: zoom-in; }
+.lightbox { position: fixed; inset: 0; z-index: 10; overflow: auto; background: var(--bg);
+            cursor: zoom-out; outline: none; }
+.lightbox img { display: block; max-width: none; margin: 0 auto; }
+
+/* stacked on a phone, the title scrolls away instead of pinning under the nav */
+@media (max-width: 700px) {
+  .sidebar { position: static; }
+}

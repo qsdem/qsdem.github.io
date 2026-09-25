@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subduction simulation &mdash; qsDEM</title>
+<meta name="description" content="A qsDEM model of subduction that couples bonded DEM grains, for a brittle lithosphere, with SPH particles for a viscous mantle, and a parameter sweep of bond Young's modulus and strength for a neutrally buoyant crust under compression.">
+<meta name="author" content="Brayden Noh">
+<meta name="keywords" content="subduction, discrete element method, DEM, smoothed particle hydrodynamics, SPH, DEM-SPH coupling, bonded particles, lithosphere, mantle, qsDEM">
+<link rel="canonical" href="https://qsdem.github.io/blog/2026-09-25-subduction-simulation/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="qsDEM">
+<meta property="og:title" content="Subduction simulation">
+<meta property="og:description" content="A qsDEM model of subduction that couples bonded DEM grains, for a brittle lithosphere, with SPH particles for a viscous mantle, and a parameter sweep of bond Young's modulus and strength for a neutrally buoyant crust under compression.">
+<meta property="og:url" content="https://qsdem.github.io/blog/2026-09-25-subduction-simulation/">
+<meta property="og:image" content="https://qsdem.github.io/blog/2026-09-25-subduction-simulation/matrix_1560.webp">
+<meta property="article:published_time" content="2026-09-25">
+<meta property="article:author" content="Brayden Noh">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "BlogPosting",
+ "headline": "Subduction simulation",
+ "description": "A qsDEM model of subduction that couples bonded DEM grains, for a brittle lithosphere, with SPH particles for a viscous mantle, and a parameter sweep of bond Young's modulus and strength for a neutrally buoyant crust under compression.",
+ "datePublished": "2026-09-25",
+ "author": {
+  "@type": "Person",
+  "name": "Brayden Noh",
+  "url": "https://braydennoh.github.io/"
+ },
+ "publisher": {
+  "@type": "Organization",
+  "name": "qsDEM",
+  "url": "https://qsdem.github.io/"
+ },
+ "image": "https://qsdem.github.io/blog/2026-09-25-subduction-simulation/matrix_1560.webp",
+ "mainEntityOfPage": "https://qsdem.github.io/blog/2026-09-25-subduction-simulation/",
+ "keywords": "subduction, discrete element method, DEM, smoothed particle hydrodynamics, SPH, DEM-SPH coupling, bonded particles, lithosphere, mantle, qsDEM"
+}
+</script>
+<link rel="stylesheet" href="../../assets/css/main.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<link rel="stylesheet" href="../../assets/css/post.css">
+<script src="../../assets/js/appearance.js"></script>
+</head>
+<body>
+
+<nav>
+  <a href="../../index.html">qsDEM</a> <span class="sep">&middot;</span>
+  <a href="../../getting-started.html">Getting Started</a> <span class="sep">&middot;</span>
+  <a href="../../blog.html" aria-current="page">Blog</a> <span class="sep">&middot;</span>
+  <a href="../../about.html">About</a>
+</nav>
+<div class="columns">
+  <div class="sidebar">
+    <h1>Subduction simulation</h1>
+    <p class="meta"><time datetime="2026-09-25">September 25, 2026</time> &middot; Written by Brayden Noh</p>
+  </div>
+
+  <div class="main">
+    <article class="post-body">
+    <p>A qsDEM model to simulate subduction will be available soon (depending on the
+      publication of the paper describing it), and definitely by the end of the year. The
+      model (qualitatively) couples DEM with SPH to simulate a brittle lithosphere and a
+      viscous mantle. In slightly more technical terms, the lithosphere is made of bonded
+      DEM grains with enough strength to be compressed laterally (ridge push), a Young's
+      modulus in the range that lets it bend, and enough buoyancy to float on a viscous
+      mantle, which is modeled with particles. The SPH method is based on
+      <a href="https://doi.org/10.1006/jcph.1997.5776">Morris et al. (1997)</a>, and the
+      coupling is inspired by
+      <a href="https://doi.org/10.1007/s10596-012-9335-x">Komor&oacute;czi et al. (2013)</a>.
+      Its application to subduction, however, is the first of its kind. Below is a
+      parameter sweep of the bonds' Young's modulus and strength (both tensile and shear,
+      although most bonds fail in tension) for a neutrally buoyant crust being
+      compressed.</p>
+    <figure>
+      <a class="zoom" href="matrix_5544.webp">
+        <img src="matrix_1560.webp"
+             srcset="matrix_780.webp 780w,
+                     matrix_1560.webp 1560w,
+                     matrix_2340.webp 2340w,
+                     matrix_5544.webp 5544w"
+             sizes="(max-width: 700px) calc(100vw - 60px),
+                    (max-width: 1276px) calc(100vw - 496px),
+                    780px"
+             width="1560" height="1031" loading="lazy"
+             alt="A 9 by 9 parameter sweep of qsDEM subduction runs, with the bonds' Young's
+                  modulus (ec) increasing down the rows and their strength (ts) increasing
+                  across the columns. In every panel a dark blue plate lies over a red mantle.
+                  In most panels the plate bends and sinks into the mantle as one slab, and in
+                  the first columns it breaks into pieces, with yellow along the cracks.">
+      </a>
+    </figure>
+  
+    </article>
+  </div>
+</div>
+<script src="../../assets/js/post.js"></script>
+</body>
+</html>

@@ -4,41 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Blog &mdash; qsDEM</title>
+<meta name="description" content="Posts on qsDEM, a Kishino (1988) inspired quasi-static discrete element model (DEM) for slow geological processes: subduction with DEM and SPH, and Lees-Edwards shear tests of bonded DEM grains.">
+<link rel="canonical" href="https://qsdem.github.io/blog.html">
 <link rel="stylesheet" href="assets/css/main.css">
 <link rel="stylesheet" href="assets/css/theme.css">
 <script src="assets/js/appearance.js"></script>
 <style>
-  /* One post per <details>, newest first.  The title, date and summary always show, and a click
-     on them opens the full article underneath. */
-  .post { scroll-margin-top: calc(var(--nav-h) + 12px); }
-  .post + .post { margin-top: 28px; border-top: 1px solid var(--rule); padding-top: 24px; }
-  .post > summary { display: block; list-style: none; cursor: pointer; }
-  .post > summary::-webkit-details-marker { display: none; }
-  .post h2 { font-size: 22px; font-weight: normal; color: var(--fg); margin: 0 0 3px; }
-  .post > summary:hover h2 { text-decoration: underline; }
-  .post .meta { display: block; font-size: calc(var(--fs) * 0.87); color: var(--fg-dim); }
-  .post > summary::after {
-    content: "Read the full post"; display: block; margin-top: 8px;
-    font-size: calc(var(--fs) * 0.87); color: var(--link);
-  }
-  .post[open] > summary::after { content: "Show less"; }
-  .post .body { margin-top: 18px; }
-  .post .body p { margin-bottom: 16px; }
-  .post .body figure { margin: 22px 0 8px; }
-  .post .body img, .post .body video { display: block; width: 100%; height: auto; }
-  .post .body figure.schematic img { width: 518px; max-width: 100%; }   /* line art at its drawn size */
-  .post .body video.movie { background: var(--bg); }
-
-  /* A figure linked with class="zoom" opens its full-resolution file over the page, one image
-     pixel per screen pixel, so labels too fine for the column stay sharp. */
-  .post .body a.zoom { display: block; cursor: zoom-in; }
-  .lightbox { position: fixed; inset: 0; z-index: 10; overflow: auto; background: var(--bg);
-              cursor: zoom-out; outline: none; }
-  .lightbox img { display: block; max-width: none; margin: 0 auto; }
-
-  /* shown only while the list holds no posts */
-  .posts .none { color: var(--fg-dim); }
-  .posts .none:not(:only-child) { display: none; }
+  /* The post list, newest first.  Each post is its own page, blog/<date>-<slug>/index.html, and
+     its card here shows only the title, the date and the author. */
+  .posts { list-style: none; padding: 0; margin: 0; }
+  .posts li + li { margin-top: 28px; border-top: 1px solid var(--rule); padding-top: 24px; }
+  .posts h2 { font-size: 22px; font-weight: normal; margin: 0 0 3px; }
+  .posts h2 a, .posts h2 a:visited { color: var(--fg); }
+  .posts .meta { font-size: calc(var(--fs) * 0.87); color: var(--fg-dim); margin: 0; }
+  .posts .more { font-size: calc(var(--fs) * 0.87); margin: 8px 0 0; }
 </style>
 </head>
 <body>
@@ -55,198 +34,19 @@
   </div>
 
   <div class="main">
-    <div class="posts">
-<!-- A post. Copy this block to the top of the list, newest first. Its id is its date and a
-     slug, and a link to blog.html#<id> opens it. Give images loading="lazy" and videos
-     preload="none" to keep the page light. Wrap a figure in <a class="zoom" href="full-size
-     file"> to let a click open it at full resolution.
-
-      <details class="post" id="2026-09-25-slug">
-        <summary>
-          <h2>Title</h2>
-          <span class="meta"><time datetime="2026-09-25">September 25, 2026</time> &middot; Written by Name</span>
-        </summary>
-        <div class="body">
-          <p>The full article.</p>
-        </div>
-      </details>
--->
-      <details class="post" id="2026-09-25-subduction-simulation">
-        <summary>
-          <h2>Subduction simulation</h2>
-          <span class="meta"><time datetime="2026-09-25">September 25, 2026</time> &middot; Written by Brayden Noh</span>
-        </summary>
-        <div class="body">
-          <p>A qsDEM model to simulate subduction will be available soon (depending on the
-            publication of the paper describing it), and definitely by the end of the year. The
-            model (qualitatively) couples DEM with SPH to simulate a brittle lithosphere and a
-            viscous mantle. In slightly more technical terms, the lithosphere is made of bonded
-            DEM grains with enough strength to be compressed laterally (ridge push), a Young's
-            modulus in the range that lets it bend, and enough buoyancy to float on a viscous
-            mantle, which is modeled with particles. The SPH method is based on
-            <a href="https://doi.org/10.1006/jcph.1997.5776">Morris et al. (1997)</a>, and the
-            coupling is inspired by
-            <a href="https://doi.org/10.1007/s10596-012-9335-x">Komor&oacute;czi et al. (2013)</a>.
-            Its application to subduction, however, is the first of its kind. Below is a
-            parameter sweep of the bonds' Young's modulus and strength (both tensile and shear,
-            although most bonds fail in tension) for a neutrally buoyant crust being
-            compressed.</p>
-          <figure>
-            <a class="zoom" href="blog/2026-09-25-subduction-simulation/matrix_5544.webp">
-              <img src="blog/2026-09-25-subduction-simulation/matrix_1560.webp"
-                   srcset="blog/2026-09-25-subduction-simulation/matrix_780.webp 780w,
-                           blog/2026-09-25-subduction-simulation/matrix_1560.webp 1560w,
-                           blog/2026-09-25-subduction-simulation/matrix_2340.webp 2340w,
-                           blog/2026-09-25-subduction-simulation/matrix_5544.webp 5544w"
-                   sizes="(max-width: 700px) calc(100vw - 60px),
-                          (max-width: 1276px) calc(100vw - 496px),
-                          780px"
-                   width="1560" height="1031" loading="lazy"
-                   alt="A 9 by 9 parameter sweep of qsDEM subduction runs, with the bonds' Young's
-                        modulus (ec) increasing down the rows and their strength (ts) increasing
-                        across the columns. In every panel a dark blue plate lies over a red mantle.
-                        In most panels the plate bends and sinks into the mantle as one slab, and in
-                        the first columns it breaks into pieces, with yellow along the cracks.">
-            </a>
-          </figure>
-        </div>
-      </details>
-
-      <details class="post" id="2026-08-31-lees-edwards-shear-test">
-        <summary>
-          <h2>Lees-Edwards shear test</h2>
-          <span class="meta"><time datetime="2026-08-31">August 31, 2026</time> &middot; Written by Brayden Noh</span>
-        </summary>
-        <div class="body">
-          <p>This is a simple shear test of the plate material in the subduction model (no fluid,
-            no walls and no gravity), run with the same
-            <a href="getting-started.html#kishino">Kishino solver</a>. The grains are the same
-            bonded bidisperse discs (radii 0.5 and 0.3 at a packing fraction of 0.86, with every
-            touching pair bonded), and the friction between grains is tan&nbsp;30&deg;. The box
-            is periodic with Lees-Edwards boundaries
-            (<a href="https://doi.org/10.1088/0022-3719/5/15/006">Lees and Edwards, 1972</a>),
-            which let the whole box shear without walls. A grain that leaves through the top
-            comes back in through the bottom, shifted sideways by <i>&gamma;H</i> (where
-            <i>&gamma;</i> is the shear strain and <i>H</i> the box height).</p>
-          <figure class="schematic">
-            <img src="blog/2026-08-31-lees-edwards-shear-test/lees_edwards.svg" width="518" height="499" loading="lazy"
-                 alt="A square periodic cell with a cluster of discs, seen inside the seams of its
-                      copies. The row of copies above is shifted right by gamma H and the row below
-                      is shifted left by gamma H. A grain at the top of the cell appears again at
-                      the bottom, gamma H to the left.">
-          </figure>
-          <p>Each load step shears the box a little (an affine step of
-            <i>&Delta;&gamma;</i> = 5&thinsp;&times;&thinsp;10<sup>&minus;5</sup>), slides the
-            copies above and below by the new offset, and then relaxes every grain back to
-            equilibrium. Below is a sweep of bond strength (tensile and shear strength set equal,
-            with no scatter) at a fixed bond Young's modulus, with one hundred thousand grains in
-            each box, sheared to <i>&gamma;</i> = 1. Each grain is colored by the cumulative
-            non-rigid motion around it. Weak bonds break everywhere into a dense network of shear
-            bands, and stronger bonds fail along fewer and larger cracks that open up (the white
-            areas are empty space).</p>
-          <figure>
-            <video class="movie" muted loop playsinline preload="none" width="3120" height="850"
-                   poster="blog/2026-08-31-lees-edwards-shear-test/shear_sweep_poster.webp"
-                   aria-label="Movie of four Lees-Edwards shear cells side by side, with bond
-                               strength 10^4, 10^5, 10^6 and 10^7. Bands of deformation form as the
-                               cells shear, a dense network at the lowest strength and a few large
-                               open cracks at the highest.">
-              <source src="blog/2026-08-31-lees-edwards-shear-test/shear_sweep.mp4" type="video/mp4">
-            </video>
-          </figure>
-        </div>
-      </details>
-
-      <p class="none">No posts yet.</p>
-    </div>
+    <ol class="posts">
+      <li>
+        <h2><a href="blog/2026-09-25-subduction-simulation/">Subduction simulation</a></h2>
+        <p class="meta"><time datetime="2026-09-25">September 25, 2026</time> &middot; Written by Brayden Noh</p>
+        <p class="more"><a href="blog/2026-09-25-subduction-simulation/">Read the full post</a></p>
+      </li>
+      <li>
+        <h2><a href="blog/2026-08-31-lees-edwards-shear-test/">Lees-Edwards shear test</a></h2>
+        <p class="meta"><time datetime="2026-08-31">August 31, 2026</time> &middot; Written by Brayden Noh</p>
+        <p class="more"><a href="blog/2026-08-31-lees-edwards-shear-test/">Read the full post</a></p>
+      </li>
+    </ol>
   </div>
 </div>
-<script>
-'use strict';
-// A link to blog.html#<post id> opens that post, and opening a post puts its id in the address
-// bar, so an open post can be shared by copying the address.
-(function () {
-  function openFromHash() {
-    var d = location.hash ? document.getElementById(location.hash.slice(1)) : null;
-    if (d && d.tagName === 'DETAILS') { d.open = true; d.scrollIntoView(); }
-  }
-  var posts = document.querySelectorAll('details.post');
-  for (var i = 0; i < posts.length; i++) {
-    posts[i].addEventListener('toggle', function () {
-      if (this.open) history.replaceState(null, '', '#' + this.id);
-      else if (location.hash === '#' + this.id) history.replaceState(null, '', location.pathname);
-    });
-  }
-  openFromHash();
-  window.addEventListener('hashchange', openFromHash);
-
-  // A zoom figure opens its full-resolution file over the page at one image pixel per screen
-  // pixel, centered on the point that was clicked. Scrolling pans it, and a click or Escape
-  // closes it.
-  var box = null, from = null;
-  function close() {
-    if (!box) return;
-    box.remove();
-    box = null;
-    document.documentElement.style.overflow = '';
-    if (from) from.focus();
-  }
-  document.addEventListener('click', function (e) {
-    var a = e.target.closest ? e.target.closest('a.zoom') : null;
-    if (!a || box) return;
-    e.preventDefault();
-    from = a;
-    var r = a.getBoundingClientRect();
-    var fx = e.clientX ? (e.clientX - r.left) / r.width : 0.5;
-    var fy = e.clientY ? (e.clientY - r.top) / r.height : 0.5;
-    box = document.createElement('div');
-    box.className = 'lightbox';
-    box.setAttribute('role', 'dialog');
-    box.setAttribute('aria-modal', 'true');
-    box.setAttribute('aria-label', 'Figure at full resolution. Click or press Escape to close.');
-    box.tabIndex = -1;
-    var img = new Image();
-    var thumb = a.querySelector('img');
-    img.alt = thumb ? thumb.alt : '';
-    img.onload = function () {
-      img.style.width = img.naturalWidth / (window.devicePixelRatio || 1) + 'px';
-      box.scrollLeft = fx * img.offsetWidth - box.clientWidth / 2;
-      box.scrollTop = fy * img.offsetHeight - box.clientHeight / 2;
-    };
-    img.src = a.href;
-    box.appendChild(img);
-    box.addEventListener('click', close);
-    document.body.appendChild(box);
-    document.documentElement.style.overflow = 'hidden';
-    box.focus();
-  });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
-
-  // A post's movie plays while it is open and on screen, and a click pauses it. A reader who
-  // has asked for less motion gets the controls instead.
-  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var movies = document.querySelectorAll('.post video.movie');
-  for (var m = 0; m < movies.length; m++) {
-    (function (v) {
-      var held = false;
-      function play() { v.preload = 'auto'; v.play().catch(function () {}); }
-      if (still) { v.setAttribute('controls', ''); return; }
-      v.style.cursor = 'pointer';
-      v.title = 'Click to pause or play';
-      v.addEventListener('click', function () {
-        if (v.paused) { held = false; play(); } else { held = true; v.pause(); }
-      });
-      if ('IntersectionObserver' in window) {
-        new IntersectionObserver(function (entries) {
-          entries.forEach(function (e) {
-            if (e.isIntersecting) { if (!held) play(); }
-            else if (!v.paused) { v.pause(); }
-          });
-        }, {threshold: 0.25}).observe(v);
-      }
-    })(movies[m]);
-  }
-})();
-</script>
 </body>
 </html>
