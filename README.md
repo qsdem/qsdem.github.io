@@ -11,7 +11,8 @@ Started page carries a separate teaching version of the Kishino method in plain 
 | `index.html` | — | **black** page, full-bleed looping sweep of 10 render frames |
 | `getting-started.html` | Getting Started | concepts and applications: the Kishino solver as code, the biaxial test, the SPH mantle (see below) |
 | `apply.html` | — | redirect to `getting-started.html`, which replaced the Apply form |
-| `wiki.html` | Wiki | placeholder. Intended to point at a public wiki repo once one exists. |
+| `blog.html` | Blog | dated posts, newest first (see below) |
+| `wiki.html` | — | redirect to `getting-started.html`, where the Wiki's two articles now live. Its old anchors land on their sections |
 | `about.html` | About | what qsDEM is, the method, and the interactive DEM vs qsDEM explorable |
 | `assets/css/main.css` | — | shared styles: brand, nav, and the site layout width |
 
@@ -49,9 +50,9 @@ The site mirrors `braydennoh.github.io/style.css` exactly: the same self-hosted 
 same 15px / 1.5 body on a 960px left-aligned column with 30x40 padding, `#031326` links (the darkest colour of cmcrameri lipari),
 the same 13px dot-separated top nav, and the same two-column layout.
 
-**Getting Started, Wiki and About have a left sidebar.** `.columns` is a flex row of a fixed 280px
+**Getting Started, Blog and About have a left sidebar.** `.columns` is a flex row of a fixed 280px
 `.sidebar` and a flexible `.main`, with a 40px gap. The page heading (`h1`) and that page's standing
-text live in the sidebar (the contents list on Getting Started and Wiki, the model description on About); the content
+text live in the sidebar (the contents list on Getting Started, the model description on About); the content
 lives in `.main`. Below 700px the columns stack and the sidebar goes full width.
 
 The nav is `position: fixed` rather than `sticky`, because sticky fails silently in some mobile
@@ -74,12 +75,25 @@ same for qsDEM, rather than interleaving. The standalone version of the same dem
 lives outside this repo at `Research/qsdem2/demos/qsdem_explorable.html`; the two are separate
 files, so a change to one does not propagate to the other.
 
+## Blog page
+
+`blog.html` is one page of dated posts, newest first. Each post is a `<details class="post">`:
+its `<summary>` holds the title, the date and a one or two sentence summary, which always show,
+and a click opens the full article underneath. No JavaScript is needed for that. A small script
+opens the post named in the address (`blog.html#<post id>`) and writes a post's id into the
+address when it is opened, so an open post can be shared.
+
+To add a post, copy the commented template at the top of the list in `blog.html`, fill it in and
+put it above the newest post. Its id is its date and a slug, `2026-09-25-slug`, and its date goes
+in a `<time datetime>`. Give images `loading="lazy"` and videos `preload="none"`, so a closed post
+downloads nothing. "No posts yet." hides itself once the list holds a post.
+
 ## Getting Started page
 
 `getting-started.html` is a wiki of qsDEM's concepts and the applications built on them, in four
 sections: Setup, the Kishino solver, the biaxial test, and the SPH mantle. The Kishino and SPH
-text is the Wiki's, without the momentum paragraphs, and the Kishino section adds the solver as
-code cells. Future applications (subduction) go in as sections of their own.
+text is the old Wiki's articles, without the momentum paragraphs, and the Kishino section adds
+the solver as code cells. Future applications (subduction) go in as sections of their own.
 
 The code cells, the downloadable script and the notebook all come from one file,
 `biaxial/biaxial.py`, where each `# %% Title` line starts a cell. Edit that file, then run

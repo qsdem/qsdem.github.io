@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blog &mdash; qsDEM</title>
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="stylesheet" href="assets/css/theme.css">
+<script src="assets/js/appearance.js"></script>
+<style>
+  /* One post per <details>, newest first.  The title, date and summary always show, and a click
+     on them opens the full article underneath. */
+  .post { scroll-margin-top: calc(var(--nav-h) + 12px); }
+  .post + .post { margin-top: 28px; border-top: 1px solid var(--rule); padding-top: 24px; }
+  .post > summary { display: block; list-style: none; cursor: pointer; }
+  .post > summary::-webkit-details-marker { display: none; }
+  .post h2 { font-size: 22px; font-weight: normal; color: var(--fg); margin: 0 0 3px; }
+  .post > summary:hover h2 { text-decoration: underline; }
+  .post time { display: block; font-size: calc(var(--fs) * 0.87); color: var(--fg-dim); margin: 0 0 8px; }
+  .post .gist { display: block; }
+  .post > summary::after {
+    content: "Read the full post"; display: block; margin-top: 8px;
+    font-size: calc(var(--fs) * 0.87); color: var(--link);
+  }
+  .post[open] > summary::after { content: "Show less"; }
+  .post .body { margin-top: 18px; }
+  .post .body p { margin-bottom: 16px; }
+  .post .body img, .post .body video { display: block; max-width: 100%; height: auto; }
+
+  /* shown only while the list holds no posts */
+  .posts .none { color: var(--fg-dim); }
+  .posts .none:not(:only-child) { display: none; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">qsDEM</a> <span class="sep">&middot;</span>
+  <a href="getting-started.html">Getting Started</a> <span class="sep">&middot;</span>
+  <a href="blog.html" aria-current="page">Blog</a> <span class="sep">&middot;</span>
+  <a href="about.html">About</a>
+</nav>
+<div class="columns">
+  <div class="sidebar">
+    <h1>Blog</h1>
+  </div>
+
+  <div class="main">
+    <div class="posts">
+<!-- A post. Copy this block to the top of the list, newest first. Its id is its date and a
+     slug, and a link to blog.html#<id> opens it. Give images loading="lazy" and videos
+     preload="none", so a closed post downloads nothing.
+
+      <details class="post" id="2026-09-25-slug">
+        <summary>
+          <h2>Title</h2>
+          <time datetime="2026-09-25">September 25, 2026</time>
+          <span class="gist">One or two sentences on what the post is about.</span>
+        </summary>
+        <div class="body">
+          <p>The full article.</p>
+        </div>
+      </details>
+-->
+      <p class="none">No posts yet.</p>
+    </div>
+  </div>
+</div>
+<script>
+'use strict';
+// A link to blog.html#<post id> opens that post, and opening a post puts its id in the address
+// bar, so an open post can be shared by copying the address.
+(function () {
+  function openFromHash() {
+    var d = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+    if (d && d.tagName === 'DETAILS') { d.open = true; d.scrollIntoView(); }
+  }
+  var posts = document.querySelectorAll('details.post');
+  for (var i = 0; i < posts.length; i++) {
+    posts[i].addEventListener('toggle', function () {
+      if (this.open) history.replaceState(null, '', '#' + this.id);
+      else if (location.hash === '#' + this.id) history.replaceState(null, '', location.pathname);
+    });
+  }
+  openFromHash();
+  window.addEventListener('hashchange', openFromHash);
+})();
+</script>
+</body>
+</html>
