@@ -131,6 +131,12 @@ sections: Setup, the Kishino solver, the biaxial test, and the SPH mantle. The K
 text is the old Wiki's articles, without the momentum paragraphs, and the Kishino section adds
 the solver as code cells. Future applications (subduction) go in as sections of their own.
 
+Above Setup, two paragraphs say what qsDEM is for, followed by the inertial number figure,
+`assets/img/inertial_number_{780,1560,2340}.webp`. They come from the PNG the user supplied
+(`~/Downloads/slide_figure.png`, 3699x1679), flattened onto white, resized with PIL LANCZOS and
+saved as WebP quality 90, method 6. Lossy is right here, unlike the subduction matrix: the figure
+is mostly photographs, and at 90 its axis text matches the lossless copy at a quarter of the size.
+
 The code cells, the downloadable script and the notebook all come from one file,
 `biaxial/biaxial.py`, where each `# %% Title` line starts a cell. Edit that file, then run
 
@@ -145,7 +151,7 @@ The other files in `biaxial/`:
 
 | file | made by |
 |---|---|
-| `apparatus.svg` | `python biaxial/apparatus.py`, Figure 1 of the page, the biaxial apparatus |
+| `apparatus.svg` | `python biaxial/apparatus.py`, Figure 2 of the page, the biaxial apparatus |
 | `results.svg` | `python biaxial/make_results.py`, which runs `biaxial.py` (about a minute) and redraws its last cell |
 | `mu_sweep_1M.mp4` | the 1M-grain friction sweep, see below |
 | `mu_sweep_1M_poster.webp` | its last frame at 1560 px, `cwebp -q 88 -m 6 -sharp_yuv -resize 1560 0` |

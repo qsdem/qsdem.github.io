@@ -1,4 +1,4 @@
-"""apparatus.py -- Figure 1 of the Getting Started page: the qsDEM biaxial apparatus (9.24/biaxial),
+"""apparatus.py -- Figure 2 of the Getting Started page: the qsDEM biaxial apparatus (9.24/biaxial),
 the box, the wall roles, the loads, the dimension lines and the x-y frame, one thin line weight
 throughout.
 
