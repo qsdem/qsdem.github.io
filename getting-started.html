@@ -85,7 +85,7 @@
   figure { margin: 22px 0 26px; }
   figure img, figure video { display: block; max-width: 100%; height: auto; }
   figure.art-apparatus img { width: 518px; }
-  figure.art-results img { width: 780px; }
+  figure.art-results img, figure.art-regimes img { width: 780px; }
   figure.movie video { width: 100%; background: var(--bg); }
   figure.movie video.toggle { cursor: pointer; }
   figcaption { font-size: calc(var(--fs) * 0.87); color: var(--fg-dim); margin-top: 8px; line-height: 1.5; }
@@ -141,6 +141,34 @@
   </div>
 
   <div class="main">
+
+    <p>The qsDEM code has been developed to address geophysical deformation, which is often
+      non-inertial but is solved using inertial DEM by introducing artificial damping to drain
+      the kinetic energy. The underlying discrete element model is based on
+      <a href="https://doi.org/10.1680/geot.1979.29.1.47">Cundall and Strack (1979)</a>, but it
+      is solved using the geometric matrix conversion of
+      <a href="https://www.sciencedirect.com/science/article/pii/B9780444705235500242">Kishino
+      (1988)</a>.</p>
+
+    <p>The code is written in Python and can be run on either a CPU or a GPU. Potential users
+      should note that complex simulations with a large number of grains can be time-consuming
+      and prone to instabilities.</p>
+
+    <figure class="art-regimes">
+      <img src="assets/img/inertial_number_780.webp"
+           srcset="assets/img/inertial_number_780.webp 780w,
+                   assets/img/inertial_number_1560.webp 1560w,
+                   assets/img/inertial_number_2340.webp 2340w"
+           sizes="(max-width: 780px) 100vw, 780px" width="780" height="354"
+           alt="Bars placing nine geophysical processes on an inertial number axis from
+                10^-18 to 10^2. Plate tectonics, fault creep, ice flow and hillslope creep stay
+                below about 10^-7. Sea-ice ridging, iceberg calving, earthquake rupture,
+                landslides and bedload transport extend past 10^-3 into a shaded band at high
+                inertial number. A photograph of each process sits beside the
+                chart, grouped as tectonic, cryosphere and surface.">
+      <figcaption>Figure 1. Geophysical deformation processes placed by their inertial number,
+        grouped as tectonic, cryosphere and surface processes.</figcaption>
+    </figure>
 
     <h2 class="art" id="setup">Setup</h2>
 
@@ -490,7 +518,7 @@ def relax(sp, sigma, mu, muw, tol=1e-3, max_iter=500_000):
 
     <h3 class="sub" id="apparatus">Apparatus</h3>
 
-    <p>The biaxial apparatus follows Figure 1. The bottom platen is fixed, and the top platen
+    <p>The biaxial apparatus follows Figure 2. The bottom platen is fixed, and the top platen
       is driven down by <span class="gk">&delta;</span> every step, which is strain control.
       Both side walls are servo walls, each held at
       <span class="gk">&sigma;</span><sub>3</sub><i>H</i> like the membrane of a triaxial
@@ -506,7 +534,7 @@ def relax(sp, sigma, mu, muw, tol=1e-3, max_iter=500_000):
            alt="A square box of discs. An arrow labeled delta pushes the top platen down.
                 Arrows labeled sigma 3 times H press on both side walls. The bottom platen is
                 hatched as fixed.">
-      <figcaption>Figure 1. The biaxial apparatus. The side walls are released inside every iteration,
+      <figcaption>Figure 2. The biaxial apparatus. The side walls are released inside every iteration,
         by (6), so each one carries <span class="gk">&sigma;</span><sub>3</sub><i>H</i> at
         every converged step.</figcaption>
     </figure>
@@ -616,7 +644,7 @@ plt.show()</code></pre>
                 then drops in steps. Middle, the volumetric strain rises to 3% compaction and
                 falls to 1% dilation. Right, grain rotations concentrate in an X of two
                 crossing bands.">
-      <figcaption>Figure 2. The output of the cell above, redrawn for this page. Stress ratio and
+      <figcaption>Figure 3. The output of the cell above, redrawn for this page. Stress ratio and
         volumetric strain against axial strain, and the grain rotations at 10% axial strain,
         red counterclockwise and blue clockwise.</figcaption>
     </figure>
@@ -643,7 +671,7 @@ plt.show()</code></pre>
                          the frictional specimens as they are shortened.">
         <source src="biaxial/mu_sweep_1M.mp4" type="video/mp4">
       </video>
-      <figcaption>Figure 3. Each grain is colored by the cumulative non-rigid motion around
+      <figcaption>Figure 4. Each grain is colored by the cumulative non-rigid motion around
         it.</figcaption>
     </figure>
 
