@@ -26,6 +26,8 @@
   .post .body p { margin-bottom: 16px; }
   .post .body figure { margin: 22px 0 8px; }
   .post .body img, .post .body video { display: block; width: 100%; height: auto; }
+  .post .body figure.schematic img { width: 518px; max-width: 100%; }   /* line art at its drawn size */
+  .post .body video.movie { background: var(--bg); }
 
   /* A figure linked with class="zoom" opens its full-resolution file over the page, one image
      pixel per screen pixel, so labels too fine for the column stay sharp. */
@@ -110,6 +112,51 @@
         </div>
       </details>
 
+      <details class="post" id="2026-08-31-lees-edwards-shear-test">
+        <summary>
+          <h2>Lees-Edwards shear test</h2>
+          <span class="meta"><time datetime="2026-08-31">August 31, 2026</time> &middot; Written by Brayden Noh</span>
+        </summary>
+        <div class="body">
+          <p>This is a simple shear test of the plate material in the subduction model (no fluid,
+            no walls and no gravity), run with the same
+            <a href="getting-started.html#kishino">Kishino solver</a>. The grains are the same
+            bonded bidisperse discs (radii 0.5 and 0.3 at a packing fraction of 0.86, with every
+            touching pair bonded), and the friction between grains is tan&nbsp;30&deg;. The box
+            is periodic with Lees-Edwards boundaries
+            (<a href="https://doi.org/10.1088/0022-3719/5/15/006">Lees and Edwards, 1972</a>),
+            which let the whole box shear without walls. A grain that leaves through the top
+            comes back in through the bottom, shifted sideways by <i>&gamma;H</i> (where
+            <i>&gamma;</i> is the shear strain and <i>H</i> the box height).</p>
+          <figure class="schematic">
+            <img src="blog/2026-08-31-lees-edwards-shear-test/lees_edwards.svg" width="518" height="499" loading="lazy"
+                 alt="A square periodic cell with a cluster of discs, seen inside the seams of its
+                      copies. The row of copies above is shifted right by gamma H and the row below
+                      is shifted left by gamma H. A grain at the top of the cell appears again at
+                      the bottom, gamma H to the left.">
+          </figure>
+          <p>Each load step shears the box a little (an affine step of
+            <i>&Delta;&gamma;</i> = 5&thinsp;&times;&thinsp;10<sup>&minus;5</sup>), slides the
+            copies above and below by the new offset, and then relaxes every grain back to
+            equilibrium. Below is a sweep of bond strength (tensile and shear strength set equal,
+            with no scatter) at a fixed bond Young's modulus, with one hundred thousand grains in
+            each box, sheared to <i>&gamma;</i> = 1. Each grain is colored by the cumulative
+            non-rigid motion around it. Weak bonds break everywhere into a dense network of shear
+            bands, and stronger bonds fail along fewer and larger cracks that open up (the white
+            areas are empty space).</p>
+          <figure>
+            <video class="movie" muted loop playsinline preload="none" width="3120" height="850"
+                   poster="blog/2026-08-31-lees-edwards-shear-test/shear_sweep_poster.webp"
+                   aria-label="Movie of four Lees-Edwards shear cells side by side, with bond
+                               strength 10^4, 10^5, 10^6 and 10^7. Bands of deformation form as the
+                               cells shear, a dense network at the lowest strength and a few large
+                               open cracks at the highest.">
+              <source src="blog/2026-08-31-lees-edwards-shear-test/shear_sweep.mp4" type="video/mp4">
+            </video>
+          </figure>
+        </div>
+      </details>
+
       <p class="none">No posts yet.</p>
     </div>
   </div>
@@ -174,6 +221,31 @@
     box.focus();
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+
+  // A post's movie plays while it is open and on screen, and a click pauses it. A reader who
+  // has asked for less motion gets the controls instead.
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var movies = document.querySelectorAll('.post video.movie');
+  for (var m = 0; m < movies.length; m++) {
+    (function (v) {
+      var held = false;
+      function play() { v.preload = 'auto'; v.play().catch(function () {}); }
+      if (still) { v.setAttribute('controls', ''); return; }
+      v.style.cursor = 'pointer';
+      v.title = 'Click to pause or play';
+      v.addEventListener('click', function () {
+        if (v.paused) { held = false; play(); } else { held = true; v.pause(); }
+      });
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { if (!held) play(); }
+            else if (!v.paused) { v.pause(); }
+          });
+        }, {threshold: 0.25}).observe(v);
+      }
+    })(movies[m]);
+  }
 })();
 </script>
 </body>

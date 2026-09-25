@@ -96,6 +96,15 @@ about 3 px tall. Its inline copies follow the homepage hero's recipe, PIL LANCZO
 1560 and 2340 wide, saved as lossless WebP (method 6), because lossy WebP smears small colored
 specks. The full-size file is lossless WebP too. Give images `loading="lazy"` and videos
 `preload="none"`. Chrome still fetches the image of a closed post near the top of the page.
+A movie in a post, `<video class="movie">`, plays while its post is open and on screen, and a
+click pauses it.
+
+The posts so far, and where their files come from:
+
+| post | files in `blog/<post id>/` |
+|---|---|
+| Subduction simulation, September 25, 2026 | `matrix_*.webp`, from the PNG the user supplied (`~/Downloads/matrix_ss_subduct.png`) |
+| Lees-Edwards shear test, August 31, 2026 | `lees_edwards.svg` from `lees_edwards.py` next to it, drawn like `biaxial/apparatus.py`. `shear_sweep.mp4` from `../8.31/sheartest/render_row_web.py`, which is `render_row.py`'s September 8 grains cut as one row in the site's type, 3120 px wide, CRF 21 capped at 11 Mb/s to stay under GitHub's 50 MB warning. `shear_sweep_poster.webp` is its last frame at 1560 px |
 
 ## Getting Started page
 
