@@ -132,10 +132,13 @@ text is the old Wiki's articles, without the momentum paragraphs, and the Kishin
 the solver as code cells. Future applications (subduction) go in as sections of their own.
 
 Above Setup, two paragraphs say what qsDEM is for, followed by the inertial number figure,
-`assets/img/inertial_number_{780,1560,2340}.webp`. They come from the PNG the user supplied
-(`~/Downloads/slide_figure.png`, 3699x1679), flattened onto white, resized with PIL LANCZOS and
-saved as WebP quality 90, method 6. Lossy is right here, unlike the subduction matrix: the figure
-is mostly photographs, and at 90 its axis text matches the lossless copy at a quarter of the size.
+`assets/img/inertial_number.svg`. It is `slide_figure.svg` from
+`../noninertial_figure/inertial_number_figure.py`, the light slide version of that figure, without
+the (a) and (b) panel labels, copied byte for byte. The bars, text and axis are vector, with the
+text as outlines, so the figure needs no font and stays sharp at any zoom. The nine photos are
+embedded as JPEG, quality 90 with full-resolution color, at 412 px each (the script's 500 dpi,
+about 2.4 times what a 2x screen draws in the 780 px column), and the gray gradient as PNG. The
+file is about 0.9 MB, almost all of it the photos.
 
 The code cells, the downloadable script and the notebook all come from one file,
 `biaxial/biaxial.py`, where each `# %% Title` line starts a cell. Edit that file, then run
