@@ -4,17 +4,52 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Subduction visualizer &mdash; qsDEM</title>
-<meta name="description" content="243 quasi-static DEM subduction runs: a bonded granular plate pushed into an SPH mantle, with bond stiffness, bond strength and mantle viscosity swept and the lithosphere colored by von Mises strain, from the initial condition to the end of the push.">
-<link rel="stylesheet" href="/assets/css/main.css">
-<link rel="stylesheet" href="/assets/css/theme.css">
-<script src="/assets/js/appearance.js"></script>
+<meta name="description" content="An interactive matrix of 243 qsDEM subduction runs, bonded DEM grains pushed into a viscous SPH mantle, with bond stiffness, bond strength and mantle viscosity varied and each run colored by von Mises strain from the initial condition to the end of the push.">
+<meta name="author" content="Brayden Noh">
+<meta name="keywords" content="subduction, discrete element method, DEM, smoothed particle hydrodynamics, SPH, bonded particles, von Mises strain, Delaunay triangulation, lithosphere, mantle viscosity, qsDEM">
+<link rel="canonical" href="https://qsdem.github.io/blog/subduction-visualizer/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="qsDEM">
+<meta property="og:title" content="Subduction visualizer">
+<meta property="og:description" content="An interactive matrix of 243 qsDEM subduction runs, bonded DEM grains pushed into a viscous SPH mantle, with bond stiffness, bond strength and mantle viscosity varied and each run colored by von Mises strain from the initial condition to the end of the push.">
+<meta property="og:url" content="https://qsdem.github.io/blog/subduction-visualizer/">
+<meta property="og:image" content="https://qsdem.github.io/blog/subduction-visualizer/data/q/mosaic_vm/49.webp">
+<meta property="article:published_time" content="2026-09-30">
+<meta property="article:author" content="Brayden Noh">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "BlogPosting",
+ "headline": "Subduction visualizer",
+ "description": "An interactive matrix of 243 qsDEM subduction runs, bonded DEM grains pushed into a viscous SPH mantle, with bond stiffness, bond strength and mantle viscosity varied and each run colored by von Mises strain from the initial condition to the end of the push.",
+ "datePublished": "2026-09-30",
+ "author": {
+  "@type": "Person",
+  "name": "Brayden Noh",
+  "url": "https://braydennoh.github.io/"
+ },
+ "publisher": {
+  "@type": "Organization",
+  "name": "qsDEM",
+  "url": "https://qsdem.github.io/"
+ },
+ "image": "https://qsdem.github.io/blog/subduction-visualizer/data/q/mosaic_vm/49.webp",
+ "mainEntityOfPage": "https://qsdem.github.io/blog/subduction-visualizer/",
+ "keywords": "subduction, discrete element method, DEM, smoothed particle hydrodynamics, SPH, bonded particles, von Mises strain, Delaunay triangulation, lithosphere, mantle viscosity, qsDEM"
+}
+</script>
+<link rel="stylesheet" href="../../assets/css/main.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<link rel="stylesheet" href="../../assets/css/post.css">
+<script src="../../assets/js/appearance.js"></script>
 <style>
-  /* Page-specific styling.  Layout, fonts and colors come from the site's main.css and theme.css;
-     the controls copy the flat, square look of braydennoh.github.io/scheidegger.html. */
+  /* The interactive matrix.  Layout, fonts and colors come from the site's main.css, theme.css
+     and post.css; the controls copy the flat, square look of braydennoh.github.io/scheidegger.html. */
   :root { --accent: #003399; --caption: #767676; --lab: 40px; }
 
-  /* mantle drag: three flat, square buttons, as on the Scheidegger page */
-  #picker { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0 0 14px; font-size: 85%; }
+  /* mantle drag: three flat, square buttons */
+  #picker { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 6px 0 14px; font-size: 85%; }
   #picker .grp { display: inline-flex; flex-wrap: wrap; }
   #picker .grp button + button { margin-left: -1px; }
   #picker button {
@@ -26,7 +61,7 @@
   #picker button[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); position: relative; z-index: 1; background: #fff; }
   #picker button:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
 
-  /* the matrix: row labels (bond modulus) to the left, column labels (bond strength) on top.
+  /* the matrix: row labels (bond stiffness) to the left, column labels (bond strength) on top.
      It is the chooser: click a run to open it below. */
   #viewer { position: relative; padding: 18px 0 0 var(--lab); user-select: none; -webkit-user-select: none; }
   #stage { position: relative; border: 1px solid var(--rule); overflow: hidden; background: #fff; cursor: pointer; }
@@ -44,7 +79,7 @@
   }
   .status { position: absolute; right: 6px; bottom: 4px; z-index: 2; font-family: monospace; font-size: 11px; color: var(--caption); background: rgba(255,255,255,0.85); padding: 0 4px; pointer-events: none; }
   .status:empty { display: none; }
-  #hint { font-size: 85%; color: var(--caption); margin: 5px 0 0 var(--lab); }
+  .post-body p#hint { font-size: 85%; color: var(--caption); margin: 5px 0 0 var(--lab); }
 
   /* time: the play button beside a light bar with a solid blue square handle, both 10 px tall */
   #timebar { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: center; margin: 12px 0 0 var(--lab); font-size: 85%; }
@@ -65,7 +100,7 @@
 
   /* the selected run, the same width as the matrix and drawn grain by grain */
   #detail { margin: 16px 0 0 var(--lab); }
-  #dtitle { font-size: calc(var(--fs) * 0.93); color: var(--fg); margin: 0 0 6px; }
+  .post-body p#dtitle { font-size: calc(var(--fs) * 0.93); color: var(--fg); margin: 0 0 6px; }
   #dstage { position: relative; border: 1px solid var(--rule); overflow: hidden; background: #fff; }
   #dstage canvas { position: absolute; left: 0; top: 0; display: block; }
 
@@ -75,16 +110,11 @@
   #cbarTicks { position: relative; height: 14px; font-family: monospace; font-size: 11px; color: var(--caption); margin-top: 1px; }
   #cbarTicks span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
   #cbarLabel { font-size: 11px; color: var(--caption); text-align: center; margin-top: 1px; }
-  /* remarks under the selected run */
-  #remarks { margin: 20px 0 0 var(--lab); }
-  #remarks p { margin-bottom: 12px; }
-  noscript p, #nogl { font-size: 85%; color: var(--warn); margin: 6px 0 0 var(--lab); }
+  .post-body p.remarks { margin-top: 22px; }
+  noscript p, .post-body p#nogl { font-size: 85%; color: var(--warn); margin: 6px 0 0 var(--lab); }
   #nogl:empty { display: none; }
 
   @media (max-width: 700px) {
-    /* the site pins its sidebar under the nav even when stacked, which suits a short one; this
-       sidebar is long enough to cover the matrix on a phone, so here it scrolls with the page */
-    .sidebar { position: static; }
     :root { --lab: 30px; }
   }
 </style>
@@ -92,27 +122,30 @@
 <body>
 
 <nav>
-  <a href="/index.html">qsDEM</a> <span class="sep">&middot;</span>
-  <a href="/getting-started.html">Getting Started</a> <span class="sep">&middot;</span>
-  <a href="/blog.html">Blog</a> <span class="sep">&middot;</span>
-  <a href="/about.html">About</a>
+  <a href="../../index.html">qsDEM</a> <span class="sep">&middot;</span>
+  <a href="../../getting-started.html">Getting Started</a> <span class="sep">&middot;</span>
+  <a href="../../blog.html" aria-current="page">Blog</a> <span class="sep">&middot;</span>
+  <a href="../../about.html">About</a>
 </nav>
 <div class="columns">
   <div class="sidebar">
-    <a class="brand" href="/index.html" aria-label="qsDEM home">
+    <a class="brand" href="../../index.html" aria-label="qsDEM home">
       <video class="brand-video" autoplay muted loop playsinline preload="auto"
-             poster="/assets/img/logo_crush_poster.webp" width="2560" height="614" aria-hidden="true">
-        <source src="/assets/img/logo_crush.mp4" type="video/mp4">
+             poster="../../assets/img/logo_crush_poster.webp" width="2560" height="614"
+             aria-hidden="true">
+        <source src="../../assets/img/logo_crush.mp4" type="video/mp4">
       </video>
     </a>
     <h1>Subduction visualizer</h1>
-
-    <p>Here we simulate the subduction of bonded grains and vary their bond stiffness (Young&rsquo;s modulus) and strength (tensile and shear, set equal) across three different viscosity values, equal to 2&nbsp;&times;&nbsp;10<sup>18</sup>, 2&nbsp;&times;&nbsp;10<sup>19</sup> and 2&nbsp;&times;&nbsp;10<sup>20</sup>&nbsp;Pa&nbsp;s, assuming a convergence rate of 10&nbsp;cm/yr and a 15&nbsp;km thick plate. The site is designed so that you first select the mantle drag and then pick the combination of stiffness and strength that you wish to see. The time slider records from the initial condition of a coherent slab with a weak angled cut to the final step of the simulation.</p>
-
-    <p>The grains are colored by their von Mises strain, computed following <a href="https://doi.org/10.1039/D1SM00898F">Jin et al. (2021)</a>. Each Delaunay triangle of the first frame gets its exact deformation gradient <i>F</i>, the Green&ndash;Lagrange strain <i>E</i> = (<i>F</i><sup>T</sup><i>F</i> &minus; <i>I</i>)/2 and &epsilon;<sub>vm</sub> = &radic;(&frac12; tr <i>E</i>&prime;<sup>2</sup>) of its deviatoric part.</p>
+    <p class="meta"><time datetime="2026-09-30">September 30, 2026</time> &middot; Written by Brayden Noh</p>
   </div>
 
   <div class="main">
+    <article class="post-body">
+    <p>Here we simulate the subduction of bonded grains and vary their bond stiffness (Young&rsquo;s modulus) and strength (tensile and shear, set equal) across three different viscosity values, equal to 2&nbsp;&times;&nbsp;10<sup>18</sup>, 2&nbsp;&times;&nbsp;10<sup>19</sup> and 2&nbsp;&times;&nbsp;10<sup>20</sup>&nbsp;Pa&nbsp;s, assuming a convergence rate of 10&nbsp;cm/yr and a 15&nbsp;km thick plate. The site is designed so that you first select the mantle drag and then pick the combination of stiffness and strength that you wish to see. The time slider records from the initial condition of a coherent slab with a weak angled cut to the final step of the simulation.</p>
+
+    <p>The grains are colored by their von Mises strain, computed following <a href="https://doi.org/10.1039/D1SM00898F">Jin et al. (2021)</a>. Each Delaunay triangle of the first frame gets its exact deformation gradient <i>F</i>, the Green&ndash;Lagrange strain <i>E</i> = (<i>F</i><sup>T</sup><i>F</i> &minus; <i>I</i>)/2 and &epsilon;<sub>vm</sub> = &radic;(&frac12; tr <i>E</i>&prime;<sup>2</sup>) of its deviatoric part.</p>
+
     <noscript><p>This page draws the runs with JavaScript.</p></noscript>
 
     <div id="picker"><span>mantle drag</span><span class="grp" role="group" aria-label="Mantle drag"></span></div>
@@ -150,12 +183,12 @@
       <div id="cbarLabel"></div>
     </div>
 
-    <div id="remarks">
-      <p>Some remarks are immediate. In the left column (the weakest bonds), the plate fails near the piston, where it piles up and thickens, so even though the weak cut is already in place, the bonds are not strong enough for the plate to reach the cut, let alone slide across it. Across the stiffness and strength space, the upper triangular region of the matrix subducts coherently and the lower one does not, which means that a stiffer plate needs stronger bonds to stay in one piece. One way to think about why is that subduction requires the plate to bend into a certain geometry (to get under the overriding plate), which means it must take on some strain (call it &epsilon;). Since stress is modulus times strain (&sigma; = <i>E</i>&epsilon;), the same &epsilon; in a stiffer plate means a higher stress on its bonds, so we need a higher strength for the plate not to break. In a way, the diagonal line is where these two compete, with coherent subduction on one side and breaking apart on the other (although the line is shallower than one-to-one, since a stiffer plate also bends over a wider hinge and needs less strain). The mantle also makes it harder to subduct. For the plate to go down, it has to push the mantle out of the way, and a more viscous mantle resists this more, which means the piston has to push harder. So the slab stays flat under the overriding plate.</p>
-    </div>
+    <p class="remarks">Some remarks are immediate. In the left column (the weakest bonds), the plate fails near the piston, where it piles up and thickens, so even though the weak cut is already in place, the bonds are not strong enough for the plate to reach the cut, let alone slide across it. Across the stiffness and strength space, the upper triangular region of the matrix subducts coherently and the lower one does not, which means that a stiffer plate needs stronger bonds to stay in one piece. One way to think about why is that subduction requires the plate to bend into a certain geometry (to get under the overriding plate), which means it must take on some strain (call it &epsilon;). Since stress is modulus times strain (&sigma; = <i>E</i>&epsilon;), the same &epsilon; in a stiffer plate means a higher stress on its bonds, so we need a higher strength for the plate not to break. In a way, the diagonal line is where these two compete, with coherent subduction on one side and breaking apart on the other (although the line is shallower than one-to-one, since a stiffer plate also bends over a wider hinge and needs less strain). The mantle also makes it harder to subduct. For the plate to go down, it has to push the mantle out of the way, and a more viscous mantle resists this more, which means the piston has to push harder. So the slab stays flat under the overriding plate.</p>
+    </article>
   </div>
 </div>
 
-<script src="app.js?v=20260930153009"></script>
+<script src="app.js?v=20260930153749"></script>
+<script src="../../assets/js/post.js"></script>
 </body>
 </html>

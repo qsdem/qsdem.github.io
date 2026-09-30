@@ -85,8 +85,8 @@ files, so a change to one does not propagate to the other.
 ## Blog page
 
 `blog.html` is the list of posts, newest first. Each card shows only the title, the date and
-the author, and links to the post. Each post is its own page, `blog/<date>-<slug>/index.html`,
-so it has its own address (`https://qsdem.github.io/blog/2026-08-31-lees-edwards-shear-test/`)
+the author, and links to the post. Each post is its own page, `blog/<slug>/index.html`, where the
+slug is the title alone, with no date, so it has its own address (`https://qsdem.github.io/blog/lees-edwards-shear-test/`)
 and can be found by search. Its files sit in the same folder. A post page puts its title, date
 and author in the sidebar and the article in the main column. `assets/css/post.css` and
 `assets/js/post.js` are shared by every post.
@@ -100,10 +100,10 @@ sooner.
 
 To add a post:
 
-1. Copy a post folder to `blog/<date>-<slug>/` and edit its `index.html`: the `<title>`,
+1. Copy a post folder to `blog/<slug>/` (the title, no date) and edit its `index.html`: the `<title>`,
    `description`, `keywords`, canonical and `og:` addresses, the JSON-LD, the sidebar title and
    date, and the article.
-2. Add a card at the top of the list in `blog.html`, linking to `blog/<date>-<slug>/index.html`.
+2. Add a card at the top of the list in `blog.html`, linking to `blog/<slug>/index.html`.
    Link the file, not the folder: opened from disk (`file://`), a folder shows a file listing
    instead of its `index.html`, while GitHub Pages serves either.
 3. Add the post's address to `sitemap.xml`.
