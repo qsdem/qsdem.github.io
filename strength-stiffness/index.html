@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subduction visualizer &mdash; qsDEM</title>
+<meta name="description" content="243 quasi-static DEM subduction runs: a bonded granular plate pushed into an SPH mantle, with bond stiffness, bond strength and mantle viscosity swept and the lithosphere colored by von Mises strain, from the initial condition to the end of the push.">
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="/assets/css/theme.css">
+<script src="/assets/js/appearance.js"></script>
+<style>
+  /* Page-specific styling.  Layout, fonts and colors come from the site's main.css and theme.css;
+     the controls copy the flat, square look of braydennoh.github.io/scheidegger.html. */
+  :root { --accent: #003399; --caption: #767676; --lab: 40px; }
+
+  /* mantle drag: three flat, square buttons, as on the Scheidegger page */
+  #picker { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0 0 14px; font-size: 85%; }
+  #picker .grp { display: inline-flex; flex-wrap: wrap; }
+  #picker .grp button + button { margin-left: -1px; }
+  #picker button {
+    border: 1px solid var(--rule); border-radius: 0; background: var(--box-bg); color: var(--fg);
+    padding: 0.2em 0.8em; cursor: pointer; font: inherit; line-height: 1.5;
+  }
+  #picker button:hover { background: #f0f2f5; }
+  #picker button:active { background: #e6e9ee; }
+  #picker button[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); position: relative; z-index: 1; background: #fff; }
+  #picker button:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+
+  /* the matrix: row labels (bond modulus) to the left, column labels (bond strength) on top.
+     It is the chooser: click a run to open it below. */
+  #viewer { position: relative; padding: 18px 0 0 var(--lab); user-select: none; -webkit-user-select: none; }
+  #stage { position: relative; border: 1px solid var(--rule); overflow: hidden; background: #fff; cursor: pointer; }
+  #stage canvas { position: absolute; left: 0; top: 0; display: block; }
+  #stage:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+  #colLabels, #rowLabels { position: absolute; font-family: monospace; font-size: 11px; color: var(--caption); pointer-events: none; overflow: hidden; }
+  #colLabels { left: var(--lab); right: 0; top: 0; height: 18px; }
+  #rowLabels { left: 0; top: 18px; width: calc(var(--lab) - 2px); bottom: 0; }
+  #colLabels span, #rowLabels span { position: absolute; white-space: nowrap; }
+  #colLabels span { transform: translateX(-50%); top: 2px; }
+  #rowLabels span { right: 3px; transform: translateY(-50%); }
+  #tip {
+    position: absolute; pointer-events: none; display: none; z-index: 3; white-space: nowrap;
+    background: #fff; border: 1px solid var(--rule); padding: 5px 8px; font-size: 12px; line-height: 1.45; color: var(--fg);
+  }
+  .status { position: absolute; right: 6px; bottom: 4px; z-index: 2; font-family: monospace; font-size: 11px; color: var(--caption); background: rgba(255,255,255,0.85); padding: 0 4px; pointer-events: none; }
+  .status:empty { display: none; }
+  #hint { font-size: 85%; color: var(--caption); margin: 5px 0 0 var(--lab); }
+
+  /* time: the play button beside a light bar with a solid blue square handle, both 10 px tall */
+  #timebar { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: center; margin: 12px 0 0 var(--lab); font-size: 85%; }
+  #play {
+    border: 1px solid var(--rule); border-radius: 0; background: var(--box-bg); color: var(--fg);
+    padding: 0.2em 0.8em; cursor: pointer; font: inherit; line-height: 1.5; min-width: 4.6em;
+  }
+  #play:hover { background: #f0f2f5; }
+  #play:active { background: #e6e9ee; }
+  #play:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+  #time { -webkit-appearance: none; appearance: none; width: 100%; height: 16px; margin: 0; background: transparent; cursor: pointer; }
+  #time::-webkit-slider-runnable-track { height: 10px; border: 0; border-radius: 0; background: #fafbfc; box-shadow: inset 0 0 0 1px #ddd; }
+  #time::-moz-range-track { height: 10px; border: 0; border-radius: 0; background: #fafbfc; box-shadow: inset 0 0 0 1px #ddd; }
+  #time::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 10px; height: 10px; border: 0; border-radius: 0; background: var(--accent); }
+  #time::-moz-range-thumb { width: 10px; height: 10px; border: 0; border-radius: 0; background: var(--accent); }
+  #time:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+  #tread { grid-column: 2; font-family: monospace; font-size: 11px; color: var(--caption); }
+
+  /* the selected run, the same width as the matrix and drawn grain by grain */
+  #detail { margin: 16px 0 0 var(--lab); }
+  #dtitle { font-size: calc(var(--fs) * 0.93); color: var(--fg); margin: 0 0 6px; }
+  #dstage { position: relative; border: 1px solid var(--rule); overflow: hidden; background: #fff; }
+  #dstage canvas { position: absolute; left: 0; top: 0; display: block; }
+
+  /* color bar, ticks at their true log positions */
+  #cbarWrap { margin: 12px 0 0 var(--lab); max-width: 420px; }
+  #cbar { display: block; width: 100%; height: 10px; border: 1px solid #ddd; }
+  #cbarTicks { position: relative; height: 14px; font-family: monospace; font-size: 11px; color: var(--caption); margin-top: 1px; }
+  #cbarTicks span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+  #cbarLabel { font-size: 11px; color: var(--caption); text-align: center; margin-top: 1px; }
+  /* remarks under the selected run */
+  #remarks { margin: 20px 0 0 var(--lab); }
+  #remarks p { margin-bottom: 12px; }
+  noscript p, #nogl { font-size: 85%; color: var(--warn); margin: 6px 0 0 var(--lab); }
+  #nogl:empty { display: none; }
+
+  @media (max-width: 700px) {
+    /* the site pins its sidebar under the nav even when stacked, which suits a short one; this
+       sidebar is long enough to cover the matrix on a phone, so here it scrolls with the page */
+    .sidebar { position: static; }
+    :root { --lab: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/index.html">qsDEM</a> <span class="sep">&middot;</span>
+  <a href="/getting-started.html">Getting Started</a> <span class="sep">&middot;</span>
+  <a href="/blog.html">Blog</a> <span class="sep">&middot;</span>
+  <a href="/about.html">About</a>
+</nav>
+<div class="columns">
+  <div class="sidebar">
+    <a class="brand" href="/index.html" aria-label="qsDEM home">
+      <video class="brand-video" autoplay muted loop playsinline preload="auto"
+             poster="/assets/img/logo_crush_poster.webp" width="2560" height="614" aria-hidden="true">
+        <source src="/assets/img/logo_crush.mp4" type="video/mp4">
+      </video>
+    </a>
+    <h1>Subduction visualizer</h1>
+
+    <p>Here we simulate the subduction of bonded grains and vary their bond stiffness (Young&rsquo;s modulus) and strength (tensile and shear, set equal) across three different viscosity values, equal to 2&nbsp;&times;&nbsp;10<sup>18</sup>, 2&nbsp;&times;&nbsp;10<sup>19</sup> and 2&nbsp;&times;&nbsp;10<sup>20</sup>&nbsp;Pa&nbsp;s, assuming a convergence rate of 10&nbsp;cm/yr and a 15&nbsp;km thick plate. The site is designed so that you first select the mantle drag and then pick the combination of stiffness and strength that you wish to see. The time slider records from the initial condition of a coherent slab with a weak angled cut to the final step of the simulation.</p>
+
+    <p>The grains are colored by their von Mises strain, computed following <a href="https://doi.org/10.1039/D1SM00898F">Jin et al. (2021)</a>. Each Delaunay triangle of the first frame gets its exact deformation gradient <i>F</i>, the Green&ndash;Lagrange strain <i>E</i> = (<i>F</i><sup>T</sup><i>F</i> &minus; <i>I</i>)/2 and &epsilon;<sub>vm</sub> = &radic;(&frac12; tr <i>E</i>&prime;<sup>2</sup>) of its deviatoric part.</p>
+  </div>
+
+  <div class="main">
+    <noscript><p>This page draws the runs with JavaScript.</p></noscript>
+
+    <div id="picker"><span>mantle drag</span><span class="grp" role="group" aria-label="Mantle drag"></span></div>
+
+    <div id="viewer">
+      <div id="colLabels" aria-hidden="true"></div>
+      <div id="rowLabels" aria-hidden="true"></div>
+      <div id="stage" tabindex="0" role="grid" aria-label="Matrix of runs. Click a run, or use the arrow keys, to open it below.">
+        <canvas id="mos"></canvas>
+        <div id="tip"></div>
+        <div id="status" class="status"></div>
+      </div>
+    </div>
+    <p id="hint">Columns: log<sub>10</sub> bond strength &sigma;<sub>c</sub>. Rows: log<sub>10</sub> bond stiffness <i>E</i>. Click a run to open it below; the arrow keys move the selection.</p>
+
+    <div id="timebar">
+      <button type="button" id="play" aria-label="Play the time evolution">Play</button>
+      <input id="time" type="range" min="0" max="49" step="0.01" value="49" aria-label="time">
+      <span id="tread"></span>
+    </div>
+
+    <div id="detail">
+      <p id="dtitle" aria-live="polite"></p>
+      <div id="dstage" aria-label="The selected run">
+        <canvas id="dmos"></canvas>
+        <canvas id="dgl"></canvas>
+        <div id="dstatus" class="status"></div>
+      </div>
+    </div>
+    <p id="nogl"></p>
+
+    <div id="cbarWrap">
+      <canvas id="cbar" height="1"></canvas>
+      <div id="cbarTicks"></div>
+      <div id="cbarLabel"></div>
+    </div>
+
+    <div id="remarks">
+      <p>Some remarks are immediate. In the left column (the weakest bonds), the plate fails near the piston, where it piles up and thickens, so even though the weak cut is already in place, the bonds are not strong enough for the plate to reach the cut, let alone slide across it. Across the stiffness and strength space, the upper triangular region of the matrix subducts coherently and the lower one does not, which means that a stiffer plate needs stronger bonds to stay in one piece. One way to think about why is that subduction requires the plate to bend into a certain geometry (to get under the overriding plate), which means it must take on some strain (call it &epsilon;). Since stress is modulus times strain (&sigma; = <i>E</i>&epsilon;), the same &epsilon; in a stiffer plate means a higher stress on its bonds, so we need a higher strength for the plate not to break. In a way, the diagonal line is where these two compete, with coherent subduction on one side and breaking apart on the other (although the line is shallower than one-to-one, since a stiffer plate also bends over a wider hinge and needs less strain). The mantle also makes it harder to subduct. For the plate to go down, it has to push the mantle out of the way, and a more viscous mantle resists this more, which means the piston has to push harder. So the slab stays flat under the overriding plate.</p>
+    </div>
+  </div>
+</div>
+
+<script src="app.js?v=20260930153009"></script>
+</body>
+</html>
