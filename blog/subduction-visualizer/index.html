@@ -61,15 +61,16 @@
   #picker button[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); position: relative; z-index: 1; background: #fff; }
   #picker button:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
 
-  /* the matrix: row labels (bond stiffness) to the left, column labels (bond strength) on top.
+  /* the matrix: its left edge lines up with the text, so the row labels (bond stiffness) hang out
+     into the gap to its left (--lab wide); the column labels (bond strength) sit on top.
      It is the chooser: click a run to open it below. */
-  #viewer { position: relative; padding: 18px 0 0 var(--lab); user-select: none; -webkit-user-select: none; }
+  #viewer { position: relative; padding: 18px 0 0; user-select: none; -webkit-user-select: none; }
   #stage { position: relative; border: 1px solid var(--rule); overflow: hidden; background: #fff; cursor: pointer; }
   #stage canvas { position: absolute; left: 0; top: 0; display: block; }
   #stage:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
   #colLabels, #rowLabels { position: absolute; font-family: monospace; font-size: 11px; color: var(--caption); pointer-events: none; overflow: hidden; }
-  #colLabels { left: var(--lab); right: 0; top: 0; height: 18px; }
-  #rowLabels { left: 0; top: 18px; width: calc(var(--lab) - 2px); bottom: 0; }
+  #colLabels { left: 0; right: 0; top: 0; height: 18px; }
+  #rowLabels { left: calc(-1 * var(--lab)); top: 18px; width: calc(var(--lab) - 2px); bottom: 0; }
   #colLabels span, #rowLabels span { position: absolute; white-space: nowrap; }
   #colLabels span { transform: translateX(-50%); top: 2px; }
   #rowLabels span { right: 3px; transform: translateY(-50%); }
@@ -79,10 +80,10 @@
   }
   .status { position: absolute; right: 6px; bottom: 4px; z-index: 2; font-family: monospace; font-size: 11px; color: var(--caption); background: rgba(255,255,255,0.85); padding: 0 4px; pointer-events: none; }
   .status:empty { display: none; }
-  .post-body p#hint { font-size: 85%; color: var(--caption); margin: 5px 0 0 var(--lab); }
+  .post-body p#hint { font-size: 85%; color: var(--caption); margin: 5px 0 0; }
 
   /* time: the play button beside a light bar with a solid blue square handle, both 10 px tall */
-  #timebar { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: center; margin: 12px 0 0 var(--lab); font-size: 85%; }
+  #timebar { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: center; margin: 12px 0 0; font-size: 85%; }
   #play {
     border: 1px solid var(--rule); border-radius: 0; background: var(--box-bg); color: var(--fg);
     padding: 0.2em 0.8em; cursor: pointer; font: inherit; line-height: 1.5; min-width: 4.6em;
@@ -98,24 +99,29 @@
   #time:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
   #tread { grid-column: 2; font-family: monospace; font-size: 11px; color: var(--caption); }
 
-  /* the selected run, the same width as the matrix and drawn grain by grain */
-  #detail { margin: 16px 0 0 var(--lab); }
+  /* the selected run, the same width as the matrix (and the text) and drawn grain by grain */
+  #detail { margin: 16px 0 0; }
   .post-body p#dtitle { font-size: calc(var(--fs) * 0.93); color: var(--fg); margin: 0 0 6px; }
   #dstage { position: relative; border: 1px solid var(--rule); overflow: hidden; background: #fff; }
   #dstage canvas { position: absolute; left: 0; top: 0; display: block; }
 
   /* color bar, ticks at their true log positions */
-  #cbarWrap { margin: 12px 0 0 var(--lab); max-width: 420px; }
+  #cbarWrap { margin: 12px 0 0; max-width: 420px; }
   #cbar { display: block; width: 100%; height: 10px; border: 1px solid #ddd; }
   #cbarTicks { position: relative; height: 14px; font-family: monospace; font-size: 11px; color: var(--caption); margin-top: 1px; }
   #cbarTicks span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
   #cbarLabel { font-size: 11px; color: var(--caption); text-align: center; margin-top: 1px; }
   .post-body p.remarks { margin-top: 22px; }
-  noscript p, .post-body p#nogl { font-size: 85%; color: var(--warn); margin: 6px 0 0 var(--lab); }
+  noscript p, .post-body p#nogl { font-size: 85%; color: var(--warn); margin: 6px 0 0; }
   #nogl:empty { display: none; }
 
   @media (max-width: 700px) {
-    :root { --lab: 30px; }
+    /* the site pins its sidebar under the nav even when stacked, which suits a short one; this
+       sidebar is long enough to cover the matrix on a phone, so here it scrolls with the page */
+    .sidebar { position: static; }
+    :root { --lab: 30px; }       /* the body's side padding on a phone */
+    #colLabels, #rowLabels { font-size: 10px; }
+    #rowLabels span { right: 2px; }
   }
 </style>
 </head>
@@ -138,14 +144,14 @@
     </a>
     <h1>Subduction visualizer</h1>
     <p class="meta"><time datetime="2026-09-30">September 30, 2026</time> &middot; Written by Brayden Noh</p>
+
+    <p>Here we simulate the subduction of bonded grains and vary their bond stiffness (Young&rsquo;s modulus) and strength (tensile and shear, set equal) across three different viscosity values, equal to 2&nbsp;&times;&nbsp;10<sup>18</sup>, 2&nbsp;&times;&nbsp;10<sup>19</sup> and 2&nbsp;&times;&nbsp;10<sup>20</sup>&nbsp;Pa&nbsp;s, assuming a convergence rate of 10&nbsp;cm/yr and a 15&nbsp;km thick plate. The site is designed so that you first select the mantle drag and then pick the combination of stiffness and strength that you wish to see. The time slider records from the initial condition of a coherent slab with a weak angled cut to the final step of the simulation.</p>
+
+    <p>The grains are colored by their von Mises strain, computed following <a href="https://doi.org/10.1039/D1SM00898F">Jin et al. (2021)</a>. Each Delaunay triangle of the first frame gets its exact deformation gradient <i>F</i>, the Green&ndash;Lagrange strain <i>E</i> = (<i>F</i><sup>T</sup><i>F</i> &minus; <i>I</i>)/2 and &epsilon;<sub>vm</sub> = &radic;(&frac12; tr <i>E</i>&prime;<sup>2</sup>) of its deviatoric part.</p>
   </div>
 
   <div class="main">
     <article class="post-body">
-    <p>Here we simulate the subduction of bonded grains and vary their bond stiffness (Young&rsquo;s modulus) and strength (tensile and shear, set equal) across three different viscosity values, equal to 2&nbsp;&times;&nbsp;10<sup>18</sup>, 2&nbsp;&times;&nbsp;10<sup>19</sup> and 2&nbsp;&times;&nbsp;10<sup>20</sup>&nbsp;Pa&nbsp;s, assuming a convergence rate of 10&nbsp;cm/yr and a 15&nbsp;km thick plate. The site is designed so that you first select the mantle drag and then pick the combination of stiffness and strength that you wish to see. The time slider records from the initial condition of a coherent slab with a weak angled cut to the final step of the simulation.</p>
-
-    <p>The grains are colored by their von Mises strain, computed following <a href="https://doi.org/10.1039/D1SM00898F">Jin et al. (2021)</a>. Each Delaunay triangle of the first frame gets its exact deformation gradient <i>F</i>, the Green&ndash;Lagrange strain <i>E</i> = (<i>F</i><sup>T</sup><i>F</i> &minus; <i>I</i>)/2 and &epsilon;<sub>vm</sub> = &radic;(&frac12; tr <i>E</i>&prime;<sup>2</sup>) of its deviatoric part.</p>
-
     <noscript><p>This page draws the runs with JavaScript.</p></noscript>
 
     <div id="picker"><span>mantle drag</span><span class="grp" role="group" aria-label="Mantle drag"></span></div>
@@ -188,7 +194,7 @@
   </div>
 </div>
 
-<script src="app.js?v=20260930153749"></script>
+<script src="app.js?v=20260930155944"></script>
 <script src="../../assets/js/post.js"></script>
 </body>
 </html>

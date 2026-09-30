@@ -341,12 +341,14 @@
     const viewer = $('viewer');
     const W = Math.max(200, Math.floor(viewer.clientWidth - parseFloat(getComputedStyle(viewer).paddingLeft) - 2));
     st.m.W = W; st.m.H = Math.round(W * MH / MW); st.m.s = W / MW;
-    stage.style.width = W + 'px'; stage.style.height = st.m.H + 'px';
+    // the boxes are border-box (the site's rule), so each is its content plus the 1 px border: the matrix
+    // and the run then span the text column exactly, and the canvases inside are not clipped
+    stage.style.width = (W + 2) + 'px'; stage.style.height = (st.m.H + 2) + 'px';
     mos.width = Math.round(W * st.dpr); mos.height = Math.round(st.m.H * st.dpr);
     mos.style.width = W + 'px'; mos.style.height = st.m.H + 'px';
     // the detail: same width as the matrix, the tile's 3:2 aspect
     st.d.W = W; st.d.H = Math.round(W * TH / TW); st.d.s = W / TW;
-    dstage.style.width = W + 'px'; dstage.style.height = st.d.H + 'px';
+    dstage.style.width = (W + 2) + 'px'; dstage.style.height = (st.d.H + 2) + 'px';
     for (const c of [dmos, glc]) { c.width = Math.round(W * st.dpr); c.height = Math.round(st.d.H * st.dpr); c.style.width = W + 'px'; c.style.height = st.d.H + 'px'; }
     drawColorbar(); labels(); dirty();
   }
