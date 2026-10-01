@@ -61,9 +61,11 @@
   #picker button[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); position: relative; z-index: 1; background: #fff; }
   #picker button:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
 
-  /* the matrix: its left edge lines up with the text, so the row labels (bond stiffness) hang out
-     into the gap to its left (--lab wide); the column labels (bond strength) sit on top.
-     It is the chooser: click a run to open it below. */
+  /* the post column is indented by --lab: the row labels (bond stiffness) sit in that strip, inside
+     the column and clear of the sidebar, and everything else (drag buttons, matrix, time bar, run,
+     text) starts at the matrix's left edge.  The column labels (bond strength) sit on top.
+     The matrix is the chooser: click a run to open it below. */
+  .post-body { padding-left: var(--lab); }
   #viewer { position: relative; padding: 18px 0 0; user-select: none; -webkit-user-select: none; }
   #stage { position: relative; border: 1px solid var(--rule); overflow: hidden; background: #fff; cursor: pointer; }
   #stage canvas { position: absolute; left: 0; top: 0; display: block; }
