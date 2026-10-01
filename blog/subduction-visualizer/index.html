@@ -13,7 +13,7 @@
 <meta property="og:title" content="Subduction visualizer">
 <meta property="og:description" content="An interactive matrix of 243 qsDEM subduction runs, bonded DEM grains pushed into a viscous SPH mantle, with bond stiffness, bond strength and mantle viscosity varied and each run colored by von Mises strain from the initial condition to the end of the push.">
 <meta property="og:url" content="https://qsdem.github.io/blog/subduction-visualizer/">
-<meta property="og:image" content="https://qsdem.github.io/blog/subduction-visualizer/data/q/mosaic_vm/49.webp">
+<meta property="og:image" content="https://qsdem.github.io/blog/subduction-visualizer/data/m4/mosaic_vm/49.webp">
 <meta property="article:published_time" content="2026-09-30">
 <meta property="article:author" content="Brayden Noh">
 <meta name="twitter:card" content="summary_large_image">
@@ -34,7 +34,7 @@
   "name": "qsDEM",
   "url": "https://qsdem.github.io/"
  },
- "image": "https://qsdem.github.io/blog/subduction-visualizer/data/q/mosaic_vm/49.webp",
+ "image": "https://qsdem.github.io/blog/subduction-visualizer/data/m4/mosaic_vm/49.webp",
  "mainEntityOfPage": "https://qsdem.github.io/blog/subduction-visualizer/",
  "keywords": "subduction, discrete element method, DEM, smoothed particle hydrodynamics, SPH, bonded particles, von Mises strain, Delaunay triangulation, lithosphere, mantle viscosity, qsDEM"
 }
@@ -189,12 +189,12 @@
       <div id="cbarLabel"></div>
     </div>
 
-    <p class="remarks">Some remarks are immediate. In the left column (the weakest bonds), the plate fails near the piston, where it piles up and thickens, so even though the weak cut is already in place, the bonds are not strong enough for the plate to reach the cut, let alone slide across it. Across the stiffness and strength space, the upper triangular region of the matrix subducts coherently and the lower one does not, which means that a stiffer plate needs stronger bonds to stay in one piece. One way to think about why is that subduction requires the plate to bend into a certain geometry (to get under the overriding plate), which means it must take on some strain (call it &epsilon;). Since stress is modulus times strain (&sigma; = <i>E</i>&epsilon;), the same &epsilon; in a stiffer plate means a higher stress on its bonds, so we need a higher strength for the plate not to break. In a way, the diagonal line is where these two compete, with coherent subduction on one side and breaking apart on the other (although the line is shallower than one-to-one, since a stiffer plate also bends over a wider hinge and needs less strain). The mantle also makes it harder to subduct. For the plate to go down, it has to push the mantle out of the way, and a more viscous mantle resists this more, which means the piston has to push harder. So the slab stays flat under the overriding plate.</p>
+    <p class="remarks">Some remarks are immediate. In the left column (the weakest bonds), the plate fails near the piston, where it piles up and thickens, so even though the weak cut is already in place, the bonds are not strong enough for the plate to reach the cut. Across the stiffness and strength space, the upper triangular region of the matrix subducts coherently and the lower one does not, which means that a stiffer plate needs stronger bonds to stay in one piece. One way to think about why is that subduction requires the plate to bend into a certain geometry (to get under the overriding plate), which means it must take on some strain (call it &epsilon;). Since stress is modulus times strain (&sigma; = <i>E</i>&epsilon;), the same &epsilon; in a stiffer plate means a higher stress on its bonds, so we need a higher strength for the plate not to break. The diagonal line is where these two compete, with coherent subduction on one side and breaking apart on the other. The mantle also makes it harder to subduct. For the plate to go down, it has to push the mantle out of the way, and a more viscous mantle resists this more, which means the piston has to push harder. So the slab stays flat under the overriding plate.</p>
     </article>
   </div>
 </div>
 
-<script src="app.js?v=20260930155944"></script>
+<script src="app.js?v=20261001081116"></script>
 <script src="../../assets/js/post.js"></script>
 </body>
 </html>

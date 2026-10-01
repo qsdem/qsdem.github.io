@@ -30,7 +30,7 @@
   const ACCENT = '#003399';
   const LUT = new Uint8Array((man.lut || man.imola).match(/../g).map(h => parseInt(h, 16)));    // 256 x RGB, the color map (imola)
   // viscosity of each drag at 10 cm/yr, for a 15 km thick plate: eta = mu* x stress unit x step time
-  const ETA_LABEL = { q: '2 × 10¹⁸ Pa s', m5: '2 × 10¹⁹ Pa s', m6: '2 × 10²⁰ Pa s' };
+  const ETA_LABEL = { m4: '2 × 10¹⁸ Pa s', m5: '2 × 10¹⁹ Pa s', m6: '2 × 10²⁰ Pa s' };
 
   // ------------------------------------------------------------------ state
   // every load starts at the lowest mantle drag (the first in the manifest order), the final step and
